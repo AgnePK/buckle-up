@@ -121,7 +121,9 @@ export default function Itinerary() {
             {trip.map((item, index) => (
                 <Card key={item.id} className='w-full max-w-sm'>
                     <Link
-                        href={`/itinerary/${item.id}`}>
+                        href={`/itinerary/${item.id}`}
+                        
+                        >
                         <CardHeader>
                             <CardTitle>{item.title || 'Untitled Trip'}</CardTitle>
                         </CardHeader>

@@ -13,7 +13,7 @@ export default function SignIn() {
         email: "",
         password: ""
     })
-    const [error, setError] = useState(null)
+    const [error, setError] = useState("")
 
     const { signIn } = useSession();
 
@@ -24,24 +24,37 @@ export default function SignIn() {
             [name]: value
         }));
     }
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
 
-    const handleLogin = async () => {
+        // Basic validation
+        if (!user.email || !user.password) {
+            setError("All fields are required");
+            return;
+        }
+
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(user.email)) {
+            setError("Please enter a valid email");
+            return;
+        }
+
+        // Password length validation
+        if (user.password.length < 6) {
+            setError("Password must be at least 6 characters");
+            return;
+        }
+
         try {
-            return await signIn(user.email, user.password)
-        } catch (error) {
-            console.log("[handleLogin] ==>", error);
+            await signIn(user.email, user.password);
+            router.push("/itinerary");
+        } catch (err: any) {
+            setError(err.message || err.code || "An error occurred during signup");
         }
     };
 
     const router = useRouter()
-    const handleSubmit = async () => {
-        const response = await handleLogin();
-        if (response) {
-            router.push("/itinerary");
-        }
-        console.log(" Logged in! ", user)
-    };
-
     return (
         <div className='grid gap-8 place-content-center min-h-screen'>
             <h1 className="text-6xl text-emerald-800 font-extrabold">Buckle Up</h1>
@@ -57,6 +70,7 @@ export default function SignIn() {
                     onChange={handleChange}
                     className='bg-slate-100'
                     name="email"
+                    type="email"
                 />
                 {/* {/* <Label nativeID='pw'>Password</Label> */}
                 <Input
@@ -67,7 +81,7 @@ export default function SignIn() {
                     name="password"
                     type='password'
                 />
-                {error}
+                {error && <p className="text-red-500 text-sm">{error}</p>}
                 <p className='text-sm text-slate-500'>Forgot password?</p>
 
             </div>
