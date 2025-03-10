@@ -4,7 +4,7 @@
  */
 "use client";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { User, onAuthStateChanged } from "firebase/auth";
+import { User, browserLocalPersistence, onAuthStateChanged, setPersistence } from "firebase/auth";
 import {
     getCurrentUser,
     login,
@@ -12,7 +12,7 @@ import {
     register,
 } from "@/firebaseServices";
 import { firebase_auth } from "@/firebaseConfig";
-import { useRouter  } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 // ============================================================================
 // Types & Interfaces
@@ -80,7 +80,7 @@ export function useSession(): AuthContextType {
     const value = useContext(AuthContext);
 
     if (process.env.NODE_ENV !== "production") {
-        if (!value) {
+        if (!Object.keys(value).length) {
             throw new Error("useSession must be wrapped in a <SessionProvider />");
         }
     }
@@ -99,7 +99,7 @@ export function useSession(): AuthContextType {
  * @returns {JSX.Element} Provider component
  */
 export function SessionProvider(props: { children: React.ReactNode }) {
-    const router = useRouter()
+    const router = useRouter();
 
     // ============================================================================
     // State & Hooks
@@ -117,6 +117,18 @@ export function SessionProvider(props: { children: React.ReactNode }) {
      */
     const [isLoading, setIsLoading] = useState(true);
 
+    useEffect(() => {
+        const setupPersistence = async () => {
+            try {
+                await setPersistence(firebase_auth, browserLocalPersistence);
+                console.log("Firebase persistence set to LOCAL");
+            } catch (error) {
+                console.error("Error setting persistence:", error);
+            }
+        };
+        setupPersistence();
+    }, []);
+
     // ============================================================================
     // Effects
     // ============================================================================
@@ -126,18 +138,23 @@ export function SessionProvider(props: { children: React.ReactNode }) {
      * Automatically updates user state on auth changes
      */
     useEffect(() => {
-        onAuthStateChanged(firebase_auth, (user) => {
-            if (user) {
-                console.log("USER IS STILL LOGGED IN: ", user);
-                setUser(user);
-                router.push("/page")
-                setIsLoading(false);
-            }
+        console.log("Setting up auth state listener");
+        
+        // Auth state change listener
+        const unsubscribe = onAuthStateChanged(firebase_auth, (authUser) => {
+            console.log("Auth state changed:", authUser ? `User logged in: ${authUser.email}` : "No user");
+            
+            // Update state with the authenticated user
+            setUser(authUser);
+            setIsLoading(false);
         });
-
-        // Cleanup subscription on unmount
-    }, [user]);
-
+        
+        return () => {
+            console.log("Cleaning up auth state listener");
+            unsubscribe();
+        };
+    }, []);
+    
     // ============================================================================
     // Handlers
     // ============================================================================
@@ -150,11 +167,14 @@ export function SessionProvider(props: { children: React.ReactNode }) {
      */
     const handleSignIn = async (email: string, password: string) => {
         try {
+            setIsLoading(true);
             const response = await login(email, password);
             return response?.user;
         } catch (error) {
             console.error("[handleSignIn error] ==>", error);
-            return undefined;
+            throw error;
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -171,11 +191,14 @@ export function SessionProvider(props: { children: React.ReactNode }) {
         full_name: string,
     ) => {
         try {
+            setIsLoading(true);
             const response = await register(email, password, full_name);
             return response?.user;
         } catch (error) {
             console.error("[handleSignUp error] ==>", error);
-            return undefined;
+            throw error;
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -185,10 +208,13 @@ export function SessionProvider(props: { children: React.ReactNode }) {
      */
     const handleSignOut = async () => {
         try {
+            setIsLoading(true);
             await logout();
-            setUser(null);
+            router.push("/signIn");
         } catch (error) {
             console.error("[handleSignOut error] ==>", error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
