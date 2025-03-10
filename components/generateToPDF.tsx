@@ -1,3 +1,4 @@
+"use client"
 import { TripType } from '@/types/types'
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -117,37 +118,29 @@ export const generateItineraryHTML = (trip: TripType) => {
 }
 
 // GENERATE TO PDF
-export default async function generatePDF (trip: TripType) {
+export default async function generatePDF() {
 
-    if (!trip) return;
+    if (typeof window === "undefined") return; // Prevent execution in SSR
 
-    const htmlContent = generateItineraryHTML(trip);
-
-    // Create a temporary div to render the HTML
-    const element = document.createElement('div');
-    element.innerHTML = htmlContent;
-    document.body.appendChild(element);
+    const element = document.getElementById("itinerary-container"); // Replace with actual ID
     
+    if (!element) {
+        console.error("Element not found");
+        return;
+    }
+
     try {
-        const canvas = await html2canvas(element, {
-            scale: 2, // Higher scale for better quality
-            useCORS: true,
-            logging: false
-        });
-        
-        // Remove the temporary element
-        document.body.removeChild(element);
-        
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const imgData = canvas.toDataURL('image/png');
-        
-        // Calculate dimensions to fit the content
-        const width = 210; // A4 width in mm
-        const height = (canvas.height * width) / canvas.width;
-        
-        pdf.addImage(imgData, 'PNG', 0, 0, width, height);
-        pdf.save(`${trip.title || 'Trip-Itinerary'}.pdf`);
+        const canvas = await html2canvas(element);
+        const imgData = canvas.toDataURL("image/png");
+
+        const pdf = new jsPDF("p", "mm", "a4");
+        pdf.addImage(imgData, "PNG", 10, 10, 190, 0); // Adjust size as needed
+        pdf.save("itinerary.pdf");
+
     } catch (error) {
         console.error("Error generating PDF:", error);
+        // Add a user-visible error message
+        alert("Failed to generate PDF. Please try again.");
+        return false;
     }
 };
