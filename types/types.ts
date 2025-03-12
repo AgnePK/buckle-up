@@ -87,3 +87,32 @@ export interface Events {
 		name: string;
 	};
 }
+
+export interface DragItem {
+	day: number;
+	period: keyof DayType;
+	index: number;
+}
+
+// Define ItemTypes for drag and drop
+export const ItemTypes = {
+	STOP: 'stop'
+};
+
+// Props for the DraggableStop component
+export interface DraggableStopProps {
+	key: number;
+	day: number;
+	period: keyof DayType;
+	index: number;
+	stop: StopType;
+	updateStop: (day: number, period: keyof DayType, index: number, field: keyof StopType, value: string) => void;
+	removeStop: (day: number, timeOfDay: "morning" | "afternoon" | "evening", index: number) => void;
+	toggleNotes: (day: number, period: keyof DayType, index: number) => void;
+	showNotes: Record<string, boolean>;
+	setSelectedDay: React.Dispatch<React.SetStateAction<number | null>>;
+	setSelectedSlot: React.Dispatch<React.SetStateAction<"morning" | "afternoon" | "evening" | null>>;
+	setSelectedEntryIndex: React.Dispatch<React.SetStateAction<number | null>>;
+	setShowTimePicker: React.Dispatch<React.SetStateAction<boolean>>;
+	moveStop: (day: number, period: keyof DayType, fromIndex: number, toIndex: number) => void;
+}

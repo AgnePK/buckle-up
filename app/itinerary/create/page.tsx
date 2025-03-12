@@ -2,7 +2,7 @@
 import React from 'react'
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from 'next/navigation';
-import { DayType, StopType, TripType } from '@/types/types';
+import { DayType, DraggableStopProps, DragItem, ItemTypes, StopType, TripType } from '@/types/types';
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import DatePicker from "react-datepicker";
@@ -18,13 +18,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Calendar as CalendarIcon } from 'lucide-react';
 
-// DND Item Type
-const ItemTypes = {
-  STOP: 'stop'
-};
-
 // Draggable Stop component
-const DraggableStop = ({ 
+const DraggableStop : React.FC<DraggableStopProps> = ({ 
   day, 
   period, 
   index, 
@@ -41,7 +36,7 @@ const DraggableStop = ({
 }) => {
   const ref = useRef(null);
   
-  const [{ isDragging }, drag] = useDrag({
+  const [{ isDragging }, drag] = useDrag<DragItem, unknown, { isDragging: boolean }>({
     type: ItemTypes.STOP,
     item: { day, period, index },
     collect: (monitor) => ({
@@ -49,7 +44,7 @@ const DraggableStop = ({
     }),
   });
   
-  const [, drop] = useDrop({
+  const [, drop] = useDrop<DragItem>({
     accept: ItemTypes.STOP,
     hover(item, monitor) {
       if (!ref.current) {
