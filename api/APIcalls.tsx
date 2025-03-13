@@ -44,13 +44,11 @@ export async function FailteIrelandBnB(page: number, pageSize: number)
     try {
         // Check if data already exists in Firebase
         if (dataFromDB.exists()) {
-            if (lastUpdated > oneWeekAgo) {
-                // If data is less than a week old, return it
-                // console.log(existingData.items, "Using bnb cached data from Firebase");
-                return displayBnBs(existingData.items, page, pageSize);
-            }
-
+            // If data is less than a week old, return it
+            // console.log(existingData.items, "Using bnb cached data from Firebase");
+            return displayBnBs(existingData.items, page, pageSize);
         }
+        
         // Fetch data from api and store
         const response = await axios.get(`${FAILTE_IRE_URL}/accommodation/csv`, {
             timeout: 10000, // Set a 10s timeout (prevents infinite waiting)
@@ -139,11 +137,10 @@ export async function FailteIrelandAttractions(page: number, pageSize: number)
     try {
         // Check if data already exists in Firebase
         if (dataFromDB.exists()) {
-            if (lastUpdated > oneWeekAgo) {
-                // If data is less than a week old, return it
-                // console.log(existingData.items, "Using attractions stored data from Firebase");
-                return displayAttractions(existingData.items, page, pageSize);
-            }
+            // If data is less than a week old, return it
+            // console.log(existingData.items, "Using attractions stored data from Firebase");
+            return displayAttractions(existingData.items, page, pageSize);
+
         }
 
         const response = await axios.get(`${FAILTE_IRE_URL}/attractions/csv`, {
@@ -164,8 +161,8 @@ export async function FailteIrelandAttractions(page: number, pageSize: number)
             Tags: Array.isArray(item.Tags) // If already an array, keep it as is
                 ? item.Tags
                 : typeof item.Tags === "string"
-                ? item.Tags.split(",").map((tag: string) => tag.trim()) // Convert string to array
-                : [] // Default to an empty array if Tags is missing
+                    ? item.Tags.split(",").map((tag: string) => tag.trim()) // Convert string to array
+                    : [] // Default to an empty array if Tags is missing
         }));
 
         const sanitisedData = allItems.map((item) => sanitiseKeys(item));
