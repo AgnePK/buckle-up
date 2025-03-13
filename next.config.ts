@@ -1,5 +1,18 @@
 import type { NextConfig } from "next";
 
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
+const withPWA = require('next-pwa')({
+  dest: 'public',
+  register: true,
+  skipWaiting: true,
+  scope: '/app',
+  sw: 'service-worker.js',
+  disable: process.env.NODE_ENV === 'development',
+});
+
+
 const nextConfig: NextConfig = {
 	/* config options here */
 	env: {
@@ -14,4 +27,4 @@ const nextConfig: NextConfig = {
 	}
 };
 
-export default nextConfig;
+export default withPWA(nextConfig);
