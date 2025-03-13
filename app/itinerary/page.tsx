@@ -117,28 +117,34 @@ export default function Itinerary() {
         );
     }
     return (
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'>
-            {trip.map((item, index) => (
-                <Card key={item.id} className='w-full max-w-sm'>
-                    <Link
-                        href={`/itinerary/${item.id}`}
-                        
-                        >
-                        <CardHeader>
-                            <CardTitle>{item.title || 'Untitled Trip'}</CardTitle>
-                        </CardHeader>
-                    </Link>
-                    <CardContent className='flex items-center gap-3'>
-                        <CalendarDays className='w-6 h-6 text-emerald-800' />
-                        <div>
-                            <p> From {item.start_date} to {item.end_date} </p>
-                        </div>
-                    </CardContent>
-                    <CardFooter>
-                        <p>Notes: {item.notes || 'No notes'}</p>
-                    </CardFooter>
-                </Card>
-            ))}
-        </div>
+        <>
+            <div className='flex flex-col ms-6'>
+                <div className='flex mb-6'>
+                    <h1 className='text-3xl'>Welcome Back, {user.displayName}</h1>
+                </div>
+                <div className='grid grid-cols-2 gap-4'>
+                    {trip.map((item, index) => (
+                        <Card key={item.id} className='w-full max-w-sm'>
+                            <Link
+                                href={`/itinerary/${item.id}`}
+                            >
+                                <CardHeader>
+                                    <CardTitle>{item.title || 'Untitled Trip'}</CardTitle>
+                                </CardHeader>
+                            </Link>
+                            <CardContent className='flex items-center gap-3'>
+                                <CalendarDays className='w-6 h-6 text-emerald-800' />
+                                <div>
+                                    <p> From {item.start_date} to {item.end_date} </p>
+                                </div>
+                            </CardContent>
+                            <CardFooter>
+                                <p>Notes: {item.notes || 'No notes'}</p>
+                            </CardFooter>
+                        </Card>
+                    ))}
+                </div>
+            </div>
+        </>
     );
 }

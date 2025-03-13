@@ -10,13 +10,15 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { Plus, Home, Compass, LogOut, Settings } from "lucide-react"
+import { Plus, Home, Compass, FerrisWheel, Music4, BedDouble } from "lucide-react"
 import Link from "next/link"
 import { Button } from "../components/ui/button"
 import { signOut } from "firebase/auth"
 import { ModeToggle } from "../components/toggle-mode"
 import { useSession } from "@/AuthContext"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
+import logo from "@/public/logo-dark.png"
 
 const items = [
     {
@@ -25,15 +27,30 @@ const items = [
         icon: Home,
     },
     {
-        title: "Discover",
-        url: "/itinerary/discover",
-        icon: Compass,
-    },
-    {
         title: "Add Itinerary",
         url: "/itinerary/create",
         icon: Plus,
-    }
+    },
+    // {
+    //     title: "Discover",
+    //     url: "",
+    //     icon: Compass,
+    // },
+    {
+        title: "BnBs",
+        url: "/itinerary/discover/bnbs",
+        icon: BedDouble,
+    },
+    {
+        title: "Attractions",
+        url: "/itinerary/discover/attractions",
+        icon: FerrisWheel,
+    },
+    {
+        title: "Events",
+        url: "/itinerary/discover/events",
+        icon: Music4,
+    },
 ]
 
 export function AppSidebar() {
@@ -47,16 +64,27 @@ export function AppSidebar() {
     };
 
     return (
-        <Sidebar variant="floating" collapsible="icon" >
+        <Sidebar variant="sidebar" collapsible="icon" >
             <SidebarHeader>
             </SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel>
+                    <SidebarHeader className="mx-auto">
+                        <Image
+                            alt="Vercel logo"
+                            src={logo}
+                            width={120}
+                            
+                            style={{
+                                maxWidth: "100%",
+                                height: "auto",
+                            }}
+                        />
                         <Link href="/itinerary" className="text-2xl mb-4">
                             Buckle Up
                         </Link>
-                    </SidebarGroupLabel>
+                    </SidebarHeader>
+                    <SidebarGroupLabel>Platform</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {items.map((item) => (

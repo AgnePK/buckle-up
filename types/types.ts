@@ -56,7 +56,7 @@ export interface Attractions {
 	County: string;
 	// Tags: Array<string>;
 	// or
-	Tags: string[];
+	Tags: string[]|string;
 }
 
 export interface Events {
