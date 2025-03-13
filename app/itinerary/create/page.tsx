@@ -2,138 +2,50 @@
 import React from 'react'
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from 'next/navigation';
-import { DayType, DraggableStopProps, DragItem, ItemTypes, StopType, TripType } from '@/types/types';
-import Calendar from "react-calendar";
+import { DayType, StopType, TripType } from '@/types/types';
 import "react-calendar/dist/Calendar.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
 // FIREBASE
 import { db } from "@/firebaseConfig"; // Import Firebase Realtime Database
 import { ref, push, get, set } from "firebase/database";
 import { useSession } from '@/AuthContext';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Calendar as CalendarIcon } from 'lucide-react';
 
-// Draggable Stop component
-const DraggableStop : React.FC<DraggableStopProps> = ({ 
-  day, 
-  period, 
-  index, 
-  stop, 
-  updateStop, 
-  removeStop, 
-  toggleNotes, 
-  showNotes, 
-  setSelectedDay, 
-  setSelectedSlot, 
-  setSelectedEntryIndex, 
-  setShowTimePicker, 
-  moveStop 
-}) => {
-  const ref = useRef(null);
-  
-  const [{ isDragging }, drag] = useDrag<DragItem, unknown, { isDragging: boolean }>({
-    type: ItemTypes.STOP,
-    item: { day, period, index },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  });
-  
-  const [, drop] = useDrop<DragItem>({
-    accept: ItemTypes.STOP,
-    hover(item, monitor) {
-      if (!ref.current) {
-        return;
-      }
-      
-      // Don't replace items with themselves
-      if (item.day !== day || item.period !== period || item.index === index) {
-        return;
-      }
-      
-      // Move the stop
-      moveStop(item.day, item.period, item.index, index);
-      
-      // Update the item's index for further interactions
-      item.index = index;
-    },
-  });
-  
-  drag(drop(ref));
-  
-  return (
-    <div 
-      ref={ref} 
-      className="mb-2 p-2 border rounded" 
-      style={{ opacity: isDragging ? 0.5 : 1 }}
-    >
-      <div className="flex items-center space-x-2 mb-2">
-        {/* Drag handle */}
-        <div className="cursor-move px-2">=</div>
-        
-        <Input
-          placeholder={`Stop name`}
-          value={stop.name}
-          onChange={(e) => updateStop(day, period, index, "name", e.target.value)}
-          className="flex-grow"
-        />
-
-        <div className="min-w-[120px]">
-          <p className="text-xs mb-1">Time: {stop.time || "None"}</p>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => {
-              setSelectedDay(day);
-              setSelectedSlot(period);
-              setSelectedEntryIndex(index);
-              setShowTimePicker(true);
-            }}
-          >
-            Set Time
-          </Button>
-        </div>
-        <Button
-          variant="destructive"
-          size="sm"
-          onClick={() => removeStop(day, period, index)}
-        >
-          X
-        </Button>
-      </div>
-
-      <div className="flex items-center">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => toggleNotes(day, period, index)}
-        >
-          {showNotes[`${day}-${period}-${index}`] ? "Hide Notes" : "Add Notes"}
-        </Button>
-      </div>
-
-      {showNotes[`${day}-${period}-${index}`] && (
-        <Input
-          placeholder="Notes"
-          value={stop.notes}
-          onChange={(e) => updateStop(day, period, index, "notes", e.target.value)}
-          className="mt-2"
-        />
-      )}
-    </div>
-  );
-};
+import DraggableStop from '@/components/itinerary/DraggableStop';
+import DateRangePicker, {generateDays} from '@/components/itinerary/DateRangePicker'
+import { cleanItinerary, generateMarkedDates } from '@/components/itinerary/CleanItinerary';
+import { Textarea } from '@/components/ui/textarea';
 
 const CreatePage = () => {
     const router = useRouter()
     const [step, setStep] = useState(1);
     const nextStep = () => setStep(step + 1);
     const prevStep = () => setStep(step - 1);
+    const [showNotes, setShowNotes] = useState<Record<string, boolean>>({});
+
+    // Calendar functionality
+    const [selectedDates, setSelectedDates] = useState<{ start: string; end: string }>({
+        start: "",
+        end: "",
+    });
+    const [startDate, setStartDate] = useState<Date | null>(null);
+    const [endDate, setEndDate] = useState<Date | null>(null);
+    const [markedDates, setMarkedDates] = useState<Record<string, boolean>>({});
+
+    // Time functionality
+    const [showTimePicker, setShowTimePicker] = useState(false);
+    const [flightType, setFlightType] = useState<"departure" | "landing" | null>(null);
+    const [selectedDay, setSelectedDay] = useState<number | null>(null);
+    const [selectedSlot, setSelectedSlot] = useState<"morning" | "afternoon" | "evening" | null>(null);
+    const [selectedEntryIndex, setSelectedEntryIndex] = useState<number | null>(null);
+
+
 
     const [itinerary, setItinerary] = useState<TripType>({
         title: "",
@@ -182,7 +94,7 @@ const CreatePage = () => {
             const stops = [...prev.days[day][period]];
             const [movedItem] = stops.splice(fromIndex, 1);
             stops.splice(toIndex, 0, movedItem);
-            
+
             return {
                 ...prev,
                 days: {
@@ -240,7 +152,6 @@ const CreatePage = () => {
         });
     };
 
-    const [showNotes, setShowNotes] = useState<Record<string, boolean>>({});
 
     const toggleNotes = (day: number, period: keyof DayType, index: number): void => {
         setShowNotes((prev) => {
@@ -250,33 +161,6 @@ const CreatePage = () => {
     };
 
     const { user } = useSession();
-
-    const cleanItinerary = (itinerary: TripType) => {
-        return {
-            ...itinerary,
-            days: Object.keys(itinerary.days).reduce((acc, dayKey) => {
-                const day = itinerary.days[Number(dayKey)];
-                acc[Number(dayKey)] = {
-                    morning: day.morning.map((stop: { name: string; time: string; notes: string; }) => ({
-                        name: stop.name ?? "",
-                        time: stop.time ?? "",
-                        notes: stop.notes ?? "",
-                    })),
-                    afternoon: day.afternoon.map((stop: { name: string; time: string; notes: string; }) => ({
-                        name: stop.name ?? "",
-                        time: stop.time ?? "",
-                        notes: stop.notes ?? "",
-                    })),
-                    evening: day.evening.map((stop: { name: string; time: string; notes: string; }) => ({
-                        name: stop.name ?? "",
-                        time: stop.time ?? "",
-                        notes: stop.notes ?? "",
-                    })),
-                };
-                return acc;
-            }, {} as TripType["days"]),
-        };
-    };
 
     // Submit itinerary to Firebase
     const submitItinerary = async () => {
@@ -312,30 +196,6 @@ const CreatePage = () => {
         }
     };
 
-    // CALENDAR FUNCTIONALITY
-    const [selectedDates, setSelectedDates] = useState<{ start: string; end: string }>({
-        start: "",
-        end: "",
-    });
-
-    const [startDate, setStartDate] = useState<Date | null>(null);
-    const [endDate, setEndDate] = useState<Date | null>(null);
-
-    const [markedDates, setMarkedDates] = useState<Record<string, boolean>>({});
-
-    // Function to generate marked dates
-    const generateMarkedDates = (startDate: string, endDate: string) => {
-        let date = new Date(startDate);
-        let newMarkedDates: Record<string, boolean> = {};
-
-        while (date <= new Date(endDate)) {
-            const formattedDate = date.toISOString().split("T")[0];
-            newMarkedDates[formattedDate] = true;
-            date.setDate(date.getDate() + 1);
-        }
-
-        return newMarkedDates;
-    };
 
     // Handle date selection
     const onChange = (dates: [Date | null, Date | null]) => {
@@ -369,22 +229,6 @@ const CreatePage = () => {
         }
     }, [selectedDates]);
 
-    // Function to generate itinerary days
-    const generateDays = (start: string, end: string): Record<number, any> => {
-        const startDate = new Date(start);
-        const endDate = new Date(end);
-        const numDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-
-        const newDays: Record<number, any> = {};
-        for (let i = 1; i <= numDays; i++) {
-            newDays[i] = {
-                morning: [{ name: "", time: "", notes: "" }],
-                afternoon: [{ name: "", time: "", notes: "" }],
-                evening: [{ name: "", time: "", notes: "" }],
-            };
-        }
-        return newDays;
-    };
 
     // Handle itinerary generation
     const handleGenerateItinerary = () => {
@@ -404,11 +248,6 @@ const CreatePage = () => {
         nextStep(); // Moves to the next step
     };
 
-    const [showTimePicker, setShowTimePicker] = useState(false);
-    const [flightType, setFlightType] = useState<"departure" | "landing" | null>(null);
-    const [selectedDay, setSelectedDay] = useState<number | null>(null);
-    const [selectedSlot, setSelectedSlot] = useState<"morning" | "afternoon" | "evening" | null>(null);
-    const [selectedEntryIndex, setSelectedEntryIndex] = useState<number | null>(null);
 
     const onChangeTime = (selectedTime: Date | null) => {
         if (!selectedTime) return;
@@ -438,17 +277,9 @@ const CreatePage = () => {
         setShowTimePicker(false);
     };
 
-    // Custom function to check if a date has been marked
-    const tileClassName = ({ date, view }: { date: Date; view: string }) => {
-        if (view === 'month') {
-            const dateString = date.toISOString().split('T')[0];
-            return markedDates[dateString] ? 'bg-blue-200' : null;
-        }
-    };
-
     return (
         <DndProvider backend={HTML5Backend}>
-            <div className='container mx-auto px-4 py-6'>
+            <div className='px-4 py-6 w-100 flex flex-col content-center'>
                 {step === 1 && (
                     <div className="space-y-4">
                         <div>
@@ -514,28 +345,13 @@ const CreatePage = () => {
 
                 {step === 2 && (
                     <div className="space-y-4">
-                        <div>
-                            <h2 className="text-lg font-semibold mb-1">Trip Dates</h2>
-                            <p className="text-sm mb-1">Select the dates for your upcoming trip</p>
-                            <p className="text-sm text-gray-500 mb-4">This will automatically generate the days for your itinerary on the next page</p>
-
-                            <div className="calendar-container mb-6">
-                                <DatePicker
-                                    selected={startDate}
-                                    onChange={onChange}
-                                    startDate={startDate}
-                                    endDate={endDate}
-                                    selectsRange
-                                    inline
-                                />
-                            </div>
-
-                            <div className="flex justify-between mb-2">
-                                <p className="text-sm">Start Date: {selectedDates.start || "Not selected"}</p>
-                                <p className="text-sm">End Date: {selectedDates.end || "Not selected"}</p>
-                            </div>
-                        </div>
-
+                        <DateRangePicker
+                            startDate={startDate}
+                            endDate={endDate}
+                            onChange={onChange}
+                            startDateString={selectedDates.start}
+                            endDateString={selectedDates.end}
+                        />
                         <div className="flex flex-row space-x-2 justify-between">
                             <Button onClick={prevStep} variant="outline" className="flex-1">Back</Button>
                             <Button onClick={handleGenerateAndNext} className="flex-1">Generate & Next</Button>
@@ -544,11 +360,11 @@ const CreatePage = () => {
                 )}
 
                 {step === 3 && (
-                    <div className="space-y-4">
+                    <div className="w-120">
                         <h2 className="text-lg font-semibold mb-4">Create itinerary</h2>
 
                         {Object.keys(itinerary.days).length > 0 ? (
-                            <div className="space-y-6">
+                            <div className="">
                                 {Object.entries(itinerary.days).map(([day, data]) => (
                                     <div key={day} className="border rounded-lg p-4">
                                         <div className="flex justify-between items-center mb-4">

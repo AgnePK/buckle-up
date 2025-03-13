@@ -18,117 +18,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Calendar as CalendarIcon } from 'lucide-react';
 
-
-// Draggable Stop component
-const DraggableStop: React.FC<DraggableStopProps> = ({
-    day,
-    period,
-    index,
-    stop,
-    updateStop,
-    removeStop,
-    toggleNotes,
-    showNotes,
-    setSelectedDay,
-    setSelectedSlot,
-    setSelectedEntryIndex,
-    setShowTimePicker,
-    moveStop
-}) => {
-    const ref = useRef(null);
-
-    const [{ isDragging }, drag] = useDrag<DragItem, unknown, { isDragging: boolean }>({
-        type: ItemTypes.STOP,
-        item: { day, period, index },
-        collect: (monitor) => ({
-            isDragging: monitor.isDragging(),
-        }),
-    });
-
-    const [, drop] = useDrop<DragItem>({
-        accept: ItemTypes.STOP,
-        hover(item, monitor) {
-            if (!ref.current) {
-                return;
-            }
-
-            // Don't replace items with themselves
-            if (item.day !== day || item.period !== period || item.index === index) {
-                return;
-            }
-
-            // Move the stop
-            moveStop(item.day, item.period, item.index, index);
-
-            // Update the item's index for further interactions
-            item.index = index;
-        },
-    });
-
-    drag(drop(ref));
-
-    return (
-        <div
-            ref={ref}
-            className="mb-2 p-2 border rounded"
-            style={{ opacity: isDragging ? 0.5 : 1 }}
-        >
-            <div className="flex items-center space-x-2 mb-2">
-                {/* Drag handle */}
-                <div className="cursor-move px-2">=</div>
-
-                <Input
-                    placeholder={`Stop name`}
-                    value={stop.name}
-                    onChange={(e) => updateStop(day, period, index, "name", e.target.value)}
-                    className="flex-grow"
-                />
-
-                <div className="min-w-[120px]">
-                    <p className="text-xs mb-1">Time: {stop.time || "None"}</p>
-                    <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                            setSelectedDay(day);
-                            setSelectedSlot(period);
-                            setSelectedEntryIndex(index);
-                            setShowTimePicker(true);
-                        }}
-                    >
-                        Set Time
-                    </Button>
-                </div>
-                <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => removeStop(day, period, index)}
-                >
-                    X
-                </Button>
-            </div>
-
-            <div className="flex items-center">
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => toggleNotes(day, period, index)}
-                >
-                    {showNotes[`${day}-${period}-${index}`] ? "Hide Notes" : "Add Notes"}
-                </Button>
-            </div>
-
-            {showNotes[`${day}-${period}-${index}`] && (
-                <Input
-                    placeholder="Notes"
-                    value={stop.notes}
-                    onChange={(e) => updateStop(day, period, index, "notes", e.target.value)}
-                    className="mt-2"
-                />
-            )}
-        </div>
-    );
-};
+import DraggableStop from '@/components/itinerary/DraggableStop';
+import DateRangePicker from '@/components/itinerary/DateRangePicker'
+import { cleanItinerary, generateMarkedDates } from '@/components/itinerary/CleanItinerary';
 
 const EditPage = () => {
     const params = useParams();
@@ -310,33 +202,6 @@ const EditPage = () => {
         });
     };
 
-    const cleanItinerary = (itinerary: TripType) => {
-        return {
-            ...itinerary,
-            days: Object.keys(itinerary.days).reduce((acc, dayKey) => {
-                const day = itinerary.days[Number(dayKey)];
-                acc[Number(dayKey)] = {
-                    morning: day.morning.map((stop: { name: string; time: string; notes: string; }) => ({
-                        name: stop.name ?? "",
-                        time: stop.time ?? "",
-                        notes: stop.notes ?? "",
-                    })),
-                    afternoon: day.afternoon.map((stop: { name: string; time: string; notes: string; }) => ({
-                        name: stop.name ?? "",
-                        time: stop.time ?? "",
-                        notes: stop.notes ?? "",
-                    })),
-                    evening: day.evening.map((stop: { name: string; time: string; notes: string; }) => ({
-                        name: stop.name ?? "",
-                        time: stop.time ?? "",
-                        notes: stop.notes ?? "",
-                    })),
-                };
-                return acc;
-            }, {} as TripType["days"]),
-        };
-    };
-
     // Update itinerary in Firebase
     const updateItinerary = async () => {
         if (!user || !tripId) {
@@ -368,20 +233,6 @@ const EditPage = () => {
     const [endDate, setEndDate] = useState<Date | null>(null);
 
     const [markedDates, setMarkedDates] = useState<Record<string, boolean>>({});
-
-    // Function to generate marked dates
-    const generateMarkedDates = (startDate: string, endDate: string) => {
-        let date = new Date(startDate);
-        let newMarkedDates: Record<string, boolean> = {};
-
-        while (date <= new Date(endDate)) {
-            const formattedDate = date.toISOString().split("T")[0];
-            newMarkedDates[formattedDate] = true;
-            date.setDate(date.getDate() + 1);
-        }
-
-        return newMarkedDates;
-    };
 
     // Handle date selection
     const onChange = (dates: [Date | null, Date | null]) => {
@@ -496,14 +347,6 @@ const EditPage = () => {
         setShowTimePicker(false);
     };
 
-    // Custom function to check if a date has been marked
-    const tileClassName = ({ date, view }: { date: Date; view: string }) => {
-        if (view === 'month') {
-            const dateString = date.toISOString().split('T')[0];
-            return markedDates[dateString] ? 'bg-blue-200' : null;
-        }
-    };
-
     if (loading) {
         return (
             <div className="container mx-auto px-4 py-6 flex justify-center items-center h-screen">
@@ -582,28 +425,13 @@ const EditPage = () => {
 
                 {step === 2 && (
                     <div className="space-y-4">
-                        <div>
-                            <h2 className="text-lg font-semibold mb-1">Trip Dates</h2>
-                            <p className="text-sm mb-1">Edit the dates for your trip</p>
-                            <p className="text-sm text-gray-500 mb-4">This will regenerate the days for your itinerary on the next page</p>
-
-                            <div className="calendar-container mb-6">
-                                <DatePicker
-                                    selected={startDate}
-                                    onChange={onChange}
-                                    startDate={startDate}
-                                    endDate={endDate}
-                                    selectsRange
-                                    inline
-                                />
-                            </div>
-
-                            <div className="flex justify-between mb-2">
-                                <p className="text-sm">Start Date: {selectedDates.start || itinerary.start_date || "Not selected"}</p>
-                                <p className="text-sm">End Date: {selectedDates.end || itinerary.end_date || "Not selected"}</p>
-                            </div>
-                        </div>
-
+                        <DateRangePicker
+                            startDate={startDate}
+                            endDate={endDate}
+                            onChange={onChange}
+                            startDateString={selectedDates.start || itinerary.start_date || "Not selected"}
+                            endDateString={selectedDates.end || itinerary.end_date || "Not selected"}
+                        />
                         <div className="flex flex-row space-x-2 justify-between">
                             <Button onClick={prevStep} variant="outline" className="flex-1">Back</Button>
                             <Button onClick={handleGenerateAndNext} className="flex-1">Update Dates & Next</Button>
