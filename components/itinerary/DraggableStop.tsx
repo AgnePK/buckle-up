@@ -2,26 +2,48 @@ import React, { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { DraggableStopProps, DragItem, ItemTypes } from '@/types/types';
+import { DragItem, ItemTypes, StopType } from '@/types/types';
+import PlacesAutocomplete from '@/Maps/PlacesAutocomplete';
+
+type DraggableStopProps = {
+  day: number;
+  period: "morning" | "afternoon" | "evening";
+  index: number;
+  stop: StopType;
+  updateStop: (day: number, period: any, index: number, field: keyof StopType, value: any) => void;
+  removeStop: (day: number, period: any, index: number) => void;
+  toggleNotes: (day: number, period: any, index: number) => void;
+  showNotes: Record<string, boolean>;
+  setSelectedDay: (day: number | null) => void;
+  setSelectedSlot: (slot: "morning" | "afternoon" | "evening" | null) => void;
+  setSelectedEntryIndex: (index: number | null) => void;
+  setShowTimePicker: (show: boolean) => void;
+  moveStop: (day: number, period: any, fromIndex: number, toIndex: number) => void;
+  updateStopLocation: (day: number, period: any, index: number, placeData: any) => void;
+};
 
 // Draggable Stop component
-const DraggableStop : React.FC<DraggableStopProps> = ({ 
-  day, 
-  period, 
-  index, 
-  stop, 
-  updateStop, 
-  removeStop, 
-  toggleNotes, 
-  showNotes, 
-  setSelectedDay, 
-  setSelectedSlot, 
-  setSelectedEntryIndex, 
-  setShowTimePicker, 
-  moveStop 
+const DraggableStop: React.FC<DraggableStopProps> = ({
+  day,
+  period,
+  index,
+  stop,
+  updateStop,
+  removeStop,
+  toggleNotes,
+  showNotes,
+  setSelectedDay,
+  setSelectedSlot,
+  setSelectedEntryIndex,
+  setShowTimePicker,
+  moveStop,
+  updateStopLocation,
 }) => {
   const ref = useRef(null);
-  
+  const notesKey = `${day}-${period}-${index}`;
+  const isShowingNotes = showNotes[notesKey] || false;
+
+  // Setup drag and drop
   const [{ isDragging }, drag] = useDrag<DragItem, unknown, { isDragging: boolean }>({
     type: ItemTypes.STOP,
     item: { day, period, index },
@@ -29,45 +51,56 @@ const DraggableStop : React.FC<DraggableStopProps> = ({
       isDragging: monitor.isDragging(),
     }),
   });
-  
-  const [, drop] = useDrop<DragItem>({
+
+  const [, drop] = useDrop({
     accept: ItemTypes.STOP,
-    hover(item, monitor) {
-      if (!ref.current) {
-        return;
-      }
-      
+    hover(item: DragItem) {
+      if (!ref.current) return;
+
+      // Only handle items from the same day and period
+      if (item.day !== day || item.period !== period) return;
+
+      const dragIndex = item.index;
+      const hoverIndex = index;
+
       // Don't replace items with themselves
-      if (item.day !== day || item.period !== period || item.index === index) {
-        return;
-      }
-      
-      // Move the stop
-      moveStop(item.day, item.period, item.index, index);
-      
-      // Update the item's index for further interactions
-      item.index = index;
-    },
+      if (dragIndex === hoverIndex) return;
+
+      // Call moveStop to handle the actual array movement
+      moveStop(day, period, dragIndex, hoverIndex);
+
+      // Update the index for future drag operations
+      item.index = hoverIndex;
+    }
   });
-  
+
   drag(drop(ref));
-  
+
+  const handlePlaceSelect = (placeData: any) => {
+    updateStopLocation(day, period, index, placeData);
+  };
+
   return (
-    <div 
-      ref={ref} 
-      className="mb-2 p-2 border rounded" 
-      style={{ opacity: isDragging ? 0.5 : 1 }}
+    <div
+      ref={ref}
+      className={`mb-2 p-2 border rounded ${isDragging ? 'opacity-50 bg-gray-100' : ''}`}
     >
       <div className="flex items-center space-x-2 mb-2">
-        {/* Drag handle */}
         <div className="cursor-move px-2">=</div>
-        
-        <Input
-          placeholder={`Stop name`}
-          value={stop.name}
-          onChange={(e) => updateStop(day, period, index, "name", e.target.value)}
-          className="flex-grow"
-        />
+
+        <div className="flex-grow">
+          <PlacesAutocomplete
+            value={stop.name}
+            onChange={(value) => updateStop(day, period, index, 'name', value)}
+            onPlaceSelect={handlePlaceSelect}
+            placeholder="Enter location"
+          />
+          {stop.location && (
+            <div className="text-xs text-gray-500 mt-1">
+              {stop.address || `Location: ${stop.location.lat.toFixed(5)}, ${stop.location.lng.toFixed(5)}`}
+            </div>
+          )}
+        </div>
 
         <div className="min-w-[120px]">
           <p className="text-xs mb-1">Time: {stop.time || "None"}</p>
@@ -99,11 +132,11 @@ const DraggableStop : React.FC<DraggableStopProps> = ({
           size="sm"
           onClick={() => toggleNotes(day, period, index)}
         >
-          {showNotes[`${day}-${period}-${index}`] ? "Hide Notes" : "Add Notes"}
+          {isShowingNotes ? "Hide Notes" : "Add Notes"}
         </Button>
       </div>
 
-      {showNotes[`${day}-${period}-${index}`] && (
+      {isShowingNotes && (
         <Input
           placeholder="Notes"
           value={stop.notes}
@@ -114,4 +147,5 @@ const DraggableStop : React.FC<DraggableStopProps> = ({
     </div>
   );
 };
+
 export default DraggableStop;

@@ -2,7 +2,7 @@
 import React from 'react'
 import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from 'next/navigation';
-import { DayType, DraggableStopProps, DragItem, ItemTypes, StopType, TripType } from '@/types/types';
+import { DayType, DragItem, ItemTypes, StopType, TripType } from '@/types/types';
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import DatePicker from "react-datepicker";
@@ -355,6 +355,46 @@ const EditPage = () => {
         );
     }
 
+
+
+    // Maps
+
+    const updateStopLocation = (day: number, timeOfDay: keyof DayType, index: number, placeData: any) => {
+        console.log("Updating stop location:", placeData);
+
+        setItinerary((prev) => {
+            const updatedDays = { ...prev.days };
+
+            // Make sure the day exists
+            if (!updatedDays[day]) {
+                updatedDays[day] = { morning: [], afternoon: [], evening: [] };
+            }
+
+            // Make sure the period array exists and has enough items
+            if (!updatedDays[day][timeOfDay]) {
+                updatedDays[day][timeOfDay] = [];
+            }
+
+            while (updatedDays[day][timeOfDay].length <= index) {
+                updatedDays[day][timeOfDay].push({ name: "", time: "", notes: "" });
+            }
+
+            // Now update the specific stop with the place data
+            updatedDays[day][timeOfDay][index] = {
+                ...updatedDays[day][timeOfDay][index],
+                name: placeData.name || "",
+                address: placeData.address || "",
+                placeId: placeData.placeId || "",
+                location: placeData.location
+            };
+
+            return {
+                ...prev,
+                days: updatedDays
+            };
+        });
+    };
+
     return (
         <DndProvider backend={HTML5Backend}>
             <div className='container mx-auto px-4 py-6'>
@@ -487,6 +527,7 @@ const EditPage = () => {
                                                         setSelectedEntryIndex={setSelectedEntryIndex}
                                                         setShowTimePicker={setShowTimePicker}
                                                         moveStop={moveStop}
+                                                        updateStopLocation={updateStopLocation}
                                                     />
                                                 ))}
                                             </div>

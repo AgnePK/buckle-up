@@ -123,7 +123,7 @@ export default function Itinerary() {
                     <h1 className='text-3xl'>Welcome Back, {user.displayName}</h1>
                 </div>
                 <div className='grid grid-cols-2 gap-4'>
-                    {trip.map((item, index) => (
+                    {trip.slice(0).reverse().map((item, index) => (
                         <Card key={item.id} className='w-full max-w-sm'>
                             <Link
                                 href={`/itinerary/${item.id}`}

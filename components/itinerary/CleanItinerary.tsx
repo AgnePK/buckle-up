@@ -1,32 +1,30 @@
-// utils/itineraryUtils.ts
-import { TripType } from '@/types/types';
+import { StopType, TripType } from '@/types/types';
 
 export const cleanItinerary = (itinerary: TripType) => {
+
+  const cleanStop = (stop: StopType): StopType => ({
+    name: stop.name ?? "",
+    time: stop.time ?? "",
+    notes: stop.notes ?? "",
+    ...(stop.location ? { location: stop.location } : {}),
+    placeId: stop.placeId || "",
+    address: stop.address || ""
+  });
+
   return {
     ...itinerary,
     days: Object.keys(itinerary.days).reduce((acc, dayKey) => {
       const day = itinerary.days[Number(dayKey)];
       acc[Number(dayKey)] = {
-        morning: day.morning.map((stop: { name: string; time: string; notes: string; }) => ({
-          name: stop.name ?? "",
-          time: stop.time ?? "",
-          notes: stop.notes ?? "",
-        })),
-        afternoon: day.afternoon.map((stop: { name: string; time: string; notes: string; }) => ({
-          name: stop.name ?? "",
-          time: stop.time ?? "",
-          notes: stop.notes ?? "",
-        })),
-        evening: day.evening.map((stop: { name: string; time: string; notes: string; }) => ({
-          name: stop.name ?? "",
-          time: stop.time ?? "",
-          notes: stop.notes ?? "",
-        })),
+        morning: day.morning.map(cleanStop),
+        afternoon: day.afternoon.map(cleanStop),
+        evening: day.evening.map(cleanStop),
       };
       return acc;
     }, {} as TripType["days"]),
   };
 };
+
 
 export const generateMarkedDates = (startDate: string, endDate: string) => {
   let date = new Date(startDate);

@@ -12,6 +12,7 @@ import Link from 'next/link';
 import { PenLine } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+import ItineraryMapView from '@/Maps/itineraryMapView';
 const ViewItinerary = () => {
     const params = useParams();
     const id = params.id as string;
@@ -99,7 +100,12 @@ const ViewItinerary = () => {
         }
     };
 
-
+    const hasLocations = Object.values(trip.days || {}).some(day => {
+        return ['morning', 'afternoon', 'evening'].some(period => {
+            const stops = day[period as keyof typeof day];
+            return stops && Array.isArray(stops) && stops.some(stop => stop.location);
+        });
+    });
 
     return (
         <div className="container mx-auto px-4 py-6">
@@ -121,6 +127,8 @@ const ViewItinerary = () => {
                     </Button>
                 </div>
             </div>
+
+            <ItineraryMapView trip={trip} />
 
             <div id='itinerary-container' className="grid gap-6 bg-white p-6 rounded-lg shadow-sm">
                 <div className="flex gap-4">
@@ -178,9 +186,6 @@ const ViewItinerary = () => {
                                 })}
                             </div>
                         ))}
-
-
-
                     </div>
                 )}
                 <div className="mt-6">

@@ -18,9 +18,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 import DraggableStop from '@/components/itinerary/DraggableStop';
-import DateRangePicker, {generateDays} from '@/components/itinerary/DateRangePicker'
+import DateRangePicker, { generateDays } from '@/components/itinerary/DateRangePicker'
 import { cleanItinerary, generateMarkedDates } from '@/components/itinerary/CleanItinerary';
 import { Textarea } from '@/components/ui/textarea';
+import MapView from '@/Maps/MapView';
 
 const CreatePage = () => {
     const router = useRouter()
@@ -90,6 +91,7 @@ const CreatePage = () => {
 
     // Move a stop within the same day and period
     const moveStop = (day: number, period: keyof DayType, fromIndex: number, toIndex: number) => {
+        // console.log(`Moving stop - day: ${day}, period: ${period}, from: ${fromIndex}, to: ${toIndex}`);
         setItinerary((prev) => {
             const stops = [...prev.days[day][period]];
             const [movedItem] = stops.splice(fromIndex, 1);
@@ -106,8 +108,8 @@ const CreatePage = () => {
                 },
             };
         });
-    };
-
+      };
+      
     const addStop = (day: number, period: keyof DayType) => {
         setItinerary((prev) => {
             const updatedDays = { ...prev.days };
@@ -277,6 +279,45 @@ const CreatePage = () => {
         setShowTimePicker(false);
     };
 
+    // Maps
+
+    const updateStopLocation = (day: number, timeOfDay: keyof DayType, index: number, placeData: any) => {
+        console.log("Updating stop location:", placeData);
+
+        setItinerary((prev) => {
+            const updatedDays = { ...prev.days };
+
+            // Make sure the day exists
+            if (!updatedDays[day]) {
+                updatedDays[day] = { morning: [], afternoon: [], evening: [] };
+            }
+
+            // Make sure the period array exists and has enough items
+            if (!updatedDays[day][timeOfDay]) {
+                updatedDays[day][timeOfDay] = [];
+            }
+
+            while (updatedDays[day][timeOfDay].length <= index) {
+                updatedDays[day][timeOfDay].push({ name: "", time: "", notes: "" });
+            }
+
+            // Now update the specific stop with the place data
+            updatedDays[day][timeOfDay][index] = {
+                ...updatedDays[day][timeOfDay][index],
+                name: placeData.name || "",
+                address: placeData.address || "",
+                placeId: placeData.placeId || "",
+                location: placeData.location
+              };
+          
+            return {
+                ...prev,
+                days: updatedDays
+            };
+        });
+    };
+
+
     return (
         <DndProvider backend={HTML5Backend}>
             <div className='px-4 py-6 w-100 flex flex-col content-center'>
@@ -407,10 +448,12 @@ const CreatePage = () => {
                                                         setSelectedEntryIndex={setSelectedEntryIndex}
                                                         setShowTimePicker={setShowTimePicker}
                                                         moveStop={moveStop}
+                                                        updateStopLocation={updateStopLocation}
                                                     />
                                                 ))}
                                             </div>
                                         ))}
+
                                     </div>
                                 ))}
                             </div>
@@ -422,7 +465,7 @@ const CreatePage = () => {
 
                         {showTimePicker && selectedDay !== null && (
                             <div className="fixed inset-0 bg-grey bg-opacity-50 flex items-center justify-center z-50">
-                                <div className="bg-white p-4 rounded-lg">
+                                <div className="bg-white p-4 rounded-lg shadow-lg">
                                     <h3 className="mb-2 font-medium">Select Time</h3>
                                     <DatePicker
                                         selected={new Date()}
@@ -435,7 +478,15 @@ const CreatePage = () => {
                                         inline
                                     />
                                     <div className="mt-2 flex justify-end">
-                                        <Button variant="outline" onClick={() => setShowTimePicker(false)}>
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => {
+                                                setShowTimePicker(false);
+                                                setSelectedDay(null);
+                                                setSelectedSlot(null);
+                                                setSelectedEntryIndex(null);
+                                            }}
+                                        >
                                             Cancel
                                         </Button>
                                     </div>
@@ -448,6 +499,7 @@ const CreatePage = () => {
                             <Button onClick={nextStep} className="flex-1">Next</Button>
                         </div>
                     </div>
+
                 )}
 
                 {step === 4 && (
