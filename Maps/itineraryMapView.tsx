@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { TripType, StopType } from '@/types/types';
 import { loadMapsAPI, isGoogleMapsLoaded } from './loadMapsAPI';
 
@@ -9,17 +9,22 @@ type ItineraryMapViewProps = {
 const ItineraryMapView = ({ trip }: ItineraryMapViewProps) => {
     const mapRef = useRef<HTMLDivElement>(null);
     const [map, setMap] = useState<google.maps.Map | null>(null);
-    const [markers, setMarkers] = useState<google.maps.marker.AdvancedMarkerElement[]>([]);
     const [isReady, setIsReady] = useState(isGoogleMapsLoaded());
 
-    // check if trip has locations
-    const hasLocations = Object.values(trip.days || {}).some(day => {
-        return ['morning', 'afternoon', 'evening'].some(period => {
-            const stops = day[period as keyof typeof day];
-            return stops && Array.isArray(stops) &&
-                stops.some(stop => stop.location !== undefined);
+    const markersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
+    console.log("marker ref: ", markersRef)
+
+    // using a ref to track markers instead of state to avoid re-render cycles
+    const hasLocations = useMemo(() => {
+        return Object.values(trip.days || {}).some(day => {
+            return ['morning', 'afternoon', 'evening'].some(period => {  // Added "return" here
+                const stops = day[period as keyof typeof day];
+                return stops && Array.isArray(stops) &&
+                    stops.some(stop => stop.location !== undefined);
+            });
         });
-    });
+    }, [trip.days]);
+
 
     // Load Google Maps API
     useEffect(() => {
@@ -28,7 +33,7 @@ const ItineraryMapView = ({ trip }: ItineraryMapViewProps) => {
         }
     }, [isReady]);
 
-    // Initialise map
+    // Initialise map only once
     useEffect(() => {
         if (isReady && mapRef.current && !map) {
             try {
@@ -49,7 +54,8 @@ const ItineraryMapView = ({ trip }: ItineraryMapViewProps) => {
         if (!map || !isReady || !hasLocations) return;
 
         // Clear existing markers
-        markers.forEach(marker => marker.map = null);
+        markersRef.current.forEach(marker => marker.map = null);
+        markersRef.current = [];
 
         // Collect all stops with location data
         const allStops: Array<StopType & { day: number; period: string }> = [];
@@ -90,14 +96,15 @@ const ItineraryMapView = ({ trip }: ItineraryMapViewProps) => {
 
                 // Add info window to show details when clicked
                 const infoWindow = new google.maps.InfoWindow({
-                    content: `
-            <div>
-              <strong>${stop.name}</strong>
-              <br>Day ${stop.day}, ${stop.period}
-              ${stop.time ? `<br>Time: ${stop.time}` : ''}
-              ${stop.notes ? `<br>Notes: ${stop.notes}` : ''}
-            </div>
-          `
+                    content:
+                        `
+                        <div>
+                        <strong>${stop.name}</strong>
+                        <br>Day ${stop.day}, ${stop.period}
+                        ${stop.time ? `<br>Time: ${stop.time}` : ''}
+                        ${stop.notes ? `<br>Notes: ${stop.notes}` : ''}
+                        </div>
+                    `
                 });
 
                 marker.addListener('click', () => {
@@ -107,9 +114,9 @@ const ItineraryMapView = ({ trip }: ItineraryMapViewProps) => {
                 return marker;
             }).filter(Boolean) as google.maps.marker.AdvancedMarkerElement[];
 
-            setMarkers(newMarkers);
+            markersRef.current = newMarkers;
 
-            // Fit bounds to show all markers
+            // Fit bounds to show all markers on the map itself
             if (newMarkers.length > 0) {
                 const bounds = new google.maps.LatLngBounds();
                 newMarkers.forEach(marker => {
@@ -127,7 +134,7 @@ const ItineraryMapView = ({ trip }: ItineraryMapViewProps) => {
         } catch (error) {
             console.error('Error creating markers:', error);
         }
-    }, [map, isReady, trip, markers]);
+    }, [map, isReady, trip, hasLocations]);
 
     // If there are no locations, don't render the map
     if (!hasLocations) {
