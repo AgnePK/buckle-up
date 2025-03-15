@@ -1,45 +1,58 @@
 // components/itinerary/DateRangePicker.tsx
 import React from 'react';
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { DateRange } from "react-day-picker";
 
 interface DateRangePickerProps {
-    startDate: Date | null;
-    endDate: Date | null;
-    onChange: (dates: [Date | null, Date | null]) => void;
-    startDateString: string;
-    endDateString: string;
+    dateRange: DateRange | undefined;
+    onDateRangeChange: (range: DateRange | undefined) => void;
 }
 
 const DateRangePicker: React.FC<DateRangePickerProps> = ({
-    startDate,
-    endDate,
-    onChange,
-    startDateString,
-    endDateString
+    dateRange,
+    onDateRangeChange
 }) => {
     return (
-        <div>
-            <h2 className="text-lg font-semibold mb-1">Trip Dates</h2>
-            <p className="text-sm mb-1">Select the dates for your trip</p>
-            <p className="text-sm text-gray-500 mb-4">This will automatically generate the days for your itinerary on the next page</p>
+        <Card className="w-full">
+            <CardHeader>
+                <CardTitle className="text-lg">Trip Dates</CardTitle>
+                <p className="text-sm text-gray-500">
+                    Select the dates for your trip. This will automatically generate the days for your itinerary.
+                </p>
+            </CardHeader>
+            <CardContent>
+                <div className="grid gap-4">
+                    <Calendar
+                        mode="range"
+                        selected={dateRange}
+                        onSelect={onDateRangeChange}
+                        numberOfMonths={1}
+                        className="rounded-md border"
+                    />
 
-            <div className="calendar-container mb-6">
-                <DatePicker
-                    selected={startDate}
-                    onChange={onChange}
-                    startDate={startDate}
-                    endDate={endDate}
-                    selectsRange
-                    inline
-                />
-            </div>
+                    <Separator />
 
-            <div className="flex justify-between mb-2">
-                <p className="text-sm">Start Date: {startDateString || "Not selected"}</p>
-                <p className="text-sm">End Date: {endDateString || "Not selected"}</p>
-            </div>
-        </div>
+                
+                    <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
+                        <div>
+                            <p className="text-sm font-medium">Start Date</p>
+                            <p className="text-sm text-muted-foreground">
+                                {dateRange?.from ? format(dateRange.from, "PPP") : "Not selected"}
+                            </p>
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium">End Date</p>
+                            <p className="text-sm text-muted-foreground">
+                                {dateRange?.to ? format(dateRange.to, "PPP") : "Not selected"}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
     );
 };
 

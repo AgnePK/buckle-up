@@ -21,6 +21,8 @@ import { Calendar as CalendarIcon } from 'lucide-react';
 import DraggableStop from '@/components/itinerary/DraggableStop';
 import DateRangePicker from '@/components/itinerary/DateRangePicker'
 import { cleanItinerary, generateMarkedDates } from '@/components/itinerary/CleanItinerary';
+import { DateRange } from 'react-day-picker';
+import { format, parse } from "date-fns";
 
 const EditPage = () => {
     const params = useParams();
@@ -30,6 +32,8 @@ const EditPage = () => {
     const [step, setStep] = useState(1);
     const nextStep = () => setStep(step + 1);
     const prevStep = () => setStep(step - 1);
+    const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+
 
     const [itinerary, setItinerary] = useState<TripType>({
         title: "",
@@ -61,12 +65,14 @@ const EditPage = () => {
 
                     // Setup date states
                     if (tripData.start_date && tripData.end_date) {
-                        setStartDate(new Date(tripData.start_date));
-                        setEndDate(new Date(tripData.end_date));
-                        setSelectedDates({
-                            start: tripData.start_date,
-                            end: tripData.end_date
+                        const startDate = new Date(tripData.start_date);
+                        const endDate = new Date(tripData.end_date);
+
+                        setDateRange({
+                            from: startDate,
+                            to: endDate
                         });
+
                         setMarkedDates(generateMarkedDates(
                             tripData.start_date,
                             tripData.end_date
@@ -395,6 +401,31 @@ const EditPage = () => {
         });
     };
 
+    const handleDateRangeChange = (range: DateRange | undefined) => {
+        if (!range) return;
+
+        setDateRange(range);
+
+        // Update selectedDates state for compatibility with your existing code
+        if (range.from) {
+            const formattedStartDate = format(range.from, "yyyy-MM-dd");
+            let formattedEndDate = "";
+
+            if (range.to) {
+                formattedEndDate = format(range.to, "yyyy-MM-dd");
+                // Update markedDates
+                setMarkedDates(generateMarkedDates(formattedStartDate, formattedEndDate));
+            }
+
+            // Update itinerary with selected dates
+            setItinerary((prev) => ({
+                ...prev,
+                start_date: formattedStartDate,
+                end_date: formattedEndDate,
+            }));
+        }
+    };
+
     return (
         <DndProvider backend={HTML5Backend}>
             <div className='container mx-auto px-4 py-6'>
@@ -466,12 +497,16 @@ const EditPage = () => {
                 {step === 2 && (
                     <div className="space-y-4">
                         <DateRangePicker
+                            dateRange={dateRange}
+                            onDateRangeChange={handleDateRangeChange}
+                        />
+                        {/* <DateRangePicker
                             startDate={startDate}
                             endDate={endDate}
                             onChange={onChange}
                             startDateString={selectedDates.start || itinerary.start_date || "Not selected"}
                             endDateString={selectedDates.end || itinerary.end_date || "Not selected"}
-                        />
+                        /> */}
                         <div className="flex flex-row space-x-2 justify-between">
                             <Button onClick={prevStep} variant="outline" className="flex-1">Back</Button>
                             <Button onClick={handleGenerateAndNext} className="flex-1">Update Dates & Next</Button>

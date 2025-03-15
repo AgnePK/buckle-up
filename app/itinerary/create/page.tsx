@@ -20,8 +20,8 @@ import { Input } from '@/components/ui/input';
 import DraggableStop from '@/components/itinerary/DraggableStop';
 import DateRangePicker, { generateDays } from '@/components/itinerary/DateRangePicker'
 import { cleanItinerary, generateMarkedDates } from '@/components/itinerary/CleanItinerary';
-import { Textarea } from '@/components/ui/textarea';
-import MapView from '@/Maps/MapView';
+import { DateRange } from "react-day-picker";
+import { format, parse } from "date-fns";
 
 const CreatePage = () => {
     const router = useRouter()
@@ -35,6 +35,8 @@ const CreatePage = () => {
         start: "",
         end: "",
     });
+    const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
     const [markedDates, setMarkedDates] = useState<Record<string, boolean>>({});
@@ -220,6 +222,32 @@ const CreatePage = () => {
         }
     };
 
+
+    const handleDateRangeChange = (range: DateRange | undefined) => {
+        if (!range) return;
+        
+        setDateRange(range);
+        
+        // Update selectedDates state for compatibility with your existing code
+        if (range.from) {
+            const formattedStartDate = format(range.from, "yyyy-MM-dd");
+            let formattedEndDate = "";
+            
+            if (range.to) {
+                formattedEndDate = format(range.to, "yyyy-MM-dd");
+                // Update markedDates
+                setMarkedDates(generateMarkedDates(formattedStartDate, formattedEndDate));
+            }
+            
+            // Update itinerary with selected dates
+            setItinerary((prev) => ({
+                ...prev,
+                start_date: formattedStartDate,
+                end_date: formattedEndDate,
+            }));
+        }
+    };
+
     // Generate itinerary days when dates are selected
     useEffect(() => {
         if (selectedDates.start && selectedDates.end) {
@@ -385,13 +413,10 @@ const CreatePage = () => {
                 )}
 
                 {step === 2 && (
-                    <div className="space-y-4">
+                    <div className="">
                         <DateRangePicker
-                            startDate={startDate}
-                            endDate={endDate}
-                            onChange={onChange}
-                            startDateString={selectedDates.start}
-                            endDateString={selectedDates.end}
+                            dateRange={dateRange}
+                            onDateRangeChange={handleDateRangeChange}
                         />
                         <div className="flex flex-row space-x-2 justify-between">
                             <Button onClick={prevStep} variant="outline" className="flex-1">Back</Button>
