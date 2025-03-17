@@ -6,13 +6,18 @@ type ItineraryMapViewProps = {
     trip: TripType;
 };
 
+type MapStyleOption = 'default' | 'earth';
+
 const ItineraryMapView = ({ trip }: ItineraryMapViewProps) => {
     const mapRef = useRef<HTMLDivElement>(null);
     const [map, setMap] = useState<google.maps.Map | null>(null);
     const [isReady, setIsReady] = useState(isGoogleMapsLoaded());
+    const [currentStyle, setCurrentStyle] = useState<MapStyleOption>('earth');
 
     const markersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
-    console.log("marker ref: ", markersRef)
+    // console.log("marker ref: ", markersRef)
+
+
 
     // using a ref to track markers instead of state to avoid re-render cycles
     const hasLocations = useMemo(() => {
@@ -33,6 +38,44 @@ const ItineraryMapView = ({ trip }: ItineraryMapViewProps) => {
         }
     }, [isReady]);
 
+    // Function to change map style
+    // cant change mapId after rendering map
+    // also cant add a toggle button to switch styles
+    // useEffect(() => {
+    //     if (isReady && mapRef.current) {
+    //         // Clear existing markers first
+    //         if (markersRef.current.length > 0) {
+    //             markersRef.current.forEach(marker => marker.map = null);
+    //             markersRef.current = [];
+    //         }
+            
+    //         // Clear existing map instance
+    //         if (map) {
+    //             // Dispose of existing map (no direct method, just clear references)
+    //             setMap(null);
+    //         }
+            
+    //         // Create a new map with the current style
+    //         try {
+    //             console.log(`Creating map with style: ${currentStyle}, mapId: ${mapIds[currentStyle]}`);
+    //             const mapInstance = new window.google.maps.Map(mapRef.current, {
+    //                 center: { lat: 53.3498, lng: -6.2603 }, // Dublin coords
+    //                 zoom: 8,
+    //                 mapId: mapIds[currentStyle] // Use the map ID for the selected style
+    //             });
+    //             setMap(mapInstance);
+    //         } catch (error) {
+    //             console.error('Error initializing map:', error);
+    //         }
+    //     }
+    // }, [isReady, currentStyle, mapIds]);
+
+    // const mapIds = {
+    //     default: '31a2878abe5bb0cc',
+    //     earth: '8bfb21788aafdcfd'
+    // };
+
+
     // Initialise map only once
     useEffect(() => {
         if (isReady && mapRef.current && !map) {
@@ -40,14 +83,14 @@ const ItineraryMapView = ({ trip }: ItineraryMapViewProps) => {
                 const mapInstance = new window.google.maps.Map(mapRef.current, {
                     center: { lat: 53.3498, lng: -6.2603 }, // Dublin coords
                     zoom: 8,
-                    mapId: process.env.NEXT_PUBLIC_GOOGLE_MAP_ID || undefined,
+                    mapId: process.env.NEXT_PUBLIC_GOOGLE_MAP_ID || undefined
                 });
                 setMap(mapInstance);
             } catch (error) {
                 console.error('Error initializing map:', error);
             }
         }
-    }, [isReady, map]);
+    }, [isReady, map, currentStyle]);
 
     // Update markers when trip changes
     useEffect(() => {
@@ -136,6 +179,15 @@ const ItineraryMapView = ({ trip }: ItineraryMapViewProps) => {
         }
     }, [map, isReady, trip, hasLocations]);
 
+
+    // Function to change map style - trigger map rerendering
+    // const changeMapStyle = (newStyle: MapStyleOption) => {
+    //     if (newStyle !== currentStyle) {
+    //         console.log(`Changing style from ${currentStyle} to ${newStyle}`);
+    //         setCurrentStyle(newStyle);
+    //     }
+    // };
+
     // If there are no locations, don't render the map
     if (!hasLocations) {
         return (
@@ -146,11 +198,39 @@ const ItineraryMapView = ({ trip }: ItineraryMapViewProps) => {
     }
 
     return (
-        <div className="bg-white rounded-lg shadow-sm my-6">
-            <h2 className="text-xl font-semibold p-4 border-b">Itinerary Map</h2>
+        <div className="rounded-lg my-6">
+
+            {/* <div className="flex items-center space-x-4">
+                <div className="flex items-center">
+                    <input
+                        type="radio"
+                        id="style-default"
+                        name="mapStyle"
+                        value="default"
+                        checked={currentStyle === 'default'}
+                            onChange={() => changeMapStyle('default')}
+                        className="mr-2"
+                    />
+                    <label htmlFor="style-default">Default</label>
+                </div>
+
+                <div className="flex items-center">
+                    <input
+                        type="radio"
+                        id="style-earth"
+                        name="mapStyle"
+                        value="earth"
+                        checked={currentStyle === 'earth'}
+                        onChange={() => changeMapStyle('earth')}
+                        className="mr-2"
+                    />
+                    <label htmlFor="style-earth">Earth</label>
+                </div>
+            </div> */}
+
             <div
                 ref={mapRef}
-                className="w-full rounded-b-lg"
+                className="w-full rounded-2xl"
                 style={{ height: "400px" }}
             />
         </div>
