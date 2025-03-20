@@ -3,8 +3,6 @@ import React from 'react'
 import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from 'next/navigation';
 import { DayType, DragItem, ItemTypes, StopType, TripType } from '@/types/types';
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
