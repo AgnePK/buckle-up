@@ -52,13 +52,13 @@ const DraggableStop: React.FC<DraggableStopProps> = ({
     }),
   });
 
-  const [, drop] = useDrop({
+  const [{ isOver }, drop] = useDrop({
     accept: ItemTypes.STOP,
     hover(item: DragItem) {
       if (!ref.current) return;
 
       // Only handle items from the same day and period
-      if (item.day !== day || item.period !== period) return;
+      if (item.day !== day) return;
 
       const dragIndex = item.index;
       const hoverIndex = index;
@@ -71,7 +71,10 @@ const DraggableStop: React.FC<DraggableStopProps> = ({
 
       // Update the index for future drag operations
       item.index = hoverIndex;
-    }
+    },
+    collect: (monitor) => ({
+      isOver: !!monitor.isOver(),
+    }),
   });
 
   drag(drop(ref));
@@ -83,7 +86,7 @@ const DraggableStop: React.FC<DraggableStopProps> = ({
   return (
     <div
       ref={ref}
-      className={`mb-2 p-2 border rounded ${isDragging ? 'opacity-50 bg-gray-100' : ''}`}
+      className={`mb-2 p-2 border rounded ${isDragging ? 'opacity-50 bg-gray-100' : ''} ${isOver ? 'border-primary' : ''}`}
     >
       <div className="flex items-center space-x-2 mb-2">
         <div className="cursor-move px-2">=</div>
