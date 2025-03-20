@@ -13,6 +13,13 @@ import { PenLine } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 import ItineraryMapView from '@/Maps/itineraryMapView';
+
+
+// AI chatbot
+
+import { ChatProvider } from '@/gemeni/ChatContext';
+import { ChatButton } from '@/gemeni/ChatComponent';
+
 const ViewItinerary = () => {
     const params = useParams();
     const id = params.id as string;
@@ -37,7 +44,7 @@ const ViewItinerary = () => {
     useEffect(() => {
         if (isLoading || !user?.uid) {
             console.log("Auth is still loading or no user, waiting...");
-            return; // Wait for auth to initialize
+            return; // Wait for auth to initialise
         }
 
         const readData = ref(db, `User/${user.uid}/trips/${id}`);
@@ -108,93 +115,96 @@ const ViewItinerary = () => {
     });
 
     return (
-        <div className="container mx-auto px-4 py-6">
-            <div className='flex justify-between items-center mb-6'>
-                <h1 className='text-4xl font-bold'>
-                    {trip.title || 'Untitled Trip'}
-                </h1>
-                <div className="flex gap-4">
-                    <Link href={`/itinerary/${id}/edit`}>
-                        <Button variant="outline" className="flex items-center gap-2">
-                            <PenLine className="text-slate-500" size={20} /> Edit
+        <ChatProvider>
+            <div className="container mx-auto px-4 py-6">
+                <div className='flex justify-between items-center mb-6'>
+                    <h1 className='text-4xl font-bold'>
+                        {trip.title || 'Untitled Trip'}
+                    </h1>
+                    <div className="flex gap-4">
+                        <Link href={`/itinerary/${id}/edit`}>
+                            <Button variant="outline" className="flex items-center gap-2">
+                                <PenLine className="text-slate-500" size={20} /> Edit
+                            </Button>
+                        </Link>
+                        <Button
+                            variant="destructive"
+                            onClick={() => handleDelete(id)}
+                        >
+                            Delete
                         </Button>
-                    </Link>
-                    <Button
-                        variant="destructive"
-                        onClick={() => handleDelete(id)}
-                    >
-                        Delete
-                    </Button>
-                </div>
-            </div>
-
-            <ItineraryMapView trip={trip} />
-
-            <div id='itinerary-container' className="grid gap-6 bg-white p-6 rounded-lg shadow-sm">
-                <div className="flex gap-4">
-                    <p className="font-medium">Start Date: <span className="font-normal">{trip.start_date}</span></p>
-                    <p className="font-medium">End Date: <span className="font-normal">{trip.end_date}</span></p>
+                    </div>
                 </div>
 
-                {/* Display Flight Details */}
-                {trip.flight && (
-                    <div className="border-t pt-4">
-                        <h2 className="text-xl font-semibold mb-2">Flight Details</h2>
-                        <p className="mb-1">Flight Number: {trip.flight.flight_number || 'N/A'}</p>
-                        <p className="mb-1">Departure: {trip.flight.departure || 'N/A'}</p>
-                        <p className="mb-1">Landing: {trip.flight.landing || 'N/A'}</p>
+                <ItineraryMapView trip={trip} />
+
+                <div id='itinerary-container' className="grid gap-6 bg-white p-6 rounded-lg shadow-sm">
+                    <div className="flex gap-4">
+                        <p className="font-medium">Start Date: <span className="font-normal">{trip.start_date}</span></p>
+                        <p className="font-medium">End Date: <span className="font-normal">{trip.end_date}</span></p>
                     </div>
-                )}
 
-                {/*Display Notes */}
-                {trip.notes && (
-                    <div className="border-t pt-4">
-                        <h2 className="text-xl font-semibold mb-2">Notes</h2>
-                        <p className="whitespace-pre-wrap">{trip.notes}</p>
-                    </div>
-                )}
+                    {/* Display Flight Details */}
+                    {trip.flight && (
+                        <div className="border-t pt-4">
+                            <h2 className="text-xl font-semibold mb-2">Flight Details</h2>
+                            <p className="mb-1">Flight Number: {trip.flight.flight_number || 'N/A'}</p>
+                            <p className="mb-1">Departure: {trip.flight.departure || 'N/A'}</p>
+                            <p className="mb-1">Landing: {trip.flight.landing || 'N/A'}</p>
+                        </div>
+                    )}
 
-                {/* Display Trip Days */}
-                {trip.days && Object.keys(trip.days).length > 0 && (
-                    <div className="border-t pt-4">
-                        <h2 className="text-xl font-semibold mb-4">Itinerary Plan</h2>
+                    {/*Display Notes */}
+                    {trip.notes && (
+                        <div className="border-t pt-4">
+                            <h2 className="text-xl font-semibold mb-2">Notes</h2>
+                            <p className="whitespace-pre-wrap">{trip.notes}</p>
+                        </div>
+                    )}
 
-                        {Object.entries(trip.days).map(([dayNumber, dayData]) => (
-                            <div key={dayNumber} className="mb-6 bg-slate-50 p-4 rounded-md">
-                                <h3 className="text-lg font-medium mb-3">Day {dayNumber}</h3>
+                    {/* Display Trip Days */}
+                    {trip.days && Object.keys(trip.days).length > 0 && (
+                        <div className="border-t pt-4">
+                            <h2 className="text-xl font-semibold mb-4">Itinerary Plan</h2>
 
-                                {/* Render Stops for Morning, Afternoon, and Evening */}
-                                {['morning', 'afternoon', 'evening'].map((timeOfDay) => {
-                                    const stops = (dayData as any)[timeOfDay];
-                                    if (!stops || stops.length === 0) return null; // Skip empty data
+                            {Object.entries(trip.days).map(([dayNumber, dayData]) => (
+                                <div key={dayNumber} className="mb-6 bg-slate-50 p-4 rounded-md">
+                                    <h3 className="text-lg font-medium mb-3">Day {dayNumber}</h3>
 
-                                    return (
-                                        <div key={timeOfDay} className="mb-4">
-                                            <h4 className="capitalize font-medium text-slate-700 mb-2">
-                                                {timeOfDay}
-                                            </h4>
-                                            <div className="pl-4">
-                                                {stops.map((stop: any, index: number) => (
-                                                    <div key={index} className="mb-2">
-                                                        <p className="font-medium">- {stop.name} <span className="text-slate-500">({stop.time})</span></p>
-                                                        {stop.notes && <p className="text-sm pl-4 text-slate-600">Notes: {stop.notes}</p>}
-                                                    </div>
-                                                ))}
+                                    {/* Render Stops for Morning, Afternoon, and Evening */}
+                                    {['morning', 'afternoon', 'evening'].map((timeOfDay) => {
+                                        const stops = (dayData as any)[timeOfDay];
+                                        if (!stops || stops.length === 0) return null; // Skip empty data
+
+                                        return (
+                                            <div key={timeOfDay} className="mb-4">
+                                                <h4 className="capitalize font-medium text-slate-700 mb-2">
+                                                    {timeOfDay}
+                                                </h4>
+                                                <div className="pl-4">
+                                                    {stops.map((stop: any, index: number) => (
+                                                        <div key={index} className="mb-2">
+                                                            <p className="font-medium">- {stop.name} <span className="text-slate-500">({stop.time})</span></p>
+                                                            {stop.notes && <p className="text-sm pl-4 text-slate-600">Notes: {stop.notes}</p>}
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        ))}
+                                        );
+                                    })}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    <div className="mt-6">
+                        <Button onClick={() => generatePDF()}>
+                            Save as PDF
+                        </Button>
                     </div>
-                )}
-                <div className="mt-6">
-                    <Button onClick={() => generatePDF()}>
-                        Save as PDF
-                    </Button>
                 </div>
+                <ChatButton trip={trip} />
             </div>
-        </div>
+        </ChatProvider>
 
     )
 }
