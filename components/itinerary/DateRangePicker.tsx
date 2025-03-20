@@ -1,4 +1,3 @@
-// components/itinerary/DateRangePicker.tsx
 import React from 'react';
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
@@ -35,7 +34,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
 
                     <Separator />
 
-                
+
                     <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
                         <div>
                             <p className="text-sm font-medium">Start Date</p>

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { loadMapsAPI, isGoogleMapsLoaded } from '@/Maps/loadMapsAPI';
 
 type PlacesAutocompleteProps = {
-    value: string; 
+    value: string;
     onChange: (value: string) => void;
     onPlaceSelect: (placeData: any) => void;
     placeholder?: string;
@@ -40,7 +40,7 @@ const PlacesAutocomplete = ({
     useEffect(() => {
         if (!isLoaded || !inputRef.current) return;
 
-        console.log("PlacesAutocomplete: Initializing autocomplete");
+        console.log("PlacesAutocomplete: initialising autocomplete");
         try {
             const autocomplete = new google.maps.places.Autocomplete(inputRef.current, {
                 fields: ['formatted_address', 'geometry', 'name', 'place_id'],
@@ -74,9 +74,9 @@ const PlacesAutocomplete = ({
                 }
             });
 
-            console.log("PlacesAutocomplete: Autocomplete initialized successfully");
+            console.log("PlacesAutocomplete: Autocomplete initialised successfully");
         } catch (error) {
-            console.error("Error initializing autocomplete:", error);
+            console.error("Error initialising autocomplete:", error);
         }
     }, [isLoaded, onPlaceSelect]);
 
@@ -92,7 +92,7 @@ const PlacesAutocomplete = ({
             <input
                 ref={inputRef}
                 type="text"
-                defaultValue={value} 
+                defaultValue={value}
                 onChange={handleInputChange}
                 placeholder={placeholder}
                 className="w-full p-2 border rounded"

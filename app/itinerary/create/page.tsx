@@ -3,7 +3,6 @@ import React from 'react'
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from 'next/navigation';
 import { DayType, StopType, TripType } from '@/types/types';
-import "react-calendar/dist/Calendar.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { DndProvider } from 'react-dnd';
@@ -24,22 +23,16 @@ import { DateRange } from "react-day-picker";
 import { format, parse } from "date-fns";
 
 const CreatePage = () => {
-    const router = useRouter()
+    const router = useRouter();
     const [step, setStep] = useState(1);
     const nextStep = () => setStep(step + 1);
     const prevStep = () => setStep(step - 1);
     const [showNotes, setShowNotes] = useState<Record<string, boolean>>({});
 
     // Calendar functionality
-    const [selectedDates, setSelectedDates] = useState<{ start: string; end: string }>({
-        start: "",
-        end: "",
-    });
     const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
-
-    const [startDate, setStartDate] = useState<Date | null>(null);
-    const [endDate, setEndDate] = useState<Date | null>(null);
     const [markedDates, setMarkedDates] = useState<Record<string, boolean>>({});
+    const [daysGenerated, setDaysGenerated] = useState(false);
 
     // Time functionality
     const [showTimePicker, setShowTimePicker] = useState(false);
@@ -48,8 +41,7 @@ const CreatePage = () => {
     const [selectedSlot, setSelectedSlot] = useState<"morning" | "afternoon" | "evening" | null>(null);
     const [selectedEntryIndex, setSelectedEntryIndex] = useState<number | null>(null);
 
-
-
+    // Main itinerary state
     const [itinerary, setItinerary] = useState<TripType>({
         title: "",
         flight: { flight_number: "", departure: "", landing: "" },
@@ -93,7 +85,6 @@ const CreatePage = () => {
 
     // Move a stop within the same day and period
     const moveStop = (day: number, period: keyof DayType, fromIndex: number, toIndex: number) => {
-        // console.log(`Moving stop - day: ${day}, period: ${period}, from: ${fromIndex}, to: ${toIndex}`);
         setItinerary((prev) => {
             const stops = [...prev.days[day][period]];
             const [movedItem] = stops.splice(fromIndex, 1);
@@ -110,8 +101,8 @@ const CreatePage = () => {
                 },
             };
         });
-      };
-      
+    };
+
     const addStop = (day: number, period: keyof DayType) => {
         setItinerary((prev) => {
             const updatedDays = { ...prev.days };
@@ -156,7 +147,6 @@ const CreatePage = () => {
         });
     };
 
-
     const toggleNotes = (day: number, period: keyof DayType, index: number): void => {
         setShowNotes((prev) => {
             const key = `${day}-${period}-${index}`;
@@ -183,7 +173,7 @@ const CreatePage = () => {
             // Get existing trips data
             const snapshot = await get(userTripsRef);
 
-            // If the path doesn't exist, initialize it
+            // If the path doesn't exist, initialise it
             if (!snapshot.exists()) {
                 await set(userTripsRef, {});
             }
@@ -200,45 +190,22 @@ const CreatePage = () => {
         }
     };
 
-
-    // Handle date selection
-    const onChange = (dates: [Date | null, Date | null]) => {
-        const [start, end] = dates;
-        setStartDate(start);
-        setEndDate(end);
-
-        // Update selectedDates state for compatibility with your existing code
-        setSelectedDates({
-            start: start ? start.toISOString().split("T")[0] : "",
-            end: end ? end.toISOString().split("T")[0] : ""
-        });
-
-        // Update markedDates when we have a complete range
-        if (start && end) {
-            setMarkedDates(generateMarkedDates(
-                start.toISOString().split("T")[0],
-                end.toISOString().split("T")[0]
-            ));
-        }
-    };
-
-
     const handleDateRangeChange = (range: DateRange | undefined) => {
         if (!range) return;
-        
+
         setDateRange(range);
-        
-        // Update selectedDates state for compatibility with your existing code
+
+        // Update itinerary with selected dates
         if (range.from) {
             const formattedStartDate = format(range.from, "yyyy-MM-dd");
             let formattedEndDate = "";
-            
+
             if (range.to) {
                 formattedEndDate = format(range.to, "yyyy-MM-dd");
                 // Update markedDates
                 setMarkedDates(generateMarkedDates(formattedStartDate, formattedEndDate));
             }
-            
+
             // Update itinerary with selected dates
             setItinerary((prev) => ({
                 ...prev,
@@ -247,18 +214,6 @@ const CreatePage = () => {
             }));
         }
     };
-
-    // Generate itinerary days when dates are selected
-    useEffect(() => {
-        if (selectedDates.start && selectedDates.end) {
-            setItinerary((prev) => ({
-                ...prev,
-                start_date: selectedDates.start,
-                end_date: selectedDates.end,
-            }));
-        }
-    }, [selectedDates]);
-
 
     // Handle itinerary generation
     const handleGenerateItinerary = () => {
@@ -271,13 +226,16 @@ const CreatePage = () => {
             ...prev,
             days: generateDays(itinerary.start_date, itinerary.end_date),
         }));
+
+        setDaysGenerated(true);
     };
 
     const handleGenerateAndNext = () => {
-        handleGenerateItinerary(); // Generates the itinerary
+        if (!daysGenerated) {
+            handleGenerateItinerary(); // Generates the itinerary
+        }
         nextStep(); // Moves to the next step
     };
-
 
     const onChangeTime = (selectedTime: Date | null) => {
         if (!selectedTime) return;
@@ -307,8 +265,7 @@ const CreatePage = () => {
         setShowTimePicker(false);
     };
 
-    // Maps
-
+    // Maps integration
     const updateStopLocation = (day: number, timeOfDay: keyof DayType, index: number, placeData: any) => {
         console.log("Updating stop location:", placeData);
 
@@ -336,15 +293,14 @@ const CreatePage = () => {
                 address: placeData.address || "",
                 placeId: placeData.placeId || "",
                 location: placeData.location
-              };
-          
+            };
+
             return {
                 ...prev,
                 days: updatedDays
             };
         });
     };
-
 
     return (
         <DndProvider backend={HTML5Backend}>
@@ -418,9 +374,11 @@ const CreatePage = () => {
                             dateRange={dateRange}
                             onDateRangeChange={handleDateRangeChange}
                         />
-                        <div className="flex flex-row space-x-2 justify-between">
+                        <div className="flex flex-row space-x-2 justify-between mt-4">
                             <Button onClick={prevStep} variant="outline" className="flex-1">Back</Button>
-                            <Button onClick={handleGenerateAndNext} className="flex-1">Generate & Next</Button>
+                            <Button onClick={handleGenerateAndNext} className="flex-1">
+                                {daysGenerated ? "Next" : "Generate & Next"}
+                            </Button>
                         </div>
                     </div>
                 )}
@@ -432,7 +390,7 @@ const CreatePage = () => {
                         {Object.keys(itinerary.days).length > 0 ? (
                             <div className="">
                                 {Object.entries(itinerary.days).map(([day, data]) => (
-                                    <div key={day} className="border rounded-lg p-4">
+                                    <div key={day} className="border rounded-lg p-4 mb-4">
                                         <div className="flex justify-between items-center mb-4">
                                             <h3 className="text-md font-semibold">Day {day}</h3>
                                             <Button
@@ -485,6 +443,13 @@ const CreatePage = () => {
                         ) : (
                             <div className="text-center py-8">
                                 <p>No days have been generated yet.</p>
+                                <Button
+                                    onClick={handleGenerateItinerary}
+                                    className="mt-4"
+                                    disabled={!itinerary.start_date || !itinerary.end_date}
+                                >
+                                    Generate Days
+                                </Button>
                             </div>
                         )}
 
@@ -519,7 +484,7 @@ const CreatePage = () => {
                             </div>
                         )}
 
-                        <div className="flex flex-row space-x-2 justify-between">
+                        <div className="flex flex-row space-x-2 justify-between mt-4">
                             <Button onClick={prevStep} variant="outline" className="flex-1">Back</Button>
                             <Button onClick={nextStep} className="flex-1">Next</Button>
                         </div>

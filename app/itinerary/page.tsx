@@ -41,7 +41,7 @@ export default function Itinerary() {
     useEffect(() => {
         if (isLoading) {
             console.log("Auth is still loading, waiting...");
-            return; // Wait for auth to initialize
+            return; // Wait for auth to initialise
         }
 
         if (!user?.uid) {

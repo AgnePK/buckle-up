@@ -1,9 +1,9 @@
-import { initializeApp } from 'firebase/app';
+import { initialiseApp } from 'firebase/app';
 import { getAuth } from "firebase/auth";
 
 import {getDatabase} from 'firebase/database';
 
-// Initialize Firebase
+// initialise Firebase
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -16,7 +16,7 @@ const firebaseConfig = {
 };
 
 
-const app = initializeApp(firebaseConfig);
+const app = initialiseApp(firebaseConfig);
 export const firebase_auth = getAuth(app);
 
 export const db = getDatabase(app);

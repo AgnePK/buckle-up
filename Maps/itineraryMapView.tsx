@@ -48,13 +48,13 @@ const ItineraryMapView = ({ trip }: ItineraryMapViewProps) => {
     //             markersRef.current.forEach(marker => marker.map = null);
     //             markersRef.current = [];
     //         }
-            
+
     //         // Clear existing map instance
     //         if (map) {
     //             // Dispose of existing map (no direct method, just clear references)
     //             setMap(null);
     //         }
-            
+
     //         // Create a new map with the current style
     //         try {
     //             console.log(`Creating map with style: ${currentStyle}, mapId: ${mapIds[currentStyle]}`);
@@ -65,7 +65,7 @@ const ItineraryMapView = ({ trip }: ItineraryMapViewProps) => {
     //             });
     //             setMap(mapInstance);
     //         } catch (error) {
-    //             console.error('Error initializing map:', error);
+    //             console.error('Error initialising map:', error);
     //         }
     //     }
     // }, [isReady, currentStyle, mapIds]);
@@ -87,7 +87,7 @@ const ItineraryMapView = ({ trip }: ItineraryMapViewProps) => {
                 });
                 setMap(mapInstance);
             } catch (error) {
-                console.error('Error initializing map:', error);
+                console.error('Error initialising map:', error);
             }
         }
     }, [isReady, map, currentStyle]);
