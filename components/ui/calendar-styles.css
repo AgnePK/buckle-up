@@ -1,0 +1,80 @@
+/* Claude:  */
+/* Fix for ShadCN Calendar with react-day-picker 9.6.3 */
+
+
+/* DOES NOT WORK */
+
+/* calendar-styles.css */
+/* Fix for selected day appearance in calendar */
+.rdp-day_selected,
+.rdp-day_selected:focus {
+  background-color: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+  border-radius: 50%;
+}
+
+/* Makes days between selected range have proper highlighting */
+.rdp-day_range_middle {
+  background-color: color-mix(in srgb, var(--primary) 40%, transparent) !important;
+  color: var(--foreground) !important;
+}
+
+/* Today indicator */
+.rdp-day_today {
+  font-weight: bold !important;
+  border: 1px solid var(--primary) !important;
+  color: var(--foreground) !important;
+}
+
+/* Hover styles for days */
+.rdp-day:hover:not([disabled]):not(.rdp-day_selected) {
+  background-color: var(--accent) !important;
+  color: var(--accent-foreground) !important;
+}
+
+/* Fix for cell sizes to ensure proper grid appearance */
+.rdp-day {
+  width: 40px !important;
+  height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+}
+
+/* Fix for month caption */
+.rdp-caption {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  position: relative !important;
+  padding: 8px 0 !important;
+}
+
+.rdp-caption_label {
+  font-weight: 500 !important;
+  font-size: 1rem !important;
+}
+
+/* Fix for navigation buttons */
+.rdp-nav_button {
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer !important;
+}
+
+/* Fix for the days of week header */
+.rdp-head_cell {
+  font-weight: 500 !important;
+  color: var(--muted-foreground) !important;
+}
+
+/* Fix for outside days */
+.rdp-day_outside {
+  opacity: 0.5 !important;
+}
+
+/* Ensure the calendar is centered */
+.rdp {
+  margin: 0 auto !important;
+}

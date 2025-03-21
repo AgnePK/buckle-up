@@ -94,7 +94,7 @@ const DraggableStop: React.FC<DraggableStopProps> = ({
         <div className="flex-grow">
           <PlacesAutocomplete
             value={stop.name}
-            onChange={(value) => updateStop(day, period, index, 'name', value)}
+            onChange={(value: any) => updateStop(day, period, index, 'name', value)}
             onPlaceSelect={handlePlaceSelect}
             placeholder="Enter location"
           />
@@ -143,7 +143,7 @@ const DraggableStop: React.FC<DraggableStopProps> = ({
         <Input
           placeholder="Notes"
           value={stop.notes}
-          onChange={(e) => updateStop(day, period, index, "notes", e.target.value)}
+          onChange={(e: { target: { value: any; }; }) => updateStop(day, period, index, "notes", e.target.value)}
           className="mt-2"
         />
       )}
