@@ -94,7 +94,7 @@ export default function EventsPage() {
       <div className="mb-6">
         <input
           type="text"
-          placeholder="Search events, venues, or locations..."
+          placeholder="Search by Name or County..."
           value={searchTerm}
           onChange={handleSearch}
           className="w-full p-2 border border-gray-300 rounded-md"
@@ -103,7 +103,7 @@ export default function EventsPage() {
 
       {eventsQuery.isLoading && (
         <div className="flex flex-col items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700 mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
           <p>Loading... This may take a while</p>
         </div>
       )}
@@ -122,7 +122,7 @@ export default function EventsPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-start">
-                <Calendar className="h-5 w-5 mr-2 text-blue-600 shrink-0 mt-1" />
+                <Calendar className="h-5 w-5 mr-2 text-primary shrink-0 mt-1" />
                 <div>
                   <p className="font-medium">Event Date</p>
                   <p className="text-sm">{formatDate(item.dtstart)}</p>
@@ -130,7 +130,7 @@ export default function EventsPage() {
               </div>
 
               <div className="flex items-start">
-                <Building className="h-5 w-5 mr-2 text-blue-600 shrink-0 mt-1" />
+                <Building className="h-5 w-5 mr-2 text-primary shrink-0 mt-1" />
                 <div>
                   <p className="font-medium">Venue</p>
                   <p className="text-sm">{item.venue?.name || "Unknown Venue"}</p>
@@ -139,7 +139,7 @@ export default function EventsPage() {
                       href={item.venue.web}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline text-xs"
+                      className="text-primary hover:underline text-xs"
                     >
                       Venue website
                     </a>
@@ -148,7 +148,7 @@ export default function EventsPage() {
               </div>
 
               <div className="flex items-start">
-                <MapPin className="h-5 w-5 mr-2 text-blue-600 shrink-0 mt-1" />
+                <MapPin className="h-5 w-5 mr-2 text-primary shrink-0 mt-1" />
                 <div>
                   <p className="font-medium">Location</p>
                   <p className="text-sm">
@@ -159,13 +159,6 @@ export default function EventsPage() {
                 </div>
               </div>
 
-              <div className="flex items-start">
-                <User className="h-5 w-5 mr-2 text-blue-600 shrink-0 mt-1" />
-                <div>
-                  <p className="font-medium">Listed by</p>
-                  <p className="text-sm">{item.member?.name || "Unknown"}</p>
-                </div>
-              </div>
             </CardContent>
             <CardFooter>
               {item.url && (
@@ -173,7 +166,7 @@ export default function EventsPage() {
                   href={item.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
+                  className="text-primary hover:underline"
                 >
                   View on TheSession.org
                 </a>
@@ -188,7 +181,7 @@ export default function EventsPage() {
         <button
           onClick={prevPage}
           disabled={!eventsQuery.data?.prevCursor}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md disabled:opacity-50"
+          className="px-4 py-2 bg-primary text-white rounded-md disabled:opacity-50"
         >
           Previous
         </button>
@@ -196,7 +189,7 @@ export default function EventsPage() {
         <button
           onClick={nextPage}
           disabled={!eventsQuery.data?.nextCursor}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md disabled:opacity-50"
+          className="px-4 py-2 bg-primary text-white rounded-md disabled:opacity-50"
         >
           Next
         </button>

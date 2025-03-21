@@ -89,7 +89,7 @@ export default function AccommodationsPage() {
 
             {accommodationQuery.isLoading && (
                 <div className="flex flex-col items-center py-12">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700 mb-4"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
                     <p>Loading... This may take a while</p>
                 </div>
             )}
@@ -127,7 +127,7 @@ export default function AccommodationsPage() {
                 <button
                     onClick={prevPage}
                     disabled={!accommodationQuery.data?.prevCursor}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md disabled:opacity-50"
+                    className="px-4 py-2 bg-primary text-white rounded-md disabled:opacity-50"
                 >
                     Previous
                 </button>
@@ -135,7 +135,7 @@ export default function AccommodationsPage() {
                 <button
                     onClick={nextPage}
                     disabled={!accommodationQuery.data?.nextCursor}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md disabled:opacity-50"
+                    className="px-4 py-2 bg-primary text-white rounded-md disabled:opacity-50"
                 >
                     Next
                 </button>

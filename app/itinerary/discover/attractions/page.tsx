@@ -91,7 +91,7 @@ export default function AttractionsPage() {
 
             {attractionsQuery.isLoading && (
                 <div className="flex flex-col items-center py-12">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700 mb-4"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
                     <p>Loading... This may take a while</p>
                 </div>
             )}
@@ -123,7 +123,7 @@ export default function AttractionsPage() {
                                     href={item.Url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-blue-600 hover:underline text-sm block mb-4"
+                                    className="text-primary hover:underline text-sm block mb-4"
                                 >
                                     Visit Website
                                 </a>
@@ -145,7 +145,7 @@ export default function AttractionsPage() {
                 <button
                     onClick={prevPage}
                     disabled={!attractionsQuery.data?.prevCursor}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md disabled:opacity-50"
+                    className="px-4 py-2 bg-primary text-white rounded-md disabled:opacity-50"
                 >
                     Previous
                 </button>
@@ -153,7 +153,7 @@ export default function AttractionsPage() {
                 <button
                     onClick={nextPage}
                     disabled={!attractionsQuery.data?.nextCursor}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md disabled:opacity-50"
+                    className="px-4 py-2 bg-primary text-white rounded-md disabled:opacity-50"
                 >
                     Next
                 </button>
