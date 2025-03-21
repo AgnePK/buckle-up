@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, SetStateAction } from 'react';
 import { useChat } from '@/gemeni/ChatContext';
 import { Send, X, Loader, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -117,7 +117,7 @@ export const ChatComponent = ({ onClose, isOpen }: ChatComponentProps) => {
                     ref={inputRef}
                     type="text"
                     value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
+                    onChange={(e: { target: { value: SetStateAction<string>; }; }) => setInputValue(e.target.value)}
                     placeholder="Ask about your trip..."
                     className="flex-1 border rounded-l-md py-2 px-3 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                     disabled={isLoading}
