@@ -4,12 +4,12 @@ import React, { useEffect, useRef, useState } from 'react'
 import { db } from '@/firebaseConfig';
 import { ref, onValue, off, remove } from 'firebase/database';
 import { useSession } from '@/AuthContext';
-import generatePDF, { generateItineraryHTML } from '@/components/generateToPDF';
+import generatePDF from '@/components/generateToPDF';
 
 import { TripType } from '@/types/types'
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { PenLine } from 'lucide-react';
+import { Download, PenLine } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 import ItineraryMapView from '@/Maps/itineraryMapView';
@@ -19,6 +19,7 @@ import ItineraryMapView from '@/Maps/itineraryMapView';
 
 import { ChatProvider } from '@/gemeni/ChatContext';
 import { ChatButton } from '@/gemeni/ChatComponent';
+import OpenInGoogleMaps from '@/Maps/OpenInGoogleMaps';
 
 const ViewItinerary = () => {
     const params = useParams();
@@ -137,7 +138,11 @@ const ViewItinerary = () => {
                 </div>
 
                 <ItineraryMapView trip={trip} />
-
+                {hasLocations && (
+                    <div className="mb-6 flex justify-start">
+                        <OpenInGoogleMaps trip={trip} />
+                    </div>
+                )}
                 <div id='itinerary-container' className="grid gap-6 bg-white p-6 rounded-lg shadow-sm">
                     <div className="flex gap-4">
                         <p className="font-medium">Start Date: <span className="font-normal">{trip.start_date}</span></p>
@@ -196,11 +201,18 @@ const ViewItinerary = () => {
                             ))}
                         </div>
                     )}
-                    <div className="mt-6">
-                        <Button onClick={() => generatePDF()}>
-                            Save as PDF
+                    <div className="mt-6 border-t pt-4">
+
+                        <Button
+                            onClick={() => generatePDF()}
+                            className="flex items-center gap-2 mt-2"
+                            variant="outline"
+                        >
+                            <Download size={16} />
+                            Save as PDF (Legacy Method)
                         </Button>
                     </div>
+
                 </div>
                 <ChatButton trip={trip} />
             </div>
