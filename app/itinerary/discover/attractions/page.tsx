@@ -14,6 +14,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { MapPin } from 'lucide-react';
 import Head from 'next/head';
+import SaveButton from '@/components/savedItems';
 
 const PAGE_SIZE = 20;
 
@@ -105,8 +106,9 @@ export default function AttractionsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {displayData.map((item, index) => (
                     <Card key={item.id || `attraction-${index}`} className="h-full">
-                        <CardHeader>
-                            <CardTitle>{item.Name}</CardTitle>
+                        <CardHeader className='flex-row justify-between content-center'>
+                            <CardTitle>{item.Name} </CardTitle>
+                            <div>{<SaveButton item={item} itemType="attraction" />}</div>
                         </CardHeader>
                         <CardContent>
                             <div className="flex items-center mb-4">

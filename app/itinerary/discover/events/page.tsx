@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/card';
 import { Calendar, MapPin, User, Building } from 'lucide-react';
 import Head from 'next/head';
+import SaveButton from '@/components/savedItems';
 
 const PAGE_SIZE = 20;
 
@@ -117,8 +118,10 @@ export default function EventsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {displayData.map((item) => (
           <Card key={item.id} className="h-full">
-            <CardHeader>
+            <CardHeader className='flex-row justify-between content-center'>
               <CardTitle>{item.name}</CardTitle>
+              <div>{<SaveButton item={item} itemType="event" />}</div>
+
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-start">
