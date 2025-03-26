@@ -7,7 +7,7 @@ import { QueryClientProvider } from '@/components/QueryProvider';
 import { ModeToggle } from '@/components/toggle-mode';
 
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/app/app-sidebar"
+import { AppSidebar } from "@/app/NavBar"
 
 
 const AppLayout = ({ children }: Readonly<{
@@ -16,13 +16,11 @@ const AppLayout = ({ children }: Readonly<{
 
     return (
         <QueryClientProvider>
-            <SidebarProvider>
-                <AppSidebar />
-                <div>
-                    <SidebarTrigger />
-                    {children}
-                </div>
-            </SidebarProvider>
+            <AppSidebar />
+            <div>
+                {/* <SidebarTrigger /> */}
+                {children}
+            </div>
         </QueryClientProvider>
 
     )
