@@ -18,7 +18,6 @@ const AppLayout = ({ children }: Readonly<{
         <QueryClientProvider>
             <AppSidebar />
             <div>
-                {/* <SidebarTrigger /> */}
                 {children}
             </div>
         </QueryClientProvider>
