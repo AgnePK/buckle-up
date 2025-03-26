@@ -209,7 +209,7 @@ const ViewItinerary = () => {
                             variant="outline"
                         >
                             <Download size={16} />
-                            Save as PDF (Legacy Method)
+                            Save as PDF
                         </Button>
                     </div>
 
