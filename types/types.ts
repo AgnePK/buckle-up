@@ -40,7 +40,7 @@ export interface TripType {
 }
 
 // API REQUESTS
-export interface Accommodation {
+export interface Accommodation extends SavedItemBase {
 	Sector?: string;
 	"Account Name"?: string;
 	"Property Reg Number": string;
@@ -49,23 +49,21 @@ export interface Accommodation {
 	"Address County"?: string;
 	"Eircode/Postal code": string;
 	"Owner(s) as it appears on Register"?: string;
-	Latitude: Float16Array;
-	Longitude: Float16Array;
+	Latitude: number;
+	Longitude: number;
 }
-export interface Attractions {
+export interface Attractions extends SavedItemBase {
 	Name: string;
 	Url: string;
 	Telephone: string;
-	Latitude: Float16Array;
-	Longitude: Float16Array;
+	Latitude: number;
+	Longitude: number;
 	Address: string;
 	County: string;
-	// Tags: Array<string>;
-	// or
 	Tags: string[] | string;
 }
 
-export interface Events {
+export interface Events extends SavedItemBase {
 	id: string;
 	name: string;
 	url: string;
@@ -105,3 +103,8 @@ export interface DragItem {
 export const ItemTypes = {
 	STOP: "stop"
 };
+
+export interface SavedItemBase {
+	id?: string;
+	savedAt?: string;
+}
