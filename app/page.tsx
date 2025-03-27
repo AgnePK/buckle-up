@@ -14,7 +14,7 @@ export default function Home() {
       <main className="flex flex-row content-center items-center ">
         <div className=''>
           <Image
-            alt="Vercel logo"
+            alt="illustration of a notebook and airplane"
             src={planner}
             width={500}
             height={400}
