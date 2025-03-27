@@ -1,4 +1,4 @@
-import { Plus, Home, Compass, FerrisWheel, Music4, BedDouble, BookmarkCheck, ChevronDown } from "lucide-react"
+import { Plus, Home, Compass, FerrisWheel, Music4, BedDouble, ChevronDown, Menu } from "lucide-react"
 import Link from "next/link"
 import { Button } from "../components/ui/button"
 import { signOut } from "firebase/auth"
@@ -17,27 +17,34 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+    SheetClose,
+} from "@/components/ui/sheet"
+
+import { useState } from "react"
 
 const dropdownItems = [
     {
         title: "BnBs",
         url: "/itinerary/discover/bnbs",
-        icon: BedDouble,
     },
     {
         title: "Attractions",
         url: "/itinerary/discover/attractions",
-        icon: FerrisWheel,
     },
     {
         title: "Events",
         url: "/itinerary/discover/events",
-        icon: Music4,
     },
 ]
 
 
-export function AppSidebar() {
+export function NavBar() {
 
     const { user, signOut } = useSession();
     const router = useRouter()
@@ -45,7 +52,15 @@ export function AppSidebar() {
     // isActive is inspired by 
     // https://dev.to/easyvipin/nextjs-tutorial-adding-navbar-with-active-styling-in-a-server-component-layout-5h68
     const pathname = usePathname()
+
     const isActive = (path: Url) => pathname === path;
+
+    // Handle routing in mobile menu
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const handleMobileNavigation = (url: string) => {
+        router.push(url);
+        setIsMobileMenuOpen(false);
+    }
 
     const handleLogout = async () => {
         await signOut();
@@ -53,33 +68,35 @@ export function AppSidebar() {
     };
 
     return (
-        <nav className="p-2 mx-12 md:pb-8 flex justify-between items-center">
-            <div className="flex gap-3  items-center">
+        <nav className="p-4 mx-2 md:mx-6 flex justify-between items-center md:pb-8">
+            {/* Logo - visible on all screen sizes */}
+            <div className="flex gap-3 items-center  md:relative z-10 bg-background px-6 p-4 rounded-2xl">
                 <Image
-                    alt="Vercel logo"
+                    alt="Buckle Up logo"
                     src={logo}
-                    width={50}
-
+                    width={40}
                     style={{
                         maxWidth: "100%",
                         height: "auto",
                     }}
+                    onClick={() => { router.push("/itinerary") }}
                 />
-                <Link href="/itinerary" className="text-2xl mb-4">
+                <Link href="/itinerary" className="text-xl hidden sm:block">
                     Buckle Up
                 </Link>
             </div>
 
-            <ul className="flex justify-end items-center gap-10 bg-card px-6 py-4 rounded-4xl">
+            {/* Desktop Navigation */}
+            <ul className="hidden md:flex justify-end items-center gap-10 bg-card px-6 py-4 rounded-2xl">
                 <li>
                     <Link href={"/itinerary"}
                         className={`${isActive("/itinerary") ? "text-primary" : ""}`}>
-                        Home
+                        My Itineraries
                     </Link>
                 </li>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild className="items-center">
-                        <div className="flex gap-2 items-center">
+                        <div className="flex gap-2 items-center cursor-pointer">
                             <ChevronDown />
                             Discover
                         </div>
@@ -99,12 +116,88 @@ export function AppSidebar() {
                     </Link>
                 </li>
             </ul>
-            <div className=" flex gap-3">
-                <ModeToggle />
-                <Button onClick={handleLogout} variant="outline" >Log out</Button>
+
+            {/* Right section with theme toggle and logout button */}
+            <div className="flex gap-3 items-center">
+                {/* Theme toggle - hidden on small mobile */}
+                <div className="hidden sm:block">
+                    <ModeToggle />
+                </div>
+
+                {/* Logout button - visible on medium screens and above */}
+                <div className="hidden md:block">
+                    <Button onClick={handleLogout} variant="outline">Log out</Button>
+                </div>
+
+                {/* Mobile menu button - visible on medium screens and below */}
+                <Sheet>
+                    <SheetTrigger asChild className="md:hidden">
+                        <Button variant="ghost" size="icon" aria-label="Menu">
+                            <Menu className="h-6 w-6" />
+                        </Button>
+                    </SheetTrigger>
+                    <SheetContent side="right" className="w-[250px] sm:w-[300px]">
+                        <SheetHeader className="mb-6">
+                            <SheetTitle>Menu</SheetTitle>
+                        </SheetHeader>
+                        <div className="flex flex-col gap-6 px-6">
+                            {/* Mobile navigation links */}
+                            <SheetClose asChild>
+                                <Link
+                                    href="/itinerary"
+                                    className={`flex items-center text-lg ${isActive("/itinerary") ? "text-primary font-medium" : ""}`}
+                                >
+                                    <Home className="mr-2 h-5 w-5" />
+                                    My Itineraries
+                                </Link>
+                            </SheetClose>
+
+                            <div className="flex flex-col gap-3 ">
+                                <p className="text-lg flex items-center">
+                                    <Compass className="mr-2 h-5 w-5" />
+                                    Discover
+                                </p>
+                                {dropdownItems.map((item) => {
+                                    return (
+                                        <SheetClose key={item.title} asChild>
+                                            <Link
+                                                href={item.url}
+                                                className={`flex pl-7 items-center ${isActive(item.url) ? "text-primary font-medium" : ""}`}
+                                            >
+                                                {item.title}
+                                            </Link>
+                                        </SheetClose>
+                                    );
+                                })}
+                            </div>
+
+                            <SheetClose asChild>
+                                <Link
+                                    href="/itinerary/saved"
+                                    className={`flex items-center text-lg ${isActive("/itinerary/saved") ? "text-primary font-medium" : ""}`}
+                                >
+                                    <BedDouble className="mr-2 h-5 w-5" />
+                                    Saved Places
+                                </Link>
+                            </SheetClose>
+
+                            {/* Theme toggler in mobile menu */}
+                            <div className="flex items-center text-lg">
+                                <div className="mr-2">
+                                    <ModeToggle />
+                                </div>
+                                Theme
+                            </div>
+
+                            {/* Logout button in mobile menu */}
+                            <Button onClick={handleLogout} variant="outline" className="me-10">
+                                Log out
+                            </Button>
+                        </div>
+                    </SheetContent>
+                </Sheet>
             </div>
         </nav>
-
     )
 }
 // Moved the sidebar into app so that i can use the useSession.

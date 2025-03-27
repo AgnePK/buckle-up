@@ -1,13 +1,7 @@
 "use client"
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import React from 'react'
 import { QueryClientProvider } from '@/components/QueryProvider';
-import { ModeToggle } from '@/components/toggle-mode';
-
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/app/NavBar"
+import { NavBar } from "@/app/NavBar"
 
 
 const AppLayout = ({ children }: Readonly<{
@@ -16,8 +10,10 @@ const AppLayout = ({ children }: Readonly<{
 
     return (
         <QueryClientProvider>
-            <AppSidebar />
-            <div>
+            <div className="relative z-10">
+                <NavBar />
+            </div>
+            <div className='max-w-screen-xl mx-auto'>
                 {children}
             </div>
         </QueryClientProvider>
