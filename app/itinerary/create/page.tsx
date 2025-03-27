@@ -51,6 +51,9 @@ const CreatePage = () => {
         notes: "",
     });
 
+    // Navigation state for success alert
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setItinerary(prevState => ({
@@ -169,6 +172,9 @@ const CreatePage = () => {
             return;
         }
 
+
+        setIsSubmitting(true);
+
         try {
             // Get existing trips data
             const snapshot = await get(userTripsRef);
@@ -183,8 +189,10 @@ const CreatePage = () => {
             const newTripRef = push(userTripsRef); // Generates a unique key for each trip
             await set(newTripRef, cleanedItinerary);
 
-            console.log("Itinerary submitted successfully!");
-            router.push("/itinerary")
+            // console.log("Itinerary submitted successfully!");
+
+            // https://nextjs.org/docs/pages/building-your-application/routing/linking-and-navigating
+            router.push(`/itinerary?success=true&tripName=${encodeURIComponent(itinerary.title)}`);
         } catch (error) {
             console.error("Error submitting itinerary:", error);
         }

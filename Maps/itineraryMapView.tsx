@@ -198,7 +198,7 @@ const ItineraryMapView = ({ trip }: ItineraryMapViewProps) => {
     }
 
     return (
-        <div className="rounded-lg my-6">
+        <div className="rounded-lg">
 
             {/* <div className="flex items-center space-x-4">
                 <div className="flex items-center">

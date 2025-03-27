@@ -14,7 +14,8 @@ import { Button } from '@/components/ui/button';
 
 import ItineraryMapView from '@/Maps/itineraryMapView';
 
-
+import Image from 'next/image';
+import journey from "@/public/illustrations/journey.png"
 // AI chatbot
 
 import { ChatProvider } from '@/gemeni/ChatContext';
@@ -115,68 +116,91 @@ const ViewItinerary = () => {
         });
     });
 
+    const hasFlightInfo = trip.flight && (
+        trip.flight.flight_number?.trim() ||
+        trip.flight.departure?.trim() ||
+        trip.flight.landing?.trim()
+    );
+
     return (
         <ChatProvider>
-            <div className="container mx-auto px-4 py-6">
-                <div className='flex justify-between items-center mb-6'>
-                    <h1 className='text-4xl font-bold'>
-                        {trip.title || 'Untitled Trip'}
-                    </h1>
-                    <div className="flex gap-4">
-                        <Link href={`/itinerary/${id}/edit`}>
-                            <Button variant="outline" className="flex items-center gap-2">
-                                <PenLine className="text-slate-500" size={20} /> Edit
-                            </Button>
-                        </Link>
-                        <Button
-                            variant="destructive"
-                            onClick={() => handleDelete(id)}
-                        >
-                            Delete
-                        </Button>
-                    </div>
-                </div>
+            <div className="mx-auto px-4">
 
                 <ItineraryMapView trip={trip} />
+
+
+
                 {hasLocations && (
-                    <div className="mb-6 flex justify-start">
+                    <div className="my-6 flex justify-start">
                         <OpenInGoogleMaps trip={trip} />
                     </div>
                 )}
-                <div id='itinerary-container' className="grid gap-6 bg-white p-6 rounded-lg shadow-sm">
-                    <div className="flex gap-4">
-                        <p className="font-medium">Start Date: <span className="font-normal">{trip.start_date}</span></p>
-                        <p className="font-medium">End Date: <span className="font-normal">{trip.end_date}</span></p>
+
+                <div id='itinerary-container' className="grid gap-6 p-6">
+                    <div className='md:flex md:flex-row'>
+                        <div className='md:w-1/2'>
+                            <h1 className='text-4xl font-bold'>
+                                {trip.title || 'Untitled Trip'}
+                            </h1>
+                            <div className="flex gap-4">
+                                <p className="font-medium">Start Date: <span className="font-normal">{trip.start_date}</span></p>
+                                <p className="font-medium">End Date: <span className="font-normal">{trip.end_date}</span></p>
+                            </div>
+
+                            {/* Display Flight Details */}
+                            {hasFlightInfo && (
+                                <div className="border-t pt-4">
+                                    <h2 className="text-xl font-semibold mb-2">Flight Details</h2>
+                                    {trip.flight.flight_number && (
+                                        <p className="mb-1">Flight Number: {trip.flight.flight_number}</p>
+                                    )}
+                                    {trip.flight.departure && (
+                                        <p className="mb-1">Departure: {trip.flight.departure}</p>
+                                    )}
+                                    {trip.flight.landing && (
+                                        <p className="mb-1">Landing: {trip.flight.landing}</p>
+                                    )}
+                                </div>
+                            )}
+
+                            {/*Display Notes */}
+                            {trip.notes && (
+                                <div className="border-t pt-4">
+                                    <h2 className="text-xl font-semibold mb-2">Notes</h2>
+                                    <p className="whitespace-pre-wrap">{trip.notes}</p>
+                                </div>
+                            )}
+
+                            <h2 className="text-xl font-semibold mb-4">Itinerary Plan</h2>
+                        </div>
+                        <div className='md:w-1/2 '>
+                            <div className='flex justify-end'>
+                                <div className="flex gap-4">
+                                    <Button variant="outline" className="flex items-center gap-2"
+                                        onClick={() => { router.push(`/itinerary/${id}/edit`) }}>
+                                        <PenLine className="text-slate-500" size={20} /> Edit
+                                    </Button>
+                                    <Button
+                                        variant="destructive"
+                                        onClick={() => handleDelete(id)}
+                                    >
+                                        Delete
+                                    </Button>
+                                </div>
+                            </div>
+                            <Image src={journey} alt={''} />
+                        </div>
+
                     </div>
-
-                    {/* Display Flight Details */}
-                    {trip.flight && (
-                        <div className="border-t pt-4">
-                            <h2 className="text-xl font-semibold mb-2">Flight Details</h2>
-                            <p className="mb-1">Flight Number: {trip.flight.flight_number || 'N/A'}</p>
-                            <p className="mb-1">Departure: {trip.flight.departure || 'N/A'}</p>
-                            <p className="mb-1">Landing: {trip.flight.landing || 'N/A'}</p>
-                        </div>
-                    )}
-
-                    {/*Display Notes */}
-                    {trip.notes && (
-                        <div className="border-t pt-4">
-                            <h2 className="text-xl font-semibold mb-2">Notes</h2>
-                            <p className="whitespace-pre-wrap">{trip.notes}</p>
-                        </div>
-                    )}
-
                     {/* Display Trip Days */}
                     {trip.days && Object.keys(trip.days).length > 0 && (
-                        <div className="border-t pt-4">
-                            <h2 className="text-xl font-semibold mb-4">Itinerary Plan</h2>
+                        <div className="pt-4">
 
                             {Object.entries(trip.days).map(([dayNumber, dayData]) => (
                                 <div key={dayNumber} className="mb-6 bg-slate-50 p-4 rounded-md">
                                     <h3 className="text-lg font-medium mb-3">Day {dayNumber}</h3>
 
-                                    {/* Render Stops for Morning, Afternoon, and Evening */}
+                                    {/* Render Stops for Morning, Afternoon, and Evening with timeline */}
                                     {['morning', 'afternoon', 'evening'].map((timeOfDay) => {
                                         const stops = (dayData as any)[timeOfDay];
                                         if (!stops || stops.length === 0) return null; // Skip empty data
@@ -186,14 +210,39 @@ const ViewItinerary = () => {
                                                 <h4 className="capitalize font-medium text-slate-700 mb-2">
                                                     {timeOfDay}
                                                 </h4>
-                                                <div className="pl-4">
+
+                                                {/* Timeline for this period */}
+                                                <ol className="relative border-s border-gray-200 dark:border-gray-700 ml-4">
                                                     {stops.map((stop: any, index: number) => (
-                                                        <div key={index} className="mb-2">
-                                                            <p className="font-medium">- {stop.name} <span className="text-slate-500">({stop.time})</span></p>
-                                                            {stop.notes && <p className="text-sm pl-4 text-slate-600">Notes: {stop.notes}</p>}
-                                                        </div>
+                                                        <li key={index} className={index !== stops.length - 1 ? "mb-6 ms-4" : "ms-4"}>
+                                                            <div className="absolute w-3 h-3 bg-emerald-500 rounded-full mt-1.5 -start-1.5 border border-white"></div>
+
+                                                            {/* Time as the timeline marker */}
+                                                            <time className="mb-1 text-sm font-normal leading-none text-gray-500">
+                                                                {stop.time || "No time set"}
+                                                            </time>
+
+                                                            {/* Stop name as the title */}
+                                                            <h3 className="text-lg font-semibold text-gray-900">
+                                                                {stop.name}
+                                                            </h3>
+
+                                                            {/* Notes as the description */}
+                                                            {stop.notes && (
+                                                                <p className="text-base font-normal text-gray-500">
+                                                                    {stop.notes}
+                                                                </p>
+                                                            )}
+
+                                                            {/* Show address if available */}
+                                                            {stop.address && (
+                                                                <p className="mt-2 text-sm italic text-gray-400">
+                                                                    Address: {stop.address}
+                                                                </p>
+                                                            )}
+                                                        </li>
                                                     ))}
-                                                </div>
+                                                </ol>
                                             </div>
                                         );
                                     })}
