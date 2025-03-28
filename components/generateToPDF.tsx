@@ -1,6 +1,8 @@
 import jsPDF from 'jspdf';
 
 // Function to generate a nicely formatted PDF directly
+
+// used AI to style the pdf 
 export const generatePDF = async () => {
     try {
         // Get the trip data from the DOM
@@ -27,21 +29,13 @@ export const generatePDF = async () => {
         // Extract basic trip data
         const title = document.querySelector('h1')?.textContent || 'Trip Itinerary';
         
-        // Get dates
-        const dateElements = element.querySelectorAll('.font-medium');
-        let startDate = '';
-        let endDate = '';
-        
-        dateElements.forEach(dateEl => {
-            const text = dateEl.textContent || '';
-            if (text.includes('Start Date:')) {
-                startDate = text.replace('Start Date:', '').trim();
-            } else if (text.includes('End Date:')) {
-                endDate = text.replace('End Date:', '').trim();
-            }
-        });
+        // Get dates - updated selector for new layout
+        const dateText = element.querySelector('.gap-4 > p')?.textContent || '';
+        const dateParts = dateText.split(' to ');
+        const startDate = dateParts[0] || '';
+        const endDate = dateParts[1] || '';
 
-        // Extract notes
+        // Extract notes - updated for new structure
         let notes = '';
         const notesHeadings = element.querySelectorAll('h2');
         notesHeadings.forEach(heading => {
@@ -74,23 +68,24 @@ export const generatePDF = async () => {
         pdf.setFont('helvetica', 'normal');
         pdf.text(`Start Date: ${startDate}  |  End Date: ${endDate}`, 20, 40); // Left aligned
         
+        let yPosition = 50;
+        
         // Add notes if available
         if (notes) {
             pdf.setFont('helvetica', 'bold');
             pdf.setFontSize(16);
-            pdf.text('Notes', 20, 55);
+            pdf.text('Notes', 20, yPosition);
+            yPosition += 10;
             
             pdf.setFont('helvetica', 'normal');
             pdf.setFontSize(12);
             const splitNotes = pdf.splitTextToSize(notes, pageWidth - 40);
-            pdf.text(splitNotes, 20, 65);
+            pdf.text(splitNotes, 20, yPosition);
+            yPosition += (splitNotes.length * 7) + 10;
         }
         
-        // Set starting Y position for itinerary
-        let yPosition = notes ? 65 + (pdf.splitTextToSize(notes, pageWidth - 40).length * 7) : 60;
-        yPosition += 10; // Add extra space
-        
-        if (yPosition > pageHeight - 20) {
+        // Check if we need a new page before the itinerary
+        if (yPosition > pageHeight - 30) {
             pdf.addPage();
             yPosition = 20;
         }
@@ -101,8 +96,9 @@ export const generatePDF = async () => {
         pdf.text('Itinerary Plan', 20, yPosition);
         yPosition += 10;
         
-        // Process each day
-        const dayDivs = element.querySelectorAll('.mb-6.bg-slate-50.p-4.rounded-md');
+        // Process each day - updated for new timeline structure
+        const dayDivs = element.querySelectorAll('.bg-gray-200 > div.mb-6');
+        
         for (let i = 0; i < dayDivs.length; i++) {
             const dayDiv = dayDivs[i];
             const dayTitle = dayDiv.querySelector('h3')?.textContent || 'Day';
@@ -124,8 +120,9 @@ export const generatePDF = async () => {
             pdf.text(dayTitle, 20, yPosition + 7);
             yPosition += 15;
             
-            // Process each period (morning, afternoon, evening)
-            const periods = dayDiv.querySelectorAll('div.mb-4');
+            // Process each time period (morning, afternoon, evening)
+            const periods = dayDiv.querySelectorAll('div.ms-4');
+            
             for (let j = 0; j < periods.length; j++) {
                 const period = periods[j];
                 const periodTitle = period.querySelector('h4')?.textContent;
@@ -144,57 +141,69 @@ export const generatePDF = async () => {
                     pdf.text(periodTitle, 25, yPosition);
                     yPosition += 8;
                     
-                    // Process stops
-                    const stopItems = period.querySelectorAll('.pl-4 > div');
+                    // Process timeline items (stops)
+                    const stopItems = period.querySelectorAll('li');
+                    
                     for (let k = 0; k < stopItems.length; k++) {
                         const stopItem = stopItems[k];
-                        const stopMainText = stopItem.querySelector('p.font-medium')?.textContent;
+                        const time = stopItem.querySelector('time')?.textContent || '';
+                        const stopName = stopItem.querySelector('h3')?.textContent || '';
+                        const stopNotes = stopItem.querySelector('p.text-base')?.textContent || '';
+                        const address = stopItem.querySelector('p.mt-2')?.textContent || '';
                         
-                        if (stopMainText) {
-                            // Check if we need a new page
-                            if (yPosition > pageHeight - 40) {
+                        // Check if we need a new page
+                        if (yPosition > pageHeight - 40) {
+                            pdf.addPage();
+                            yPosition = 20;
+                        }
+                        
+                        // Add stop time and name
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.setFontSize(12);
+                        pdf.setTextColor(0, 0, 0);
+                        
+                        pdf.text(`${time}: ${stopName}`, 30, yPosition);
+                        yPosition += 6;
+                        
+                        // Add notes if available
+                        if (stopNotes) {
+                            if (yPosition > pageHeight - 30) {
                                 pdf.addPage();
                                 yPosition = 20;
                             }
                             
-                            // Add stop text (remove any strange characters)
-                            pdf.setFont('helvetica', 'normal');
-                            pdf.setFontSize(12);
-                            pdf.setTextColor(0, 0, 0);
+                            pdf.setFont('helvetica', 'italic');
+                            pdf.setFontSize(10);
+                            pdf.setTextColor(85, 85, 85); // #555 - Medium gray
                             
-                            // Clean up text by removing any strange characters or excessive spacing
-                            let cleanedText = stopMainText.replace(/ø=üí\s*-\s*/gi, '').trim();
-                            cleanedText = cleanedText.replace(/\s+/g, ' '); // Fix any excessive spacing
-                            
-                            pdf.text(cleanedText, 30, yPosition);
-                            yPosition += 6;
-                            
-                            // Check for notes
-                            const noteText = stopItem.querySelector('.text-sm')?.textContent;
-                            if (noteText) {
-                                // Check if we need a new page
-                                if (yPosition > pageHeight - 30) {
-                                    pdf.addPage();
-                                    yPosition = 20;
-                                }
-                                
-                                // Add notes in italics
-                                pdf.setFont('helvetica', 'italic');
-                                pdf.setFontSize(10);
-                                pdf.setTextColor(85, 85, 85); // #555 - Medium gray
-                                
-                                const splitNoteText = pdf.splitTextToSize(noteText, pageWidth - 70);
-                                pdf.text(splitNoteText, 35, yPosition);
-                                yPosition += (splitNoteText.length * 5) + 3;
-                            }
+                            const splitNoteText = pdf.splitTextToSize(stopNotes, pageWidth - 70);
+                            pdf.text(splitNoteText, 35, yPosition);
+                            yPosition += (splitNoteText.length * 5) + 3;
                         }
+                        
+                        // Add address if available
+                        if (address) {
+                            if (yPosition > pageHeight - 30) {
+                                pdf.addPage();
+                                yPosition = 20;
+                            }
+                            
+                            pdf.setFont('helvetica', 'italic');
+                            pdf.setFontSize(9);
+                            pdf.setTextColor(120, 120, 120);
+                            
+                            pdf.text(address, 35, yPosition);
+                            yPosition += 5;
+                        }
+                        
+                        yPosition += 3; // Add space after each stop
                     }
                     
                     yPosition += 5; // Add space after period
                 }
             }
             
-            yPosition += 5; // Add space after day
+            yPosition += 10; // Add space after day
         }
         
         // Add footer with page numbers
