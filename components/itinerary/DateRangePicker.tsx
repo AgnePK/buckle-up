@@ -4,7 +4,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { DateRange } from "react-day-picker";
-import "@/components/ui/calendar-styles.css"
+import "@/app/globals.css";
 
 interface DateRangePickerProps {
     dateRange: DateRange | undefined;
@@ -16,27 +16,30 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
     onDateRangeChange
 }) => {
     return (
-        <Card className="w-150">
+        <Card className="bg-transparent border-none shadow-none">
             <CardHeader>
                 <CardTitle className="text-lg">Trip Dates</CardTitle>
                 <p className="text-sm text-gray-500">
                     Select the dates for your trip. This will automatically generate the days for your itinerary.
                 </p>
+                <p className="text-sm text-gray-500 italic">
+                    The calendar is currently broken, appologies for any inconvenience
+                </p>
             </CardHeader>
             <CardContent>
                 <div className="grid gap-4">
-                    <div className="border rounded-md p-4 flex justify-center">
+                    <div className="p-4 flex justify-center">
                         {/* React-day-picker is incompatible with react19, trying to fix using AI-Claude */}
                         {/* https://github.com/shadcn-ui/ui/discussions/6271 */}
                         {/* the fix didnt work */}
                         <Calendar
-                            initialFocus
                             mode="range"
                             defaultMonth={dateRange?.from}
                             selected={dateRange}
                             onSelect={onDateRangeChange}
                             numberOfMonths={1}
                             showOutsideDays
+                            className='bg-card rounded-xl py-4'
                             styles={{
                                 caption: { textAlign: 'center', marginBottom: '8px' },
                                 day_selected: { backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)' },
