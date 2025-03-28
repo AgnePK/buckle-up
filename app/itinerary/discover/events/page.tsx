@@ -9,11 +9,16 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Calendar, MapPin, User, Building } from 'lucide-react';
+import { Calendar, MapPin, User, Building, ExternalLink } from 'lucide-react';
 import Head from 'next/head';
 import SaveButton from '@/components/savedItems';
+import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 
-const PAGE_SIZE = 20;
+import music from "@/public/illustrations/music.png"
+import { Input } from '@/components/ui/input';
+
+const PAGE_SIZE = 21;
 
 export default function EventsPage() {
   const [page, setPage] = useState(1);
@@ -84,23 +89,30 @@ export default function EventsPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Head>
-        <title>Music Events | Irish Travel Guide</title>
-        <meta name="description" content="Irish music events and gatherings" />
-      </Head>
-
-      <h1 className="text-3xl font-bold mb-6">Music Events</h1>
-
-      <div className="mb-6">
-        <input
-          type="text"
-          placeholder="Search by Name or County..."
-          value={searchTerm}
-          onChange={handleSearch}
-          className="w-full p-2 border border-gray-300 rounded-md"
-        />
+    <div className="px-8 pb-8">
+      <div className='md:flex flex-row justify-evenly items-center'>
+        <div className='md:w-1/3 gap-6 flex flex-col gap-6'>
+          <h1 className="text-3xl font-bold ">Music Events</h1>
+          <p className='text-xl text-gray-800'>
+            Explore the traditional Irish Music events provided by <a href="https://thesession.org/tunes" target='_blank' className='text-primary'>The Session</a>.
+          </p>
+          <p className='text-xl text-gray-800'>
+            Save the events you like, then find them in the Saved Places page
+          </p>
+          <div className="mb-6">
+            <Input
+              type="text"
+              placeholder="Search by Name or County..."
+              value={searchTerm}
+              onChange={handleSearch}
+              className="border-gray-300"
+              />
+          </div>
+        </div>
+        <Image src={music} alt={'illustration for the events / music events page'} className='md:w-1/3 ' />
       </div>
+
+
 
       {eventsQuery.isLoading && (
         <div className="flex flex-col items-center py-12">
@@ -163,15 +175,17 @@ export default function EventsPage() {
               </div>
 
             </CardContent>
-            <CardFooter>
+            <CardFooter className='ms-auto mt-auto'>
               {item.url && (
                 <a
                   href={item.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-primary hover:underline"
                 >
-                  View on TheSession.org
+                  <Button>
+                    <ExternalLink />
+                    TheSession.org
+                  </Button>
                 </a>
               )}
             </CardFooter>

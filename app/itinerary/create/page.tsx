@@ -21,6 +21,7 @@ import DateRangePicker, { generateDays } from '@/components/itinerary/DateRangeP
 import { cleanItinerary, generateMarkedDates } from '@/components/itinerary/CleanItinerary';
 import { DateRange } from "react-day-picker";
 import { format, parse } from "date-fns";
+import { ChevronRight, Clock } from 'lucide-react';
 
 const CreatePage = () => {
     const router = useRouter();
@@ -312,52 +313,66 @@ const CreatePage = () => {
 
     return (
         <DndProvider backend={HTML5Backend}>
-            <div className='px-4 py-6 w-100 flex flex-col content-center'>
+            <div className='mx-auto px-8 md:w-1/3'>
                 {step === 1 && (
-                    <div className="space-y-4">
+                    <div className="flex flex-col gap-8">
                         <div>
-                            <p className="text-sm font-medium mb-1">Trip Name:</p>
-                            <Input name="title" value={itinerary.title} onChange={handleChange} />
+                            <p className="text-sm font-medium mb-1">Trip Name</p>
+                            <Input
+                                name="title"
+                                value={itinerary.title}
+                                onChange={handleChange}
+                                placeholder='Name of the trip'
+                            />
                         </div>
 
                         <div>
-                            <p className="text-sm font-medium mb-1">Flight Info:</p>
+                            <p className="text-sm font-medium mb-1">Flight Info</p>
                             <Input
                                 name="flight_number"
                                 placeholder="Flight Number"
                                 value={itinerary.flight.flight_number}
                                 onChange={handleFlightChange}
-                                className="mb-2"
+                                className="mb-6"
                             />
 
-                            <div className="flex items-center space-x-2 mb-2">
-                                <p>Departure Time: {itinerary.flight.departure || "Not Set"}</p>
-                                <Button
-                                    onClick={() => {
-                                        setFlightType("departure");
-                                        setShowTimePicker(true);
-                                    }}
-                                    size="sm"
-                                >
-                                    Select
-                                </Button>
-                            </div>
+                            <div className='flex gap-8'>
+                                <div className=" flex flex-col gap-2">
+                                    <p>Departure Time </p>
+                                    <Button
+                                        onClick={() => {
+                                            setFlightType("departure");
+                                            setShowTimePicker(true);
+                                        }}
+                                        size="lg"
+                                        variant={"outline"}
+                                        className='flex gap-8'
+                                    >
+                                        {itinerary.flight.departure || "Not Set"}
+                                        <Clock />
+                                    </Button>
+                                </div>
 
-                            <div className="flex items-center space-x-2 mb-4">
-                                <p>Landing Time: {itinerary.flight.landing || "Not Set"}</p>
-                                <Button
-                                    onClick={() => {
-                                        setFlightType("landing");
-                                        setShowTimePicker(true);
-                                    }}
-                                    size="sm"
-                                >
-                                    Select
-                                </Button>
+                                <div className=" flex flex-col gap-2">
+                                    <p>Landing Time </p>
+                                    <Button
+                                        onClick={() => {
+                                            setFlightType("landing");
+                                            setShowTimePicker(true);
+                                        }}
+                                        size="lg"
+                                        variant={"outline"}
+                                        className='flex gap-8'
+                                    >
+                                        {itinerary.flight.landing || "Not Set"}
+                                        <Clock />
+                                    </Button>
+                                </div>
+
                             </div>
 
                             {showTimePicker && (
-                                <div className="mb-4 p-4 border rounded">
+                                <div className="mb-4 p-4">
                                     <DatePicker
                                         selected={new Date()}
                                         onChange={onChangeTime}
@@ -371,19 +386,20 @@ const CreatePage = () => {
                                 </div>
                             )}
                         </div>
-
-                        <Button onClick={nextStep} className="w-full">Next</Button>
+                        <div className='ms-auto'>
+                            <Button onClick={nextStep} >Next <ChevronRight/></Button>
+                        </div>
                     </div>
                 )}
 
                 {step === 2 && (
-                    <div className="">
+                    <div className="w-110 ">
                         <DateRangePicker
                             dateRange={dateRange}
                             onDateRangeChange={handleDateRangeChange}
                         />
-                        <div className="flex flex-row space-x-2 justify-between mt-4">
-                            <Button onClick={prevStep} variant="outline" className="flex-1">Back</Button>
+                        <div className="flex flex-row justify-between mt-4">
+                            <Button onClick={prevStep} variant="outline" className="flex-1 mr-2">Back</Button>
                             <Button onClick={handleGenerateAndNext} className="flex-1">
                                 {daysGenerated ? "Next" : "Generate & Next"}
                             </Button>
@@ -503,7 +519,7 @@ const CreatePage = () => {
                 {step === 4 && (
                     <div className="space-y-4">
                         <div>
-                            <p className="text-sm font-medium mb-1">General Notes:</p>
+                            <p className="text-sm font-medium mb-1">General Notes</p>
                             <Input
                                 name="notes"
                                 value={itinerary.notes}

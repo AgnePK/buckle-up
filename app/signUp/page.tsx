@@ -106,8 +106,16 @@ export default function SignUp() {
 
     return (
         <div className='grid gap-8 place-content-center min-h-screen'>
-            <h1 className="text-6xl text-emerald-800 font-extrabold">Buckle Up</h1>
+            <h1 className="text-6xl text-primary font-extrabold">Buckle Up</h1>
+            <div className='w-70 flex flex-col gap-4 text-gray-800'>
+                <p>
+                    No account yet? No problem!
+                </p>
+                <p>
+                    Let's start by signing up, then you can begin to build your first itinerary!
+                </p>
 
+            </div>
             <form onSubmit={handleSubmit} className="grid gap-4">
                 {error && (
                     <div className="p-3 rounded-md bg-red-50 border border-red-200 text-red-800 flex items-start gap-2">
@@ -122,7 +130,7 @@ export default function SignUp() {
                             placeholder="Full Name"
                             value={newUser.full_name}
                             onChange={handleChange}
-                            className={`bg-slate-100 ${fieldErrors.full_name ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                            className={`bg-gray-100 ${fieldErrors.full_name ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                             name="full_name"
                             autoComplete="name"
                             disabled={isSubmitting}
@@ -137,7 +145,7 @@ export default function SignUp() {
                             placeholder="Email address"
                             value={newUser.email}
                             onChange={handleChange}
-                            className={`bg-slate-100 ${fieldErrors.email ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                            className={`bg-gray-100 ${fieldErrors.email ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                             name="email"
                             type='email'
                             autoComplete="email"
@@ -153,7 +161,7 @@ export default function SignUp() {
                             placeholder="Password"
                             value={newUser.password}
                             onChange={handleChange}
-                            className={`bg-slate-100 ${fieldErrors.password ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                            className={`bg-gray-100 ${fieldErrors.password ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                             name="password"
                             type='password'
                             autoComplete="new-password"
@@ -164,9 +172,9 @@ export default function SignUp() {
                         )}
                     </div>
 
-                    <div className='flex justify-center gap-1 my-3'>
-                        <p>Already have an account?</p>
-                        <Link href={"/signIn"} className='text-emerald-700 hover:underline'>Log In!</Link>
+                    <div className='flex gap-1 my-3'>
+                        <p className='text-slate-600'>Already have an account?</p>
+                        <Link href={"/signIn"} className='text-primary hover:underline'>Log In!</Link>
                     </div>
                 </div>
 

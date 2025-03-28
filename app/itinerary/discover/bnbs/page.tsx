@@ -11,11 +11,17 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin } from 'lucide-react';
+import { MapPin, ExternalLink, Navigation } from 'lucide-react';
 import Head from 'next/head';
 import SaveButton from '@/components/savedItems';
+import { Button } from '@/components/ui/button';
+import { bnbs } from '@/utils/bnbImages';
+import Image from 'next/image';
+import { Input } from '@/components/ui/input';
 
-const PAGE_SIZE = 20;
+import bed from "@/public/illustrations/bed.png"
+
+const PAGE_SIZE = 21;
 
 export default function AccommodationsPage() {
     const [page, setPage] = useState(1);
@@ -69,23 +75,37 @@ export default function AccommodationsPage() {
         }
     };
 
+    const getImageForIndex = (index: number) => {
+        // Calculate the absolute index based on current page and page size
+        const absoluteIndex = ((page - 1) * PAGE_SIZE) + index;
+        // Use modulo to cycle through the images array
+        const imageIndex = absoluteIndex % bnbs.length;
+        return bnbs[imageIndex];
+    };
+
     return (
-        <div className="container mx-auto px-4 py-8">
-            <Head>
-                <title>Accommodations | Irish Travel Guide</title>
-                <meta name="description" content="Browse accommodations in Ireland" />
-            </Head>
+        <div className="px-8 pb-8">
+            <div className='md:flex flex-row justify-evenly items-center mb-2'>
+                <div className='md:w-1/3 gap-6 flex flex-col gap-6'>
+                    <h1 className="text-3xl font-bold ">Bed and Breakfast <p className='text-sm text-gray-600'>Local Businesses</p></h1>
 
-            <h1 className="text-3xl font-bold mb-6">Accommodations</h1>
-
-            <div className="mb-6">
-                <input
-                    type="text"
-                    placeholder="Search accommodations..."
-                    value={searchTerm}
-                    onChange={handleSearch}
-                    className="w-full p-2 border border-gray-300 rounded-md"
-                />
+                    <p className='text-xl text-gray-800'>
+                        Browse through the local BnBs provided by <a href="https://www.failteireland.ie/" target='_blank' className='text-primary'>Fáilte Ireland</a>.
+                    </p>
+                    <p className='text-xl text-gray-800'>
+                        Save the events you like, then find them in the Saved Places page
+                    </p>
+                    <div className="mb-6">
+                        <Input
+                            type="text"
+                            placeholder="Search by Name or County..."
+                            value={searchTerm}
+                            onChange={handleSearch}
+                            className="border-gray-300"
+                        />
+                    </div>
+                </div>
+                <Image src={bed} alt={'illustration for the bed and breadkfast discover page'} className='md:w-1/3 ' />
             </div>
 
             {accommodationQuery.isLoading && (
@@ -101,27 +121,64 @@ export default function AccommodationsPage() {
                 </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {displayData.map((item) => (
-                    <Card key={item["Property Reg Number"]} className="h-full">
-                        <CardHeader className='flex-row justify-between content-center'>
-                            <CardTitle>{item["Account Name"]}</CardTitle>
-                            <div>{<SaveButton item={item} itemType="accommodation" />}</div>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex items-center">
-                                <MapPin className="h-5 w-5 text-emerald-700 mr-2" />
-                                <p>{item["Address Line 1"]}, {item["Address County"]}</p>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                {displayData.map((item, index) => {
+                    const cardImage = getImageForIndex(index);
+
+                    return (
+                        <Card key={item["Property Reg Number"]} className="h-full pt-0 border-none">
+                            <div className="relative w-full h-48 overflow-hidden">
+                                <Image
+                                    src={cardImage}
+                                    alt={`${item["Account Name"]} accommodation`}
+                                    fill
+                                    className="object-cover transition-transform duration-300 hover:scale-105 rounded-lg"
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                    priority={index < 6}
+                                />
                             </div>
-                        </CardContent>
-                        <CardFooter>
-                            <Badge variant="outline">{item.Sector}</Badge>
-                            {item.Rating && (
-                                <Badge className="ml-2" variant="secondary">{item.Rating}</Badge>
-                            )}
-                        </CardFooter>
-                    </Card>
-                ))}
+                            <CardHeader className='flex-row justify-between content-center'>
+                                <CardTitle>{item["Account Name"]}</CardTitle>
+                                <div className='-mt-[40px] relative'>{<SaveButton item={item} itemType="accommodation" />}</div>
+                            </CardHeader>
+                            <CardContent>
+                                {item.Rating && (
+                                    <Badge className="mb-4" variant="outline">{item.Rating}</Badge>
+                                )}
+                                <div className="flex items-center mb-2">
+                                    <MapPin size={22} className="text-primary mr-2" />
+                                    <p>{item["Address Line 1"]}, {item["Address County"]}</p>
+                                </div>
+                                <a
+                                    href={`https://www.google.com/maps?q=${item.Latitude}+${item.Longitude}`}
+                                    target="_blank"
+                                    // this is to protect my site from bring linked in booking.com
+                                    rel="noopener noreferrer"
+                                    className='flex gap-2'
+                                >
+                                    <Navigation size={22} className='text-primary' />
+                                    Open in Google Maps
+                                </a>
+                            </CardContent>
+                            <CardFooter className='flex justify-between'>
+
+                                <a
+                                    href={`https://www.booking.com/search.html?ss=${encodeURIComponent(item["Account Name"])}+${encodeURIComponent(item["Address County"] || "Ireland")}`}
+                                    target="_blank"
+                                    // this is to protect my site from bring linked in booking.com
+                                    rel="noopener noreferrer"
+                                    className='flex gap-2'
+                                >
+                                    <Button>
+                                        <ExternalLink size={22} className='text-background' />
+                                        Booking.com
+                                    </Button>
+                                </a>
+                            </CardFooter>
+                        </Card>
+
+                    )
+                })}
             </div>
 
             {/* Pagination Controls */}

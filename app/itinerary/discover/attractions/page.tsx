@@ -12,10 +12,13 @@ import {
     CardDescription,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin } from 'lucide-react';
+import { MapPin, Phone, ExternalLink, Navigation } from 'lucide-react';
 import Head from 'next/head';
 import SaveButton from '@/components/savedItems';
-
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import Image from 'next/image';
+import parade from "@/public/illustrations/parade1.png"
 const PAGE_SIZE = 20;
 
 export default function AttractionsPage() {
@@ -72,22 +75,27 @@ export default function AttractionsPage() {
     };
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            <Head>
-                <title>Attractions | Irish Travel Guide</title>
-                <meta name="description" content="Discover attractions in Ireland" />
-            </Head>
-
-            <h1 className="text-3xl font-bold mb-6">Attractions</h1>
-
-            <div className="mb-6">
-                <input
-                    type="text"
-                    placeholder="Search attractions or tags..."
-                    value={searchTerm}
-                    onChange={handleSearch}
-                    className="w-full p-2 border border-gray-300 rounded-md"
-                />
+        <div className="px-8 pb-8">
+            <div className='md:flex flex-row justify-evenly items-center'>
+                <div className='md:w-1/3 gap-6 flex flex-col gap-6'>
+                    <h1 className="text-3xl font-bold ">Attractions</h1>
+                    <p className='text-xl text-gray-800'>
+                        Find below the attractions provided by <a href="https://www.failteireland.ie/" target='_blank' className='text-primary'>Fáilte Ireland</a>.
+                    </p>
+                    <p className='text-xl text-gray-800'>
+                        Save the events you like, then find them in the Saved Places page
+                    </p>
+                    <div className="mb-6">
+                        <Input
+                            type="text"
+                            placeholder="Search Name, County or Tags..."
+                            value={searchTerm}
+                            onChange={handleSearch}
+                            className="border-gray-300"
+                        />
+                    </div>
+                </div>
+                <Image src={parade} alt={'illustration for the attractions page'} className='md:w-1/3 ' />
             </div>
 
             {attractionsQuery.isLoading && (
@@ -112,31 +120,54 @@ export default function AttractionsPage() {
                         </CardHeader>
                         <CardContent>
                             <div className="flex items-center mb-4">
-                                <MapPin className="h-5 w-5 text-emerald-700 mr-2" />
+                                <MapPin size={22} className="text-primary mr-2" />
                                 <p>{item.Address || item.County}</p>
                             </div>
 
                             {item.Telephone && (
-                                <p className="text-sm text-gray-600 mb-2">Tel: {item.Telephone}</p>
+                                <div className='flex gap-2'>
+                                    <Phone size={22} className='text-gray-600' />
+                                    <p className="text-gray-600 mb-2">Tel: {item.Telephone}</p>
+                                </div>
                             )}
 
-                            {item.Url && (
-                                <a
-                                    href={item.Url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-primary hover:underline text-sm block mb-4"
-                                >
-                                    Visit Website
-                                </a>
-                            )}
-                        </CardContent>
-                        <CardFooter>
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex flex-wrap gap-2 mt-2">
                                 {item.Tags && item.Tags.map((tag: string, tagIndex: number) => (
                                     <Badge key={tagIndex} variant="outline">{tag}</Badge>
                                 ))}
                             </div>
+
+                        </CardContent>
+                        <CardFooter className='mt-auto flex justify-between'>
+                            <a
+                                href={`https://www.google.com/maps?q=${item.Latitude}+${item.Longitude}`}
+                                target="_blank"
+                                // this is to protect my site from bring linked in booking.com
+                                rel="noopener noreferrer"
+                                className='flex gap-2'
+                            >
+                                <Button variant={"outline"} className='bg-transparent'>
+                                    <Navigation size={22} className='' />
+                                    Google Maps
+                                </Button>
+                            </a>
+                            {item.Url ? (
+                                <a
+                                    href={item.Url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-primary"
+                                >
+                                    <Button variant={"default"}>
+                                        <ExternalLink className="mr-2" />
+                                        Visit Website
+                                    </Button>
+                                </a>
+                            ) : (
+                                <Button variant={"ghost"} >
+                                    <p className="text-gray-500 text-sm italic">No link available</p>
+                                </Button>
+                            )}
                         </CardFooter>
                     </Card>
                 ))}
