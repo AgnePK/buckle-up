@@ -130,7 +130,7 @@ export default function SignUp() {
                             placeholder="Full Name"
                             value={newUser.full_name}
                             onChange={handleChange}
-                            className={`bg-gray-100 ${fieldErrors.full_name ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                            className={` ${fieldErrors.full_name ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                             name="full_name"
                             autoComplete="name"
                             disabled={isSubmitting}
@@ -145,7 +145,7 @@ export default function SignUp() {
                             placeholder="Email address"
                             value={newUser.email}
                             onChange={handleChange}
-                            className={`bg-gray-100 ${fieldErrors.email ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                            className={` ${fieldErrors.email ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                             name="email"
                             type='email'
                             autoComplete="email"
@@ -161,7 +161,7 @@ export default function SignUp() {
                             placeholder="Password"
                             value={newUser.password}
                             onChange={handleChange}
-                            className={`bg-gray-100 ${fieldErrors.password ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                            className={` ${fieldErrors.password ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                             name="password"
                             type='password'
                             autoComplete="new-password"

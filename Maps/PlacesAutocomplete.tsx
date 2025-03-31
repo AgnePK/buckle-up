@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { loadMapsAPI, isGoogleMapsLoaded } from '@/Maps/loadMapsAPI';
+import { Input } from '@/components/ui/input';
 
 type PlacesAutocompleteProps = {
     value: string;
@@ -89,13 +90,12 @@ const PlacesAutocomplete = ({
 
     return (
         <div>
-            <input
+            <Input
                 ref={inputRef}
                 type="text"
                 defaultValue={value}
                 onChange={handleInputChange}
                 placeholder={placeholder}
-                className="w-full p-2 border rounded"
             />
             {/* <div className="text-xs mt-1">Google Maps API status: {isLoaded ? 'Loaded' : 'Loading...'}</div> */}
         </div>

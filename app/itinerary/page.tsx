@@ -154,7 +154,8 @@ export default function Itinerary() {
     }, [user, isLoading]);
     if (isLoading || loading) {
         return (
-            <div className="flex justify-center items-center p-8">
+            <div className="flex flex-col items-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
                 <p>Loading...</p>
             </div>
         );
@@ -321,7 +322,7 @@ export default function Itinerary() {
                                         )}
                                     </CardContent>
                                     <CardFooter className='w-full md:w-1/4'>
-                                        <Button variant="default" className='md:ms-auto' onClick={()=>{router.push(`/itinerary/${item.id}`)}}>
+                                        <Button variant="default" className='md:ms-auto' onClick={() => { router.push(`/itinerary/${item.id}`) }}>
                                             View Itinerary
                                         </Button>
                                     </CardFooter>

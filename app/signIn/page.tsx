@@ -102,7 +102,7 @@ export default function SignIn() {
                         placeholder="Email address"
                         value={user.email}
                         onChange={handleChange}
-                        className={`bg-gray-100 ${error && !user.email ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                        className={` ${error && !user.email ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                         name="email"
                         type="email"
                         autoComplete="email"
@@ -113,7 +113,7 @@ export default function SignIn() {
                         placeholder="Password"
                         value={user.password}
                         onChange={handleChange}
-                        className={`bg-gray-100 ${error && !user.password ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                        className={` ${error && !user.password ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                         name="password"
                         type='password'
                         autoComplete="current-password"

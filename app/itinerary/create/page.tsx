@@ -21,7 +21,14 @@ import DateRangePicker, { generateDays } from '@/components/itinerary/DateRangeP
 import { cleanItinerary, generateMarkedDates } from '@/components/itinerary/CleanItinerary';
 import { DateRange } from "react-day-picker";
 import { format, parse } from "date-fns";
-import { ChevronRight, Clock } from 'lucide-react';
+import { ChevronRight, Clock, Info, Plus, Trash2 } from 'lucide-react';
+
+import Image from 'next/image';
+import landscape2 from "@/public/illustrations/landscape2.png"
+import landscape3 from "@/public/illustrations/landscape3.png"
+import calendar2 from "@/public/illustrations/calendar2.png"
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { Separator } from '@/components/ui/separator';
 
 const CreatePage = () => {
     const router = useRouter();
@@ -313,58 +320,93 @@ const CreatePage = () => {
 
     return (
         <DndProvider backend={HTML5Backend}>
-            <div className='mx-auto px-8 md:w-1/3'>
+            <div className='mx-auto px-8 md:w-1/2'>
                 {step === 1 && (
-                    <div className="flex flex-col gap-8">
-                        <div>
-                            <p className="text-sm font-medium mb-1">Trip Name</p>
+                    <div className="flex flex-col gap-8 my-10">
+                        <div className='md:flex md:flex-row-reverse items-center justify-between gap-4 bg-card p-6 rounded'>
+                            <Image src={landscape2} alt={''} width={250} className='mx-auto md:mx-0' />
+                            <div className='flex flex-col gap-4'>
+                                <p className='text-xl text-primary'>Let's create your next itinerary</p>
+                                <p>We'll guide you through planning your perfect trip, step by step. First, let's get some basic details about your adventure.
+                                </p>
+                                <p className='italic text-sm'>Do not worry about filling everything out in one go, you can edit this itinerary later and pick up right where you left!</p>
+                            </div>
+                        </div>
+                        <div className='flex flex-col gap-2'>
+                            <div className='flex gap-2'>
+                                <p className=" font-medium ">Trip Name</p>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger><Info strokeWidth={1.5} size={18} /></TooltipTrigger>
+                                        <TooltipContent className='w-1/2 mx-auto'>
+                                            <p>Give your trip a memorable name that captures the spirit of your adventure!
+                                            </p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+
+                            </div>
                             <Input
                                 name="title"
                                 value={itinerary.title}
                                 onChange={handleChange}
                                 placeholder='Name of the trip'
+                                className=' '
                             />
                         </div>
 
-                        <div>
-                            <p className="text-sm font-medium mb-1">Flight Info</p>
+                        <div className='flex flex-col gap-2'>
+                            <div className='flex gap-2'>
+                                <p className=" font-medium ">Flight Information</p>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger><Info strokeWidth={1.5} size={18} /></TooltipTrigger>
+                                        <TooltipContent className='w-1/4 mx-auto'>
+                                            <p>Planning to fly? Add your flight details here to keep everything in one place. Don't worry if you don't have this information yet - you can always update it later.
+
+                                            </p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+
+                            </div>
                             <Input
                                 name="flight_number"
                                 placeholder="Flight Number"
                                 value={itinerary.flight.flight_number}
                                 onChange={handleFlightChange}
-                                className="mb-6"
+                                className=""
                             />
 
-                            <div className='flex gap-8'>
+                            <div className='flex gap-8 mt-4'>
                                 <div className=" flex flex-col gap-2">
-                                    <p>Departure Time </p>
+                                    <p className='font-medium'>Departure Time </p>
                                     <Button
                                         onClick={() => {
                                             setFlightType("departure");
                                             setShowTimePicker(true);
                                         }}
                                         size="lg"
-                                        variant={"outline"}
-                                        className='flex gap-8'
+                                        // variant={"outline"}
+                                        className='flex gap-8 bg-card text-foreground'
                                     >
-                                        {itinerary.flight.departure || "Not Set"}
+                                        <p className='font-normal'>{itinerary.flight.departure || "Not Set"}</p>
                                         <Clock />
                                     </Button>
                                 </div>
 
                                 <div className=" flex flex-col gap-2">
-                                    <p>Landing Time </p>
+                                    <p className='font-medium'>Landing Time </p>
                                     <Button
                                         onClick={() => {
                                             setFlightType("landing");
                                             setShowTimePicker(true);
                                         }}
                                         size="lg"
-                                        variant={"outline"}
-                                        className='flex gap-8'
+                                        // variant={"outline"}
+                                        className='flex gap-8 bg-card text-foreground'
                                     >
-                                        {itinerary.flight.landing || "Not Set"}
+                                        <p className='font-normal'>{itinerary.flight.landing || "Not Set"}</p>
                                         <Clock />
                                     </Button>
                                 </div>
@@ -386,78 +428,125 @@ const CreatePage = () => {
                                 </div>
                             )}
                         </div>
-                        <div className='ms-auto'>
-                            <Button onClick={nextStep} >Next <ChevronRight/></Button>
+                        <div className='ms-auto '>
+                            <Button onClick={nextStep} >Next <ChevronRight /></Button>
                         </div>
                     </div>
                 )}
 
                 {step === 2 && (
-                    <div className="w-110 ">
-                        <DateRangePicker
-                            dateRange={dateRange}
-                            onDateRangeChange={handleDateRangeChange}
-                        />
-                        <div className="flex flex-row justify-between mt-4">
-                            <Button onClick={prevStep} variant="outline" className="flex-1 mr-2">Back</Button>
-                            <Button onClick={handleGenerateAndNext} className="flex-1">
-                                {daysGenerated ? "Next" : "Generate & Next"}
-                            </Button>
+                    <div className="flex flex-col items-center  my-10 ">
+                        <div className='md:flex md:flex-row-reverse items-center justify-between gap-4 bg-card p-6 rounded'>
+                            <Image src={calendar2} alt={''} width={250} />
+                            <div className='flex flex-col gap-4'>
+                                <p className='text-xl text-primary'>When will your Irish adventure begin?
+                                </p>
+                                <p >
+                                    Select your travel dates and we'll automatically build a template for your daily itinerary, whether it's a quick weekend getaway or a two-week journey through the Emerald Isle.
+                                </p>
+                            </div>
                         </div>
+                        <div>
+                            <DateRangePicker
+                                dateRange={dateRange}
+                                onDateRangeChange={handleDateRangeChange}
+                            />
+                            <p className="text-xs text-gray-500 italic text-center mb-4">
+                                *The calendar is currently broken, appologies for any inconvenience
+                            </p>
+                            <Separator />
+                            <div className="flex flex-col gap-2 flex-row justify-between mt-4">
+                                <div>
+                                    <p className="text-sm font-medium">From</p>
+                                    <p className="text-sm text-muted-foreground">
+                                        {dateRange?.from ? format(dateRange.from, "PPP") : "Not selected"}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="text-sm font-medium">To</p>
+                                    <p className="text-sm text-muted-foreground">
+                                        {dateRange?.to ? format(dateRange.to, "PPP") : "Not selected"}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex flex-row justify-end mt-8 ">
+                                <Button onClick={prevStep} variant="outline" className="w-40 mr-2">Back</Button>
+                                <Button onClick={handleGenerateAndNext} className="w-40">
+                                    {daysGenerated ? "Next" : "Generate & Next"}
+                                </Button>
+                            </div>
+                        </div>
+
+
+
                     </div>
                 )}
 
                 {step === 3 && (
-                    <div className="w-120">
-                        <h2 className="text-lg font-semibold mb-4">Create itinerary</h2>
-
+                    <div className=" mb-8">
+                        <div className='md:flex md:flex-row-reverse items-center justify-between gap-4 bg-card p-6 rounded mb-8'>
+                            <Image src={landscape3} alt={''} width={250} />
+                            <div className='flex flex-col gap-4'>
+                                <p className='text-xl text-primary'>Now the fun begins!
+                                </p>
+                                <p >
+                                    Organize your trip by morning, afternoon, and evening activities. Add stops, set times, and include notes to create your perfect Irish experience. Don't worry about getting everything perfect—you can easily edit this later.
+                                </p>
+                            </div>
+                        </div>
                         {Object.keys(itinerary.days).length > 0 ? (
                             <div className="">
                                 {Object.entries(itinerary.days).map(([day, data]) => (
-                                    <div key={day} className="border rounded-lg p-4 mb-4">
+                                    <div key={day} className=" p-6 rounded-xl border border-secondary mb-4">
                                         <div className="flex justify-between items-center mb-4">
-                                            <h3 className="text-md font-semibold">Day {day}</h3>
+                                            <h3 className="text-2xl font-semibold">Day {day}</h3>
                                             <Button
                                                 variant="destructive"
                                                 size="sm"
                                                 onClick={() => removeDay(Number(day))}
                                             >
+                                                <Trash2 />
                                                 Remove Day
                                             </Button>
                                         </div>
 
                                         {["morning", "afternoon", "evening"].map((period) => (
-                                            <div key={period} className="mb-4">
-                                                <div className="flex justify-between items-center mb-2">
-                                                    <h4 className="capitalize text-sm font-medium">{period}</h4>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() => addStop(Number(day), period as keyof DayType)}
-                                                    >
-                                                        Add Stop
-                                                    </Button>
-                                                </div>
+                                            <div key={period} className="mb-4 ms-4">
+                                                <div className="items-center mb-2">
+                                                    <h4 className="capitalize font-medium text-lg">{period}</h4>
 
-                                                {data[period as keyof DayType].map((stop, stopIndex) => (
-                                                    <DraggableStop
-                                                        key={stopIndex}
-                                                        day={Number(day)}
-                                                        period={period as keyof DayType}
-                                                        index={stopIndex}
-                                                        stop={stop}
-                                                        updateStop={updateStop}
-                                                        removeStop={removeStop}
-                                                        toggleNotes={toggleNotes}
-                                                        showNotes={showNotes}
-                                                        setSelectedDay={setSelectedDay}
-                                                        setSelectedSlot={setSelectedSlot}
-                                                        setSelectedEntryIndex={setSelectedEntryIndex}
-                                                        setShowTimePicker={setShowTimePicker}
-                                                        moveStop={moveStop}
-                                                        updateStopLocation={updateStopLocation}
-                                                    />
-                                                ))}
+                                                </div>
+                                                <div className=' '>
+
+                                                    {data[period as keyof DayType].map((stop, stopIndex) => (
+                                                        <DraggableStop
+                                                            key={stopIndex}
+                                                            day={Number(day)}
+                                                            period={period as keyof DayType}
+                                                            index={stopIndex}
+                                                            stop={stop}
+                                                            updateStop={updateStop}
+                                                            removeStop={removeStop}
+                                                            toggleNotes={toggleNotes}
+                                                            showNotes={showNotes}
+                                                            setSelectedDay={setSelectedDay}
+                                                            setSelectedSlot={setSelectedSlot}
+                                                            setSelectedEntryIndex={setSelectedEntryIndex}
+                                                            setShowTimePicker={setShowTimePicker}
+                                                            moveStop={moveStop}
+                                                            updateStopLocation={updateStopLocation}
+                                                        />
+                                                    ))}
+                                                </div>
+                                                <Button
+                                                    size={"sm"}
+                                                    variant={"link"}
+                                                    className=' '
+                                                    onClick={() => addStop(Number(day), period as keyof DayType)}
+                                                >
+                                                    <Plus />
+                                                    <p className='font-normal'>add stop</p>
+                                                </Button>
                                             </div>
                                         ))}
 
@@ -508,9 +597,9 @@ const CreatePage = () => {
                             </div>
                         )}
 
-                        <div className="flex flex-row space-x-2 justify-between mt-4">
-                            <Button onClick={prevStep} variant="outline" className="flex-1">Back</Button>
-                            <Button onClick={nextStep} className="flex-1">Next</Button>
+                        <div className="flex flex-row gap-2 justify-end mt-4">
+                            <Button onClick={prevStep} variant="outline" className="w-40">Back</Button>
+                            <Button onClick={nextStep} className="w-40">Next</Button>
                         </div>
                     </div>
 
@@ -528,9 +617,9 @@ const CreatePage = () => {
                             />
                         </div>
 
-                        <div className="flex flex-row space-x-2 justify-between">
-                            <Button onClick={prevStep} variant="outline" className="flex-1">Back</Button>
-                            <Button onClick={submitItinerary} className="flex-1">Submit</Button>
+                        <div className="flex flex-row space-x-2 justify-end">
+                            <Button onClick={prevStep} variant="outline" className="">Back</Button>
+                            <Button onClick={submitItinerary} className="">Submit</Button>
                         </div>
                     </div>
                 )}

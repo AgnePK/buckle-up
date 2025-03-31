@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DragItem, ItemTypes, StopType } from '@/types/types';
 import PlacesAutocomplete from '@/Maps/PlacesAutocomplete';
+import { Clock, NotebookPen, X } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
 
 type DraggableStopProps = {
   day: number;
@@ -86,69 +88,76 @@ const DraggableStop: React.FC<DraggableStopProps> = ({
   return (
     <div
       ref={ref}
-      className={`mb-2 p-2 border rounded ${isDragging ? 'opacity-50 bg-gray-100' : ''} ${isOver ? 'border-primary' : ''}`}
+      className={`mb-2 p-2 relative ${isDragging ? 'opacity-50 bg-gray-100' : ''} ${isOver ? 'border-primary' : ''}`}
     >
-      <div className="flex items-center space-x-2 mb-2">
-        <div className="cursor-move px-2">=</div>
-
-        <div className="flex-grow">
-          <PlacesAutocomplete
-            value={stop.name}
-            onChange={(value: any) => updateStop(day, period, index, 'name', value)}
-            onPlaceSelect={handlePlaceSelect}
-            placeholder="Enter location"
-          />
-          {stop.location && (
-            <div className="text-xs text-gray-500 mt-1">
-              {stop.address || `Location: ${stop.location.lat.toFixed(5)}, ${stop.location.lng.toFixed(5)}`}
+      <div className="flex flex-col md:flex-row md:items-center gap-2 mb-2">
+        <div className="w-full md:w-auto md:flex-grow mb-2 md:mb-0">
+          <div className="flex items-start">
+            <div className="cursor-move px-2 mt-2">=</div>
+            <div className="flex-grow w-full">
+              <PlacesAutocomplete
+                value={stop.name}
+                onChange={(value: any) => updateStop(day, period, index, 'name', value)}
+                onPlaceSelect={handlePlaceSelect}
+                placeholder="Enter location"
+              />
             </div>
-          )}
+          </div>
         </div>
 
-        <div className="min-w-[120px]">
-          <p className="text-xs mb-1">Time: {stop.time || "None"}</p>
+        <div className="flex gap-2 ml-auto md:mt-0 mt-4">
           <Button
-            size="sm"
-            variant="outline"
             onClick={() => {
               setSelectedDay(day);
               setSelectedSlot(period);
               setSelectedEntryIndex(index);
               setShowTimePicker(true);
             }}
+            size="sm"
+            variant="outline"
+            className="bg-card border-none"
           >
-            Set Time
+            <p className="font-normal">{stop.time || "Set time"}</p>
+            <Clock className="ml-2 h-4 w-4" />
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="bg-card border-none"
+            onClick={() => toggleNotes(day, period, index)}
+          >
+            <NotebookPen className="h-4 w-4" />
+          </Button>
+
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => removeStop(day, period, index)}
+          >
+            <X className="h-4 w-4" />
           </Button>
         </div>
-        <Button
-          variant="destructive"
-          size="sm"
-          onClick={() => removeStop(day, period, index)}
-        >
-          X
-        </Button>
       </div>
 
-      <div className="flex items-center">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => toggleNotes(day, period, index)}
-        >
-          {isShowingNotes ? "Hide Notes" : "Add Notes"}
-        </Button>
-      </div>
+
+      {/* Separate container for address */}
+      {stop.location && (
+        <div className="text-xs text-gray-500 md:mt-1  ml-8 -mt-[65px]">
+          {stop.address || `Location: ${stop.location.lat.toFixed(5)}, ${stop.location.lng.toFixed(5)}`}
+        </div>
+      )}
 
       {isShowingNotes && (
         <Input
           placeholder="Notes"
           value={stop.notes}
           onChange={(e: { target: { value: any; }; }) => updateStop(day, period, index, "notes", e.target.value)}
-          className="mt-2"
-        />
-      )}
+          className="bg-transparent border border-secondary md:mt-2 mt-14"
+          />
+        )}
+        <Separator className='bg-gray-300  md:mt-4 mt-8'/>
     </div>
   );
-};
-
+}
 export default DraggableStop;

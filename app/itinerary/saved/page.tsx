@@ -116,11 +116,9 @@ export default function SavedItemsPage() {
 
     if (authLoading || isLoading) {
         return (
-            <div className="container mx-auto px-4 py-8 flex justify-center items-center min-h-[60vh]">
-                <div className="text-center">
-                    <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-                    <p>Loading your saved items...</p>
-                </div>
+            <div className="flex flex-col items-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+                <p>Loading...</p>
             </div>
         );
     }
