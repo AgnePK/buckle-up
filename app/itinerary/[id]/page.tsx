@@ -9,7 +9,7 @@ import generatePDF from '@/components/generateToPDF';
 import { TripType } from '@/types/types'
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { CalendarDays, Download, PenLine, Trash2, Plane } from 'lucide-react';
+import { CalendarDays, Download, PenLine, Trash2, Plane, Navigation, Map } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 import ItineraryMapView from '@/Maps/itineraryMapView';
@@ -84,9 +84,11 @@ const ViewItinerary = () => {
 
     if (!trip) {
         return (
-            <div className="flex justify-center items-center p-8">
+            <div className="flex flex-col items-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
                 <p>Loading...</p>
             </div>
+
         );
     }
 
@@ -142,35 +144,39 @@ const ViewItinerary = () => {
     const endDate = formatDate(trip.end_date);
     return (
         <ChatProvider>
-            <div className="mx-auto px-4">
+            <div className="px-4 md:px-0 md:flex flex-row-reverse w-full">
 
-                <ItineraryMapView trip={trip} />
+                <div className="md:w-1/2">
+                    <div className=' md:sticky top-0'>
+                        <ItineraryMapView trip={trip} />
+                        {hasLocations && (
+                            <div className="my-6 ms-6 relative md:-mt-[70px] flex justify-start">
+                                <OpenInGoogleMaps trip={trip} />
+                            </div>
+                        )}
 
-                {hasLocations && (
-                    <div className="my-6 flex justify-start ">
-                        <OpenInGoogleMaps trip={trip} />
                     </div>
-                )}
 
-                <div id='itinerary-container' className="grid gap-6 p-6">
-                    <div className='md:flex md:flex-row'>
-                        <div className='md:w-1/2 flex flex-col gap-8'>
+                </div>
+
+                <div id='itinerary-container' className="px-6 md:w-1/2 overflow-y-auto ">
+                    <div className=''>
+                        <div className='flex flex-col gap-8'>
 
                             <div className=" md:flex justify-between ">
                                 <h1 className='text-4xl font-bold'>
                                     {trip.title || 'Untitled Trip'}
                                 </h1>
-                                <div className='flex gap-4 mt-4 md:mt-0'>
+                                <div className='flex gap-4 mt-4 md:mt-0 justify-end'>
                                     <Button variant="outline" className="flex items-center gap-2"
                                         onClick={() => { router.push(`/itinerary/${id}/edit`) }}>
-                                        <PenLine className="text-slate-500" size={20} /> Edit
+                                        <PenLine className="text-slate-500" size={20} />
                                     </Button>
                                     <Button
                                         variant="destructive"
                                         onClick={() => handleDelete(id)}
                                     >
                                         <Trash2 />
-                                        Delete
                                     </Button>
 
                                 </div>
@@ -179,6 +185,9 @@ const ViewItinerary = () => {
                             <div className="flex gap-4">
                                 <CalendarDays className='text-primary' />
                                 <p className="">{startDate} to {endDate}</p>
+                                {/* <div className=' w-1/2 '>
+                                    <Image src={journey} alt={''} />
+                                </div> */}
                             </div>
                             <Separator className='bg-gray-300' />
                             {/* Display Flight Details */}
@@ -219,23 +228,19 @@ const ViewItinerary = () => {
 
                             {/*Display Notes */}
                             {trip.notes && (
-                                <div className="pt-4">
-                                    <h2 className="text-xl font-semibold mb-2">Notes</h2>
+                                <div className="pb-8">
+                                    <h2 className="text-xl font-semibold mb-4">Notes</h2>
                                     <p className="whitespace-pre-wrap">{trip.notes}</p>
                                 </div>
                             )}
 
                         </div>
-                        <div className='md:w-1/2 '>
-                            <div className='flex justify-end'>
-                            </div>
-                            <Image src={journey} alt={''} />
-                        </div>
+
 
                     </div>
                     {/* Display Trip Days */}
                     {trip.days && Object.keys(trip.days).length > 0 && (
-                        <div className="bg-gray-200 -mx-[40px] p-8">
+                        <div className="bg-muted/40  md:-mx-[24px] p-6 ">
                             <h2 className="text-xl font-semibold mb-4">Itinerary Plan</h2>
 
                             {Object.entries(trip.days).map(([dayNumber, dayData]) => (
@@ -269,17 +274,27 @@ const ViewItinerary = () => {
                                                                 {stop.name}
                                                             </h3>
 
-                                                            {/* Notes as the description */}
-                                                            {stop.notes && (
-                                                                <p className="text-base font-normal text-gray-500">
-                                                                    {stop.notes}
+                                                            {/* Show address if available */}
+                                                            {stop.address && (
+                                                                <p className="text-sm italic text-gray-400 text-align">
+                                                                    <a
+                                                                        href={`https://www.google.com/maps?q=${stop.address}`}
+                                                                        target="_blank"
+                                                                        // this is to protect my site from bring linked in booking.com
+                                                                        rel="noopener noreferrer"
+                                                                        className='flex gap-2 text-emerald-500'
+                                                                    >
+                                                                        <Map size={12} className='mt-1' />
+
+                                                                        {stop.address}
+                                                                    </a>
                                                                 </p>
                                                             )}
 
-                                                            {/* Show address if available */}
-                                                            {stop.address && (
-                                                                <p className="mt-2 text-sm italic text-gray-400">
-                                                                    Address: {stop.address}
+                                                            {/* Notes as the description */}
+                                                            {stop.notes && (
+                                                                <p className="text-base font-normal text-gray-500 m-4">
+                                                                    {stop.notes}
                                                                 </p>
                                                             )}
                                                         </li>
@@ -295,7 +310,7 @@ const ViewItinerary = () => {
                                 <Button
                                     onClick={() => generatePDF()}
                                     className="flex items-center gap-2"
-                                    variant="outline"
+                                    variant="default"
                                 >
                                     <Download size={16} />
                                     Save as PDF
@@ -305,9 +320,10 @@ const ViewItinerary = () => {
                     )}
 
 
+
                 </div>
-                <ChatButton trip={trip} />
             </div>
+            <ChatButton trip={trip} />
         </ChatProvider>
 
     )

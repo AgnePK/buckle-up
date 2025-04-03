@@ -228,11 +228,12 @@ const ItineraryMapView = ({ trip }: ItineraryMapViewProps) => {
                 </div>
             </div> */}
 
-            <div
-                ref={mapRef}
-                className="w-full rounded-2xl"
-                style={{ height: "400px" }}
-            />
+            <div className="relative">
+                <div
+                    ref={mapRef}
+                    className="w-full rounded-xl h-80 md:h-screen"
+                />
+            </div>
         </div>
     );
 };

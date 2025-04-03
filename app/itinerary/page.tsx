@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { TripType, UserType } from '@/types/types';
 // FIREBASE //
 import { db } from '@/firebaseConfig'
@@ -24,6 +24,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from "next/image"
 import roadtrip from "@/public/illustrations/roadtrip.png"
+import landscape3 from "@/public/illustrations/landscape3.png"
 
 import {
     DropdownMenu,
@@ -52,31 +53,45 @@ export default function Itinerary() {
     const { user, isLoading } = useSession();
     const router = useRouter();
 
-    const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-    const [successMessage, setSuccessMessage] = useState("");
-    const searchParams = useSearchParams();
 
-    // Check for success param in the URL (this will be used if redirected from create page)
-    useEffect(() => {
-        const success = searchParams.get('success');
-        const tripName = searchParams.get('tripName');
+    // Separate success alert component
+    function SuccessAlert() {
+        const searchParams = useSearchParams();
+        const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+        const [successMessage, setSuccessMessage] = useState("");
 
-        if (success === 'true' && tripName) {
-            setSuccessMessage(`Your trip "${tripName}" has been created successfully!`);
-            setShowSuccessAlert(true);
+        useEffect(() => {
+            const success = searchParams.get('success');
+            const tripName = searchParams.get('tripName');
 
-            // Hide the alert after 5 seconds
-            const timer = setTimeout(() => {
-                setShowSuccessAlert(false);
-            }, 5000);
+            if (success === 'true' && tripName) {
+                setSuccessMessage(`Your trip "${tripName}" has been created successfully!`);
+                setShowSuccessAlert(true);
 
-            // Clean URL parameters without refreshing the page
-            window.history.replaceState({}, '', '/itinerary');
+                // Hide the alert after 5 seconds
+                const timer = setTimeout(() => {
+                    setShowSuccessAlert(false);
+                }, 5000);
 
-            return () => clearTimeout(timer);
-        }
-    }, [searchParams]);
+                // Clean URL parameters without refreshing the page
+                window.history.replaceState({}, '', '/itinerary');
 
+                return () => clearTimeout(timer);
+            }
+        }, [searchParams]);
+
+        if (!showSuccessAlert) return null;
+
+        return (
+            <Alert className="mx-auto mb-4 border-green-500 bg-green-50 w-1/3">
+                <CheckCircle className="h-4 w-4 text-green-500" />
+                <AlertTitle>Success!</AlertTitle>
+                <AlertDescription>
+                    {successMessage}
+                </AlertDescription>
+            </Alert>
+        );
+    }
 
     useEffect(() => {
         if (!isLoading && !user) {
@@ -185,39 +200,36 @@ export default function Itinerary() {
 
     return (
         <>
-            <div className='flex flex-col mx-6'>
-                {showSuccessAlert && (
-                    <Alert className="mx-auto mb-4 border-green-500 bg-green-50 w-1/3">
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                        <AlertTitle>Success!</AlertTitle>
-                        <AlertDescription>
-                            {successMessage}
-                        </AlertDescription>
-                    </Alert>
-                )}
+            <div className='flex flex-col mx-6 '>
+                <Suspense fallback={null}>
+                    <SuccessAlert />
+                </Suspense>
 
                 {/* HERO GOES HERE */}
-                <div className="w-screen h-[80vh] relative -mt-[128px] -ms-[24px] " >
-                    <Image
-                        src={landscapeImages[currentImageIndex]}
-                        alt="Landscape hero image"
-                        fill
-                        priority
-                        className="object-cover"
-                        sizes="100vw"
-                    />
-                    <div className="flex items-center w-1/2 absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-transparent">
+                <div className="relative h-[80vh] w-full -mt-[128px]">
+                    <div className="absolute inset-0 -mx-[24px] overflow-hidden">
+                        <Image
+                            src={landscapeImages[currentImageIndex]}
+                            alt="Landscape hero image"
+                            fill
+                            priority
+                            className="object-cover"
+                            sizes="100vw"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-r from-black/100 via-black/80 to-transparent"></div>
+                    </div>
+                    <div className="relative flex items-center h-full w-2/3">
                         <div className="flex flex-col gap-6 text-white p-6 pt-24 w-full max-w-7xl mx-auto">
                             <h2 className="text-3xl md:text-4xl font-bold">Begin your journey <br /> across Ireland</h2>
-                            <p className="text-sm md:text-base mt-2">Plan your next trip to The Emerald Isle. Build your itineraries, organise your trips, discover new places, browse through the local bnbs.</p>
-                            <div className='md:flex-row '>
-                                <Button variant={"outline"} className='bg-transparent m-2 w-40'>
+                            <p className="text-sm md:text-base mt-2 md:w-3/5">Plan your next trip to The Emerald Isle. Build your itineraries, organise your trips, discover new places, browse through the local bnbs.</p>
+                            <div className=" md:flex-row">
+                                <Button variant={"outline"} className="bg-transparent m-2 w-40">
                                     Discover
                                 </Button>
                                 <Button
                                     variant={"default"}
                                     onClick={() => router.push("/itinerary/create")}
-                                    className=' w-40 m-2'
+                                    className="w-40 m-2"
                                 >
                                     <Plus />
                                     New Itinerary
@@ -228,42 +240,48 @@ export default function Itinerary() {
                 </div>
 
                 <div className='flex flex-col md:flex-row justify-around items-center mb-6 content-center'>
-                    <div className='m-12 '>
-                        <h1 className='text-2xl'>Welcome Back,</h1>
-                        <div className='flex flex-col gap-8'>
-                            <span className='text-5xl'> {user.displayName}</span>
-                            <p>Please find your itineraries below</p>
-                            {/* <Button variant={"default"} onClick={() => router.push("/itinerary/create")} className='w-38'>
-                                <Plus />
-                                New Itinerary
-                            </Button> */}
-                        </div>
-                    </div>
-                    <Image
-                        alt="illustration of a road trip"
-                        src={roadtrip}
-                        width={350}
+                    <div className='md:w-2/3  mt-8'>
+                        <div className='md:flex md:flex-row-reverse items-center justify-between gap-4  p-2 mb-8'>
+                            <Image src={roadtrip} alt={''} width={350} />
+                            <div className='flex flex-col gap-8'>
+                                <div>
+                                    <h1 className='text-4xl text-primary'>Welcome Back,</h1>
+                                    <span className='text-5xl text-primary'> {user.displayName}</span>
+                                </div>
 
-                        style={{
-                            maxWidth: "100%",
-                            height: "auto",
-                        }}
-                    />
-                </div>
-                <div className='flex justify-between mb-6 items-center'>
-                    <Input
-                        type="text"
-                        placeholder="Search itneraries..."
-                        value={""}
-                        className="p-2 border border-gray-300  w-5/6"
-                        readOnly
-                    />
-                    <div className='flex gap-6 mx-6'>
-                        <List />
-                        <LayoutGrid />
+                                <p className='text-lg'>Your Irish adventures await. Here are the itineraries you've created—ready to explore, edit, or share with your travel companions.
+                                </p>
+                                {/* <Button
+                                    variant={"default"}
+                                    onClick={() => router.push("/itinerary/create")}
+                                    className=' w-40 '
+                                >
+                                    <Plus />
+                                    New Itinerary
+                                </Button> */}
+                            </div>
+                        </div>
+
                     </div>
                 </div>
-                <div className='grid grid-cols-1 gap-2'>
+                <div className='mx-8 md:flex justify-between mb-6 items-center'>
+                    <h2 className='text-2xl'>My Itineraries</h2>
+                    <div className='md:flex items-center md:w-1/3'>
+                        <Input
+                            type="text"
+                            placeholder="Search itneraries..."
+                            value={""}
+                            className="p-2 border border-gray-300 bg-white "
+                            readOnly
+                        />
+                        <div className='flex gap-6 ms-4'>
+                            <List />
+                            <LayoutGrid />
+                        </div>
+
+                    </div>
+                </div>
+                <div className='grid grid-cols-1 gap-2 bg-card rounded-md p-2'>
                     {trip.slice(0).reverse().map((item, index) => {
 
                         // Format dates from "YYYY-MM-DD" to "Month DD"
@@ -285,8 +303,8 @@ export default function Itinerary() {
                         const startDate = formatDate(item.start_date);
                         const endDate = formatDate(item.end_date);
                         return (
-                            <>
-                                <Card key={item.id} className='bg-transpatent border-none shadow-none flex flex-col md:flex-row w-full'>
+                            <div key={item.id}>
+                                <Card key={item.id} className='rounded-none -my-[8px] border-none bg-transparent shadow-none flex flex-col md:flex-row w-full'>
                                     <Link
                                         href={`/itinerary/${item.id}`}
                                         className='w-full md:w-1/4'
@@ -302,22 +320,26 @@ export default function Itinerary() {
                                     <CardContent className='flex items-center gap-3 w-full md:w-1/4'>
                                         <CalendarDays className='w-6 h-6 text-primary' />
                                         <div>
-                                            <p> {startDate} to {endDate} </p>
+                                            <p> {startDate} - {endDate} </p>
                                         </div>
                                     </CardContent>
                                     <CardContent className='w-full md:w-1/4'>
                                         {item.flight && (item.flight.departure || item.flight.landing) ? (
-                                            <div className="flex items-center gap-4">
-                                                <PlaneTakeoff className='text-primary' />
-                                                {item.flight.departure}
-                                                <PlaneLanding className='text-primary' />
-                                                {item.flight.landing}
+                                            <div className="flex items-center gap-10">
+                                                <div className='flex gap-2'>
+                                                    <PlaneTakeoff className='text-primary' />
+                                                    {item.flight.departure}
+                                                </div>
+                                                <div className='flex gap-2'>
+                                                    <PlaneLanding className='text-primary' />
+                                                    {item.flight.landing}
+                                                </div>
                                             </div>
                                         ) : (
                                             <div className="text-gray-600">
                                                 {item.notes ?
                                                     (item.notes.length > 30 ? `${item.notes.substring(0, 30)}...` : item.notes)
-                                                    : 'No notes'}
+                                                    : <i>No notes</i>}
                                             </div>
                                         )}
                                     </CardContent>
@@ -327,8 +349,8 @@ export default function Itinerary() {
                                         </Button>
                                     </CardFooter>
                                 </Card>
-                                <Separator className='bg-gray-200' />
-                            </>
+                                <Separator className='bg-gray-300' />
+                            </div>
                         )
                     })}
                 </div>

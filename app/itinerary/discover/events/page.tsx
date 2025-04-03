@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Calendar, MapPin, User, Building, ExternalLink } from 'lucide-react';
+import { Calendar, MapPin, User, Building, ExternalLink, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import Head from 'next/head';
 import SaveButton from '@/components/savedItems';
 import { Button } from '@/components/ui/button';
@@ -106,7 +106,7 @@ export default function EventsPage() {
               value={searchTerm}
               onChange={handleSearch}
               className="border-gray-300"
-              />
+            />
           </div>
         </div>
         <Image src={music} alt={'illustration for the events / music events page'} className='md:w-1/3 ' />
@@ -175,7 +175,7 @@ export default function EventsPage() {
               </div>
 
             </CardContent>
-            <CardFooter className='ms-auto mt-auto'>
+            <CardFooter className='flex justify-between mt-auto'>
               {item.url && (
                 <a
                   href={item.url}
@@ -188,28 +188,35 @@ export default function EventsPage() {
                   </Button>
                 </a>
               )}
+              <Button variant={"outline"} className='bg-transparent'>
+                <Plus size={22} />
+              </Button>
             </CardFooter>
           </Card>
         ))}
       </div>
 
       {/* Pagination Controls */}
-      <div className="flex justify-between items-center mt-8">
-        <button
+      <div className="flex justify-center gap-8 items-center mt-8">
+        <Button
           onClick={prevPage}
           disabled={!eventsQuery.data?.prevCursor}
-          className="px-4 py-2 bg-primary text-white rounded-md disabled:opacity-50"
+          className="px-4 py-2 disabled:opacity-50 flex flex-row items-center"
+          variant={"ghost"}
         >
+          <ChevronLeft className='mt-1' />
           Previous
-        </button>
-        <span>Page {page}</span>
-        <button
+        </Button>
+        <Button disabled variant={"outline"}>{page}</Button>
+        <Button
           onClick={nextPage}
           disabled={!eventsQuery.data?.nextCursor}
-          className="px-4 py-2 bg-primary text-white rounded-md disabled:opacity-50"
+          className="px-4 py-2  disabled:opacity-50 flex flex-row items-center"
+          variant={"ghost"}
         >
           Next
-        </button>
+          <ChevronRight className='mt-1' />
+        </Button>
       </div>
     </div>
   );

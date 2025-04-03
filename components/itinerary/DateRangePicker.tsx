@@ -62,12 +62,14 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
                             day_hidden: "invisible",
                         }}
                     />
-                    
+
                 </div>
+                <p className="text-xs text-gray-500 italic ">
+                    *The calendar is currently broken, appologies for any inconvenience
+                </p>
+                <Separator />
 
-                {/* <Separator /> */}
-
-                {/* <div className="flex flex-col gap-2 flex-row justify-between">
+                <div className="flex flex-col gap-2 flex-row justify-between">
                     <div>
                         <p className="text-sm font-medium">From</p>
                         <p className="text-sm text-muted-foreground">
@@ -80,7 +82,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
                             {dateRange?.to ? format(dateRange.to, "PPP") : "Not selected"}
                         </p>
                     </div>
-                </div> */}
+                </div>
             </div>
 
         </div>

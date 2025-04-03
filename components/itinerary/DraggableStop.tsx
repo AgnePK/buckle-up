@@ -88,12 +88,12 @@ const DraggableStop: React.FC<DraggableStopProps> = ({
   return (
     <div
       ref={ref}
-      className={`mb-2 p-2 relative ${isDragging ? 'opacity-50 bg-gray-100' : ''} ${isOver ? 'border-primary' : ''}`}
+      className={`mb-2 p-2 relative ${isDragging ? 'rounded-xl  border border-muted' : ''} ${isOver ? 'rounded-xl bg-muted  ' : ''}`}
     >
-      <div className="flex flex-col md:flex-row md:items-center gap-2 mb-2">
+      <div className="flex flex-col md:flex-row md:items-center gap-2 mb-2 mt-8 md:mt-0">
         <div className="w-full md:w-auto md:flex-grow mb-2 md:mb-0">
           <div className="flex items-start">
-            <div className="cursor-move px-2 mt-2">=</div>
+            <div className="cursor-move px-2 mt-1">=</div>
             <div className="flex-grow w-full">
               <PlacesAutocomplete
                 value={stop.name}
@@ -115,7 +115,7 @@ const DraggableStop: React.FC<DraggableStopProps> = ({
             }}
             size="sm"
             variant="outline"
-            className="bg-card border-none"
+            className="bg-card border-gray-300"
           >
             <p className="font-normal">{stop.time || "Set time"}</p>
             <Clock className="ml-2 h-4 w-4" />
@@ -124,7 +124,7 @@ const DraggableStop: React.FC<DraggableStopProps> = ({
           <Button
             variant="outline"
             size="sm"
-            className="bg-card border-none"
+            className="bg-card border-gray-300"
             onClick={() => toggleNotes(day, period, index)}
           >
             <NotebookPen className="h-4 w-4" />
@@ -149,14 +149,21 @@ const DraggableStop: React.FC<DraggableStopProps> = ({
       )}
 
       {isShowingNotes && (
-        <Input
-          placeholder="Notes"
+        <textarea
+          name="notes"
           value={stop.notes}
           onChange={(e: { target: { value: any; }; }) => updateStop(day, period, index, "notes", e.target.value)}
-          className="bg-transparent border border-secondary md:mt-2 mt-14"
-          />
-        )}
-        <Separator className='bg-gray-300  md:mt-4 mt-8'/>
+          className="mb-4 w-full border border-gray-300 p-2 rounded-sm  md:mt-2 mt-14"
+          placeholder='Add your notes here'
+        />
+      )}
+      {/* <Input
+        placeholder="Notes"
+        value={stop.notes}
+        onChange={(e: { target: { value: any; }; }) => updateStop(day, period, index, "notes", e.target.value)}
+        className="bg-transparent border border-secondary  md:mt-2 mt-14"
+      /> */}
+      {/* <Separator className='bg-gray-300  md:mt-4 mt-8'/> */}
     </div>
   );
 }

@@ -96,6 +96,7 @@ const PlacesAutocomplete = ({
                 defaultValue={value}
                 onChange={handleInputChange}
                 placeholder={placeholder}
+                className='bg-background'
             />
             {/* <div className="text-xs mt-1">Google Maps API status: {isLoaded ? 'Loaded' : 'Loading...'}</div> */}
         </div>

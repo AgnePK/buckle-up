@@ -6,7 +6,7 @@ import { ModeToggle } from "../components/toggle-mode"
 import { useSession } from "@/AuthContext"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
-import logo from "@/public/logo-dark.png"
+import logo from "@/public/icon-512-svg.svg"
 
 import { usePathname } from "next/navigation";
 
@@ -70,40 +70,49 @@ export function NavBar() {
     return (
         <nav className="p-4 mx-2 md:mx-6 flex justify-between items-center md:pb-8">
             {/* Logo - visible on all screen sizes */}
-            <div className="flex gap-3 items-center  md:relative z-10 bg-background px-6 p-4 rounded-2xl">
+            <div className="flex gap-3 items-center  md:relative   rounded-2xl">
                 <Image
                     alt="Buckle Up logo"
                     src={logo}
-                    width={40}
+                    width={60}
                     style={{
                         maxWidth: "100%",
                         height: "auto",
                     }}
                     onClick={() => { router.push("/itinerary") }}
                 />
-                <Link href="/itinerary" className="text-xl hidden sm:block">
+                <Link href="/itinerary" className="text-2xl font-medium hidden text-primary  sm:block">
                     Buckle Up
                 </Link>
             </div>
 
             {/* Desktop Navigation */}
-            <ul className="hidden md:flex justify-end items-center gap-10 bg-card px-6 py-4 rounded-2xl">
+            <ul className="hidden md:flex items-center gap-10 bg-muted/80 px-6 py-4 rounded-xl">
                 <li>
                     <Link href={"/itinerary"}
-                        className={`${isActive("/itinerary") ? "text-primary" : ""}`}>
+                        className={`${isActive("/itinerary") ? " text-primary " : ""}`}>
                         My Itineraries
                     </Link>
                 </li>
+                <li>
+                    <Link
+                        href={"/itinerary/create"}
+                        className={`flex items-center  gap-2 ${isActive("/itinerary/create") ? " text-primary " : ""}`}>
+                        Create Itinerary
+                        <Plus size={20} />
+                    </Link>
+                </li>
+
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild className="items-center">
                         <div className="flex gap-2 items-center cursor-pointer">
-                            <ChevronDown />
-                            Discover
+                            <p>Discover</p>
+                            <ChevronDown className="pt-1 ms-1" />
                         </div>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent align="center" className=" bg-muted border-none">
                         {dropdownItems.map((item) => (
-                            <DropdownMenuItem key={item.title} onClick={() => router.push(item.url)}>
+                            <DropdownMenuItem key={item.title} className="text-center" onClick={() => router.push(item.url)}>
                                 {item.title}
                             </DropdownMenuItem>
                         ))}
@@ -111,22 +120,22 @@ export function NavBar() {
                 </DropdownMenu>
                 <li>
                     <Link href={"/itinerary/saved"}
-                        className={`${isActive("/itinerary/saved") ? "text-primary" : ""}`}>
+                        className={`${isActive("/itinerary/saved") ? " text-primary " : ""}`}>
                         Saved Places
                     </Link>
                 </li>
             </ul>
 
             {/* Right section with theme toggle and logout button */}
-            <div className="flex gap-3 items-center">
+            <div className="flex gap-4  items-center">
                 {/* Theme toggle - hidden on small mobile */}
-                <div className="hidden sm:block">
+                <div className="hidden sm:block ">
                     <ModeToggle />
                 </div>
 
                 {/* Logout button - visible on medium screens and above */}
                 <div className="hidden md:block">
-                    <Button onClick={handleLogout} variant="outline">Log out</Button>
+                    <Button onClick={handleLogout} variant="outline" className="bg-muted border-none">Log out</Button>
                 </div>
 
                 {/* Mobile menu button - visible on medium screens and below */}
@@ -138,7 +147,7 @@ export function NavBar() {
                     </SheetTrigger>
                     <SheetContent side="right" className="w-[250px] sm:w-[300px]">
                         <SheetHeader className="mb-6">
-                            <SheetTitle>Menu</SheetTitle>
+                            <SheetTitle className="text-2xl text-primary">Buckle Up</SheetTitle>
                         </SheetHeader>
                         <div className="flex flex-col gap-6 px-6">
                             {/* Mobile navigation links */}
@@ -190,9 +199,8 @@ export function NavBar() {
                             </div>
 
                             {/* Logout button in mobile menu */}
-                            <Button onClick={handleLogout} variant="outline" className="me-10">
-                                Log out
-                            </Button>
+                            <Button onClick={handleLogout} variant="outline" className="bg-muted border-none">Log out</Button>
+
                         </div>
                     </SheetContent>
                 </Sheet>

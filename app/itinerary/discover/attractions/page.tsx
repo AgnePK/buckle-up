@@ -12,7 +12,7 @@ import {
     CardDescription,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Phone, ExternalLink, Navigation } from 'lucide-react';
+import { MapPin, Phone, ExternalLink, Navigation, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import Head from 'next/head';
 import SaveButton from '@/components/savedItems';
 import { Button } from '@/components/ui/button';
@@ -133,7 +133,7 @@ export default function AttractionsPage() {
 
                             <div className="flex flex-wrap gap-2 mt-2">
                                 {item.Tags && item.Tags.map((tag: string, tagIndex: number) => (
-                                    <Badge key={tagIndex} variant="outline">{tag}</Badge>
+                                    <Badge key={tagIndex} variant="outline" className='border border-secondary'>{tag}</Badge>
                                 ))}
                             </div>
 
@@ -151,6 +151,9 @@ export default function AttractionsPage() {
                                     Google Maps
                                 </Button>
                             </a>
+                            <Button variant={"outline"} className='bg-transparent'>
+                                <Plus size={22} />
+                            </Button>
                             {item.Url ? (
                                 <a
                                     href={item.Url}
@@ -174,22 +177,26 @@ export default function AttractionsPage() {
             </div>
 
             {/* Pagination Controls */}
-            <div className="flex justify-between items-center mt-8">
-                <button
+            <div className="flex justify-center gap-8 items-center mt-8">
+                <Button
                     onClick={prevPage}
                     disabled={!attractionsQuery.data?.prevCursor}
-                    className="px-4 py-2 bg-primary text-white rounded-md disabled:opacity-50"
+                    className="px-4 py-2 disabled:opacity-50 flex flex-row items-center"
+                    variant={"ghost"}
                 >
+                    <ChevronLeft className='mt-1' />
                     Previous
-                </button>
-                <span>Page {page}</span>
-                <button
+                </Button>
+                <Button disabled variant={"outline"}>{page}</Button>
+                <Button
                     onClick={nextPage}
                     disabled={!attractionsQuery.data?.nextCursor}
-                    className="px-4 py-2 bg-primary text-white rounded-md disabled:opacity-50"
+                    className="px-4 py-2  disabled:opacity-50 flex flex-row items-center"
+                    variant={"ghost"}
                 >
                     Next
-                </button>
+                    <ChevronRight className='mt-1' />
+                </Button>
             </div>
         </div>
     );

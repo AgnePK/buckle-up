@@ -11,7 +11,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, ExternalLink, Navigation } from 'lucide-react';
+import { MapPin, ExternalLink, Navigation, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import Head from 'next/head';
 import SaveButton from '@/components/savedItems';
 import { Button } from '@/components/ui/button';
@@ -174,6 +174,9 @@ export default function AccommodationsPage() {
                                         Booking.com
                                     </Button>
                                 </a>
+                                <Button variant={"outline"} className='bg-transparent'>
+                                    <Plus size={22} />
+                                </Button>
                             </CardFooter>
                         </Card>
 
@@ -182,22 +185,26 @@ export default function AccommodationsPage() {
             </div>
 
             {/* Pagination Controls */}
-            <div className="flex justify-between items-center mt-8">
-                <button
+            <div className="flex justify-center gap-8 items-center mt-8">
+                <Button
                     onClick={prevPage}
                     disabled={!accommodationQuery.data?.prevCursor}
-                    className="px-4 py-2 bg-primary text-white rounded-md disabled:opacity-50"
+                    className="px-4 py-2 disabled:opacity-50 flex flex-row items-center"
+                    variant={"ghost"}
                 >
+                    <ChevronLeft className='mt-1' />
                     Previous
-                </button>
-                <span>Page {page}</span>
-                <button
+                </Button>
+                <Button disabled variant={"outline"}>{page}</Button>
+                <Button
                     onClick={nextPage}
                     disabled={!accommodationQuery.data?.nextCursor}
-                    className="px-4 py-2 bg-primary text-white rounded-md disabled:opacity-50"
+                    className="px-4 py-2  disabled:opacity-50 flex flex-row items-center"
+                    variant={"ghost"}
                 >
                     Next
-                </button>
+                    <ChevronRight className='mt-1' />
+                </Button>
             </div>
         </div>
     );

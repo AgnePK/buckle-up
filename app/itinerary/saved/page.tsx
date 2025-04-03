@@ -21,11 +21,16 @@ import {
     Phone,
     Calendar,
     Loader2,
-    BookmarkX
+    BookmarkX,
+    Navigation
 } from 'lucide-react';
 import SaveButton from '@/components/savedItems';
 import { useRouter } from 'next/navigation';
 import { Attractions, Accommodation, Events } from '@/types/types';
+import { Button } from '@/components/ui/button';
+
+import Image from 'next/image';
+import { bnbs } from '@/utils/bnbImages';
 
 // Type for our saved items
 interface SavedItemsState {
@@ -123,6 +128,28 @@ export default function SavedItemsPage() {
         );
     }
 
+    const getConsistentImage = (item: Accommodation) => {
+        // Use a property that's always available and consistent for each accommodation
+        const identifier = item["Property Reg Number"] ||
+            item["Account Name"] ||
+            item.id ||
+            JSON.stringify(item);
+
+        // Create a numeric hash from the string
+        let hash = 0;
+        if (identifier) {
+            for (let i = 0; i < identifier.length; i++) {
+                hash = ((hash << 5) - hash) + identifier.charCodeAt(i);
+                hash |= 0; // Convert to 32bit integer
+            }
+        }
+
+        // Get a consistent index between 0 and bnbs.length-1
+        const imageIndex = Math.abs(hash) % bnbs.length;
+        return bnbs[imageIndex];
+    };
+
+
     return (
         <div className="container mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold mb-2">My Saved Items</h1>
@@ -130,11 +157,11 @@ export default function SavedItemsPage() {
 
             <Tabs defaultValue="attractions" className="w-full">
                 <TabsList className="mb-6 grid w-full grid-cols-3">
+                    <TabsTrigger value="accommodations">
+                        BnBs ({savedItems.accommodations.length})
+                    </TabsTrigger>
                     <TabsTrigger value="attractions">
                         Attractions ({savedItems.attractions.length})
-                    </TabsTrigger>
-                    <TabsTrigger value="accommodations">
-                        Accommodations ({savedItems.accommodations.length})
                     </TabsTrigger>
                     <TabsTrigger value="events">
                         Events ({savedItems.events.length})
@@ -151,53 +178,68 @@ export default function SavedItemsPage() {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {savedItems.attractions.map((item) => (
-                                <Card key={item.id} className="h-full">
+                            {savedItems.attractions.map((item, index) => (
+                                <Card key={item.id || `attraction-${index}`} className="h-full">
                                     <CardHeader className='flex-row justify-between content-center'>
-                                        <div>
-                                            <CardTitle>{item.Name}</CardTitle>
-                                            {item.County && (
-                                                <CardDescription>{item.County}</CardDescription>
-                                            )}
-                                        </div>
+                                        <CardTitle>{item.Name} </CardTitle>
                                         <div>{<SaveButton item={item} itemType="attraction" />}</div>
-
                                     </CardHeader>
                                     <CardContent>
-                                        {item.Address && (
-                                            <div className="flex items-center mb-4">
-                                                <MapPin className="h-5 w-5 text-emerald-700 mr-2" />
-                                                <p>{item.Address}</p>
-                                            </div>
-                                        )}
+                                        <div className="flex items-center mb-4">
+                                            <MapPin size={22} className="text-primary mr-2" />
+                                            <p>{item.Address || item.County}</p>
+                                        </div>
 
                                         {item.Telephone && (
-                                            <div className="flex items-center mb-4">
-                                                <Phone className="h-5 w-5 text-emerald-700 mr-2" />
-                                                <p>{item.Telephone}</p>
+                                            <div className='flex gap-2'>
+                                                <Phone size={22} className='text-gray-600' />
+                                                <p className="text-gray-600 mb-2">Tel: {item.Telephone}</p>
                                             </div>
                                         )}
 
-                                        {item.Url && (
+                                        <div className="flex flex-wrap gap-2 mt-2">
+                                            {item.Tags && (
+                                                Array.isArray(item.Tags)
+                                                    ? item.Tags.map((tag: string, tagIndex: number) => (
+                                                        <Badge key={tagIndex} variant="outline" className='border border-secondary'>{tag}</Badge>
+                                                    ))
+                                                    : typeof item.Tags === 'string' && (
+                                                        <Badge variant="outline" className='border border-secondary'>{item.Tags}</Badge>
+                                                    )
+                                            )}
+                                        </div>
+
+                                    </CardContent>
+                                    <CardFooter className='mt-auto flex justify-between'>
+                                        <a
+                                            href={`https://www.google.com/maps?q=${item.Latitude}+${item.Longitude}`}
+                                            target="_blank"
+                                            // this is to protect my site from bring linked in booking.com
+                                            rel="noopener noreferrer"
+                                            className='flex gap-2'
+                                        >
+                                            <Button variant={"outline"} className='bg-transparent'>
+                                                <Navigation size={22} className='' />
+                                                Google Maps
+                                            </Button>
+                                        </a>
+                                        {item.Url ? (
                                             <a
                                                 href={item.Url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="text-primary hover:underline text-sm flex items-center mb-4"
+                                                className="text-primary"
                                             >
-                                                <ExternalLink className="h-4 w-4 mr-1" /> Visit Website
+                                                <Button variant={"default"}>
+                                                    <ExternalLink className="mr-2" />
+                                                    Visit Website
+                                                </Button>
                                             </a>
+                                        ) : (
+                                            <Button variant={"ghost"} >
+                                                <p className="text-gray-500 text-sm italic">No link available</p>
+                                            </Button>
                                         )}
-                                    </CardContent>
-                                    <CardFooter className="flex justify-between items-center">
-                                        <div className="flex flex-wrap gap-2 max-w-[70%]">
-                                            {item.Tags && Array.isArray(item.Tags) && item.Tags.slice(0, 2).map((tag: string, i: number) => (
-                                                <Badge key={i} variant="outline">{tag}</Badge>
-                                            ))}
-                                            {item.Tags && !Array.isArray(item.Tags) && typeof item.Tags === 'string' && (
-                                                <Badge variant="outline">{item.Tags}</Badge>
-                                            )}
-                                        </div>
                                     </CardFooter>
                                 </Card>
                             ))}
@@ -210,48 +252,64 @@ export default function SavedItemsPage() {
                     {savedItems.accommodations.length === 0 ? (
                         <div className="text-center py-12 bg-slate-50 rounded-lg">
                             <BookmarkX className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                            <h3 className="text-lg font-medium mb-2">No saved accommodations</h3>
-                            <p className="text-slate-600">You haven't saved any accommodations yet.</p>
+                            <h3 className="text-lg font-medium mb-2">No saved BnBs</h3>
+                            <p className="text-slate-600">You haven't saved any BnBs yet.</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {savedItems.accommodations.map((item) => (
-                                <Card key={item.id} className="h-full">
-                                    <CardHeader className='flex-row justify-between content-center'>
-                                        <div>
-                                            <CardTitle>{item["Account Name"] || 'Unnamed Accommodation'}</CardTitle>
-                                            {item["Address County"] && (
-                                                <CardDescription>{item["Address County"]}</CardDescription>
-                                            )}
+                            {savedItems.accommodations.map((item, index) => {
+                                return (
+                                    <Card key={item["Property Reg Number"]} className="h-full pt-0 border-none">
+                                        <div className="relative w-full h-48 overflow-hidden">
+                                            <Image
+                                                src={getConsistentImage(item)}
+                                                alt={`${item["Account Name"] || "Accommodation"}`}
+                                                fill
+                                                className="object-cover transition-transform duration-300 hover:scale-105 rounded-lg"
+                                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                                priority={index < 6}
+                                            />
                                         </div>
-                                        <div>{<SaveButton item={item} itemType="accommodation" />}</div>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="flex items-start mb-4">
-                                            <MapPin className="h-5 w-5 text-emerald-700 mr-2 mt-1" />
-                                            <div>
-                                                <p className="font-medium">Address</p>
-                                                <p className="text-sm">
-                                                    {item["Address Line 1"] ? `${item["Address Line 1"]}, ` : ''}
-                                                    {item["Address County"] || 'Location unavailable'}
-                                                </p>
-                                            </div>
-                                        </div>
+                                        <CardHeader className='flex-row justify-between content-center'>
+                                            <CardTitle>{item["Account Name"]}</CardTitle>
+                                            <div className='-mt-[40px] relative'>{<SaveButton item={item} itemType="accommodation" />}</div>
+                                        </CardHeader>
+                                        <CardContent>
 
-                                        {item["Eircode/Postal code"] && (
-                                            <div className="flex items-start mb-4">
-                                                <div className="h-5 w-5 mr-2"></div> {/* Spacer for alignment */}
-                                                <p className="text-sm">
-                                                    <span className="font-medium">Eircode:</span> {item["Eircode/Postal code"]}
-                                                </p>
+                                            <div className="flex items-center mb-2">
+                                                <MapPin size={22} className="text-primary mr-2" />
+                                                <p>{item["Address Line 1"]}, {item["Address County"]}</p>
                                             </div>
-                                        )}
-                                    </CardContent>
-                                    <CardFooter className="flex justify-between items-center">
-                                        <Badge variant="outline">{item.Sector || 'Accommodation'}</Badge>
-                                    </CardFooter>
-                                </Card>
-                            ))}
+                                            <a
+                                                href={`https://www.google.com/maps?q=${item.Latitude}+${item.Longitude}`}
+                                                target="_blank"
+                                                // this is to protect my site from bring linked in booking.com
+                                                rel="noopener noreferrer"
+                                                className='flex gap-2'
+                                            >
+                                                <Navigation size={22} className='text-primary' />
+                                                Open in Google Maps
+                                            </a>
+                                        </CardContent>
+                                        <CardFooter className='flex justify-between'>
+
+                                            <a
+                                                href={`https://www.booking.com/search.html?ss=${encodeURIComponent(item["Account Name"] || "")}+${encodeURIComponent(item["Address County"] || "Ireland")}`}
+                                                target="_blank"
+                                                // this is to protect my site from bring linked in booking.com
+                                                rel="noopener noreferrer"
+                                                className='flex gap-2'
+                                            >
+                                                <Button>
+                                                    <ExternalLink size={22} className='text-background' />
+                                                    Booking.com
+                                                </Button>
+                                            </a>
+                                        </CardFooter>
+                                    </Card>
+
+                                )
+                            })}
                         </div>
                     )}
                 </TabsContent>
@@ -269,15 +327,9 @@ export default function SavedItemsPage() {
                             {savedItems.events.map((item) => (
                                 <Card key={item.id} className="h-full">
                                     <CardHeader className='flex-row justify-between content-center'>
-                                        <div>
-                                            <CardTitle>{item.name}</CardTitle>
-                                            {item.member && (
-                                                <CardDescription>
-                                                    Organized by {item.member.name}
-                                                </CardDescription>
-                                            )}
-                                        </div>
+                                        <CardTitle>{item.name}</CardTitle>
                                         <div>{<SaveButton item={item} itemType="event" />}</div>
+
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         <div className="flex items-start">
@@ -288,25 +340,23 @@ export default function SavedItemsPage() {
                                             </div>
                                         </div>
 
-                                        {item.venue && (
-                                            <div className="flex items-start">
-                                                <Building className="h-5 w-5 mr-2 text-primary shrink-0 mt-1" />
-                                                <div>
-                                                    <p className="font-medium">Venue</p>
-                                                    <p className="text-sm">{item.venue.name || "Unknown Venue"}</p>
-                                                    {item.venue.web && (
-                                                        <a
-                                                            href={item.venue.web}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="text-primary hover:underline text-xs flex items-center"
-                                                        >
-                                                            <ExternalLink className="h-3 w-3 mr-1" /> Venue website
-                                                        </a>
-                                                    )}
-                                                </div>
+                                        <div className="flex items-start">
+                                            <Building className="h-5 w-5 mr-2 text-primary shrink-0 mt-1" />
+                                            <div>
+                                                <p className="font-medium">Venue</p>
+                                                <p className="text-sm">{item.venue?.name || "Unknown Venue"}</p>
+                                                {item.venue?.web && (
+                                                    <a
+                                                        href={item.venue.web}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-primary hover:underline text-xs"
+                                                    >
+                                                        Venue website
+                                                    </a>
+                                                )}
                                             </div>
-                                        )}
+                                        </div>
 
                                         <div className="flex items-start">
                                             <MapPin className="h-5 w-5 mr-2 text-primary shrink-0 mt-1" />
@@ -319,19 +369,20 @@ export default function SavedItemsPage() {
                                                 </p>
                                             </div>
                                         </div>
+
                                     </CardContent>
-                                    <CardFooter className="flex justify-between items-center">
-                                        {item.url ? (
+                                    <CardFooter className='ms-auto mt-auto'>
+                                        {item.url && (
                                             <a
                                                 href={item.url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="text-primary hover:underline flex items-center"
                                             >
-                                                <ExternalLink className="h-4 w-4 mr-1" /> View Details
+                                                <Button>
+                                                    <ExternalLink />
+                                                    TheSession.org
+                                                </Button>
                                             </a>
-                                        ) : (
-                                            <span></span>
                                         )}
                                     </CardFooter>
                                 </Card>
