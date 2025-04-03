@@ -5,6 +5,8 @@ import { ThemeProvider } from "@/components/theme-provider"
 // AuthProvider
 import { SessionProvider } from "@/AuthContext"
 
+import ServiceWorkerRegister from '@/components/ServiceWorkerRegister';
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,6 +24,11 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   icons: {
     icon: "/icon-192.png"
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Buckle Up'
   }
 };
 
@@ -30,10 +37,16 @@ export default function RootLayout({ children, }: Readonly<{
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#008d5c" />
+        <link rel="logo" href="/icon-192.png" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <SessionProvider>
+          <ServiceWorkerRegister />
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
