@@ -32,5 +32,6 @@
 	],
 	"form_factor": "wide",
 	"theme_color": "#008d5c",
-	"background_color": "#e5eee9"
+	"background_color": "#e5eee9",
+	"prefer_related_applications": false
 }
