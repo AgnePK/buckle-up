@@ -55,7 +55,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "resolutions": {
-    "@babel/plugin-bugfix-safari-class-field-initialiser-scope": "7.22.15"
+    "@babel/plugin-bugfix-safari-class-field-initialiser-scope": "7.24.0"
   },
   "devDependencies": {
     "@babel/plugin-bugfix-safari-class-field-initializer-scope": "^7.25.9",
