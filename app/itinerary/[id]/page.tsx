@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import ItineraryMapView from '@/Maps/itineraryMapView';
 
 import Image from 'next/image';
-import journey from "@/public/illustrations/journey.png"
+// import journey from "@/public/illustrations/journey.png"
 // AI chatbot
 
 import { ChatProvider } from '@/gemeni/ChatContext';
