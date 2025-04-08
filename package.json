@@ -52,7 +52,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
-    "@babel/plugin-bugfix-safari-class-field-initializer-scope": "^7.25.9",
+    "@babel/plugin-bugfix-safari-class-field-initializer-scope": "^7.24.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
