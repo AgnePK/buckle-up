@@ -2,9 +2,6 @@
   "name": "buckle-up",
   "version": "0.1.0",
   "private": true,
-  "engines": {
-    "node": ">=18.17.0"
-  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -53,9 +50,6 @@
     "react-papaparse": "^4.4.0",
     "tailwind-merge": "^3.0.2",
     "tailwindcss-animate": "^1.0.7"
-  },
-  "resolutions": {
-    "@babel/plugin-bugfix-safari-class-field-initialiser-scope": "7.24.0"
   },
   "devDependencies": {
     "@babel/plugin-bugfix-safari-class-field-initializer-scope": "^7.25.9",
