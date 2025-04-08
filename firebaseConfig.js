@@ -20,6 +20,7 @@ const app = initializeApp(firebaseConfig);
 export const firebase_auth = getAuth(app);
 
 export const db = getDatabase(app);
+
 // export const auth = getAuth(app);
 
 // For more information on how to access Firebase in your project,
