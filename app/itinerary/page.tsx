@@ -183,20 +183,20 @@ export default function Itinerary() {
         );
     }
     // No trips yet
-    if (trip.length === 0) {
-        return (
-            <div className="flex justify-center items-center p-8">
-                <Card className="w-full max-w-md text-center p-6">
-                    <CardHeader>
-                        <CardTitle>No Trips Found</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p>You haven't created any trips yet.</p>
-                    </CardContent>
-                </Card>
-            </div>
-        );
-    }
+    // if (trip.length === 0) {
+    //     return (
+    //         <div className="flex justify-center items-center p-8">
+    //             <Card className="w-full max-w-md text-center p-6">
+    //                 <CardHeader>
+    //                     <CardTitle>No Trips Found</CardTitle>
+    //                 </CardHeader>
+    //                 <CardContent>
+    //                     <p>You haven't created any trips yet.</p>
+    //                 </CardContent>
+    //             </Card>
+    //         </div>
+    //     );
+    // }
 
     return (
         <>
@@ -281,79 +281,99 @@ export default function Itinerary() {
 
                     </div>
                 </div>
-                <div className='grid grid-cols-1 gap-2 bg-card rounded-md p-2'>
-                    {trip.slice(0).reverse().map((item, index) => {
+                {trip.length === 0 ? (
+                    <div className="bg-card rounded-md p-6 text-center">
+                        <Card className="w-full max-w-xl mx-auto text-center p-6 border-none shadow-none bg-transparent">
+                            <CardHeader>
+                                <CardTitle>No Trips Found</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="mb-4">You haven't created any trips yet.</p>
+                                <Button
+                                    variant="default"
+                                    onClick={() => router.push("/itinerary/create")}
+                                    className="mx-auto"
+                                >
+                                    <Plus className="mr-2" />
+                                    Create Your First Itinerary
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    </div>
+                ) : (
+                    <div className='grid grid-cols-1 gap-2 bg-card rounded-md p-2'>
+                        {trip.slice(0).reverse().map((item, index) => {
+                            // Format dates from "YYYY-MM-DD" to "Month DD"
+                            const formatDate = (dateString: string) => {
+                                if (!dateString) return "";
 
-                        // Format dates from "YYYY-MM-DD" to "Month DD"
-                        const formatDate = (dateString: string) => {
-                            if (!dateString) return "";
+                                const date = new Date(dateString);
 
-                            const date = new Date(dateString);
+                                // Check if date is valid
+                                if (isNaN(date.getTime())) return dateString;
 
-                            // Check if date is valid
-                            if (isNaN(date.getTime())) return dateString;
+                                // Format the date
+                                return date.toLocaleDateString('en-US', {
+                                    month: 'long',
+                                    day: 'numeric'
+                                });
+                            };
 
-                            // Format the date
-                            return date.toLocaleDateString('en-US', {
-                                month: 'long',
-                                day: 'numeric'
-                            });
-                        };
-
-                        const startDate = formatDate(item.start_date);
-                        const endDate = formatDate(item.end_date);
-                        return (
-                            <div key={item.id}>
-                                <Card key={item.id} className='rounded-none -my-[8px] border-none bg-transparent shadow-none flex flex-col md:flex-row w-full'>
-                                    <Link
-                                        href={`/itinerary/${item.id}`}
-                                        className='w-full md:w-1/4'
-                                    >
-                                        <CardHeader>
-                                            <CardTitle className='text-lg'>
-                                                {item.title ?
-                                                    (item.title.length > 25 ? `${item.title.substring(0, 25)}...` : item.title)
-                                                    : 'Untitled Trip'}
-                                            </CardTitle>
-                                        </CardHeader>
-                                    </Link>
-                                    <CardContent className='flex items-center gap-3 w-full md:w-1/4'>
-                                        <CalendarDays className='w-6 h-6 text-primary' />
-                                        <div>
-                                            <p> {startDate} - {endDate} </p>
-                                        </div>
-                                    </CardContent>
-                                    <CardContent className='w-full md:w-1/4'>
-                                        {item.flight && (item.flight.departure || item.flight.landing) ? (
-                                            <div className="flex items-center gap-10">
-                                                <div className='flex gap-2'>
-                                                    <PlaneTakeoff className='text-primary' />
-                                                    {item.flight.departure}
-                                                </div>
-                                                <div className='flex gap-2'>
-                                                    <PlaneLanding className='text-primary' />
-                                                    {item.flight.landing}
-                                                </div>
+                            const startDate = formatDate(item.start_date);
+                            const endDate = formatDate(item.end_date);
+                            return (
+                                <div key={item.id}>
+                                    <Card key={item.id} className='rounded-none -my-[8px] border-none bg-transparent shadow-none flex flex-col md:flex-row w-full'>
+                                        <Link
+                                            href={`/itinerary/${item.id}`}
+                                            className='w-full md:w-1/4'
+                                        >
+                                            <CardHeader>
+                                                <CardTitle className='text-lg'>
+                                                    {item.title ?
+                                                        (item.title.length > 25 ? `${item.title.substring(0, 25)}...` : item.title)
+                                                        : 'Untitled Trip'}
+                                                </CardTitle>
+                                            </CardHeader>
+                                        </Link>
+                                        <CardContent className='flex items-center gap-3 w-full md:w-1/4'>
+                                            <CalendarDays className='w-6 h-6 text-primary' />
+                                            <div>
+                                                <p> {startDate} - {endDate} </p>
                                             </div>
-                                        ) : (
-                                            <div className="text-gray-600">
-                                                {item.notes ?
-                                                    (item.notes.length > 30 ? `${item.notes.substring(0, 30)}...` : item.notes)
-                                                    : <i>No notes</i>}
-                                            </div>
-                                        )}
-                                    </CardContent>
-                                    <CardFooter className='w-full md:w-1/4'>
-                                        <Button variant="default" className='md:ms-auto' onClick={() => { router.push(`/itinerary/${item.id}`) }}>
-                                            View Itinerary
-                                        </Button>
-                                    </CardFooter>
-                                </Card>
-                                <Separator className='bg-gray-300' />
-                            </div>
-                        )
-                    })}
-                </div>
+                                        </CardContent>
+                                        <CardContent className='w-full md:w-1/4'>
+                                            {item.flight && (item.flight.departure || item.flight.landing) ? (
+                                                <div className="flex items-center gap-10">
+                                                    <div className='flex gap-2'>
+                                                        <PlaneTakeoff className='text-primary' />
+                                                        {item.flight.departure}
+                                                    </div>
+                                                    <div className='flex gap-2'>
+                                                        <PlaneLanding className='text-primary' />
+                                                        {item.flight.landing}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="text-gray-600">
+                                                    {item.notes ?
+                                                        (item.notes.length > 30 ? `${item.notes.substring(0, 30)}...` : item.notes)
+                                                        : <i>No notes</i>}
+                                                </div>
+                                            )}
+                                        </CardContent>
+                                        <CardFooter className='w-full md:w-1/4'>
+                                            <Button variant="default" className='md:ms-auto' onClick={() => { router.push(`/itinerary/${item.id}`) }}>
+                                                View Itinerary
+                                            </Button>
+                                        </CardFooter>
+                                    </Card>
+                                    <Separator className='bg-gray-300' />
+                                </div>
+                            )
+                        })}
+                    </div>
+                )}
             </div>
         </>
     );
