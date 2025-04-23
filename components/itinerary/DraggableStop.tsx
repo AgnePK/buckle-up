@@ -1,11 +1,9 @@
 import React, { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { DragItem, ItemTypes, StopType } from '@/types/types';
 import PlacesAutocomplete from '@/Maps/PlacesAutocomplete';
-import { Clock, NotebookPen, X } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
+import { Clock, NotebookPen, X, GripHorizontal } from 'lucide-react';
 
 type DraggableStopProps = {
   day: number;
@@ -93,7 +91,7 @@ const DraggableStop: React.FC<DraggableStopProps> = ({
       <div className="flex flex-col md:flex-row md:items-center gap-2 mb-2 mt-8 md:mt-0">
         <div className="w-full md:w-auto md:flex-grow mb-2 md:mb-0">
           <div className="flex items-start">
-            <div className="cursor-move px-2 mt-1">=</div>
+            <div className="cursor-move px-2 mt-1"><GripHorizontal className="pt-1"/></div>
             <div className="flex-grow w-full">
               <PlacesAutocomplete
                 value={stop.name}
@@ -157,13 +155,6 @@ const DraggableStop: React.FC<DraggableStopProps> = ({
           placeholder='Add your notes here'
         />
       )}
-      {/* <Input
-        placeholder="Notes"
-        value={stop.notes}
-        onChange={(e: { target: { value: any; }; }) => updateStop(day, period, index, "notes", e.target.value)}
-        className="bg-transparent border border-secondary  md:mt-2 mt-14"
-      /> */}
-      {/* <Separator className='bg-gray-300  md:mt-4 mt-8'/> */}
     </div>
   );
 }
