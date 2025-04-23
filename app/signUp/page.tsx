@@ -8,6 +8,14 @@ import { AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 
 export default function SignUp() {
+
+    const { signUp, user } = useSession();
+    const router = useRouter();
+
+    if (user) {
+        router.push('/itinerary');
+        return;
+    }
     const [newUser, setNewUser] = useState({
         full_name: "",
         email: "",
@@ -21,8 +29,6 @@ export default function SignUp() {
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const { signUp } = useSession();
-    const router = useRouter();
 
     const validateField = (name: string, value: string): string => {
         // testing switch statements

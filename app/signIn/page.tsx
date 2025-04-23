@@ -9,18 +9,26 @@ import { Input } from '@/components/ui/input';
 import { AlertCircle } from 'lucide-react';
 
 export default function SignIn() {
-    const [user, setUser] = useState({
+
+    const router = useRouter()
+    const { signIn, user } = useSession();
+
+    if (user) {
+        router.replace("/itinerary")
+        return;
+    }
+
+    const [thisUser, setThisUser] = useState({
         email: "",
         password: ""
     })
     const [error, setError] = useState("")
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const { signIn } = useSession();
 
     const handleChange = (e: { target: { name: string; value: string; }; }) => {
         const { name, value } = e.target;
-        setUser(prevState => ({
+        setThisUser(prevState => ({
             ...prevState,
             [name]: value
         }));
@@ -31,20 +39,20 @@ export default function SignIn() {
         e.preventDefault();
 
         // Basic validation
-        if (!user.email || !user.password) {
+        if (!thisUser.email || !thisUser.password) {
             setError("All fields are required");
             return;
         }
 
         // Email validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!user.email.trim() || !emailRegex.test(user.email)) {
+        if (!thisUser.email.trim() || !emailRegex.test(thisUser.email)) {
             setError("Please enter a valid email");
             return;
         }
 
         // Password length validation
-        if (user.password.length < 6) {
+        if (thisUser.password.length < 6) {
             setError("Password must be at least 6 characters");
             return;
         }
@@ -52,17 +60,17 @@ export default function SignIn() {
         setError("");
 
         try {
-            await signIn(user.email, user.password);
+            await signIn(thisUser.email, thisUser.password);
             router.push("/itinerary");
         } catch (err: any) {
             console.error("Sign in error:", err);
 
-            // Map Firebase error codes to user-friendly messages
-            if (err.code === "auth/invalid-credential" || err.code === "auth/invalid-email" || err.code === "auth/user-not-found") {
+            // Map Firebase error codes to thisUser-friendly messages
+            if (err.code === "auth/invalid-credential" || err.code === "auth/invalid-email" || err.code === "auth/thisUser-not-found") {
                 setError("Invalid email or password. Please check your credentials and try again.");
             } else if (err.code === "auth/wrong-password") {
                 setError("Incorrect password. Please try again.");
-            } else if (err.code === "auth/user-disabled") {
+            } else if (err.code === "auth/thisUser-disabled") {
                 setError("This account has been disabled. Please contact support.");
             } else if (err.code === "auth/too-many-requests") {
                 setError("Too many unsuccessful login attempts. Please try again later or reset your password.");
@@ -79,7 +87,6 @@ export default function SignIn() {
 
     };
 
-    const router = useRouter()
     return (
         <div className='grid gap-8 place-content-center min-h-screen'>
             <h1 className="text-6xl text-emerald-800 font-extrabold">Buckle Up</h1>
@@ -100,9 +107,9 @@ export default function SignIn() {
                 <div className='grid gap-3'>
                     <Input
                         placeholder="Email address"
-                        value={user.email}
+                        value={thisUser.email}
                         onChange={handleChange}
-                        className={` ${error && !user.email ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                        className={` ${error && !thisUser.email ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                         name="email"
                         type="email"
                         autoComplete="email"
@@ -111,9 +118,9 @@ export default function SignIn() {
 
                     <Input
                         placeholder="Password"
-                        value={user.password}
+                        value={thisUser.password}
                         onChange={handleChange}
-                        className={` ${error && !user.password ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                        className={` ${error && !thisUser.password ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
                         name="password"
                         type='password'
                         autoComplete="current-password"

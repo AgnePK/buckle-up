@@ -5,9 +5,16 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from "next/image";
 import planner from "@/public/illustrations/planner.png"
+import { useSession } from '@/AuthContext';
 
 export default function Home() {
   const router = useRouter()
+  const { user } = useSession()
+
+  if (user) {
+    router.replace("/itinerary")
+    return;
+  }
 
   return (
     <div className="grid place-content-center min-h-screen">
