@@ -269,7 +269,7 @@ export default function Itinerary() {
                     <div className='md:flex items-center md:w-1/3'>
                         <Input
                             type="text"
-                            placeholder="Search itneraries..."
+                            placeholder="Search itineraries..."
                             value={""}
                             className="p-2 border border-gray-300 bg-white "
                             readOnly
