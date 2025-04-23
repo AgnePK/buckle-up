@@ -223,16 +223,16 @@ export default function Itinerary() {
                             <h2 className="text-3xl md:text-4xl font-bold">Begin your journey <br /> across Ireland</h2>
                             <p className="text-sm md:text-base mt-2 md:w-3/5">Plan your next trip to The Emerald Isle. Build your itineraries, organise your trips, discover new places, browse through the local bnbs.</p>
                             <div className=" md:flex-row">
-                                <Button variant={"outline"} className="bg-transparent m-2 w-40">
+                                {/* <Button variant={"outline"} className="bg-transparent m-2 w-40">
                                     Discover
-                                </Button>
+                                </Button> */}
                                 <Button
                                     variant={"default"}
                                     onClick={() => router.push("/itinerary/create")}
                                     className="w-40 m-2"
                                 >
+                                    Create Itinerary
                                     <Plus />
-                                    New Itinerary
                                 </Button>
                             </div>
                         </div>
