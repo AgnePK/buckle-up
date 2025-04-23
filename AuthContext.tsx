@@ -236,3 +236,8 @@ export function SessionProvider(props: { children: React.ReactNode }) {
         </AuthContext.Provider>
     );
 }
+
+// https://github.com/aaronksaunders/firebase-exporouter-app/tree/main
+// this code was originally taken from the above github repo. 
+// later modified to suit the needs of this project
+// also modified to work in NextJS instead of ReactNative
