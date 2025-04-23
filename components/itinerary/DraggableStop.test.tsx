@@ -4,13 +4,13 @@ import '@testing-library/jest-dom';
 import DraggableStop from '@/components/itinerary/DraggableStop';
 import { StopType } from '@/types/types';
 
-// Mock dependencies
-jest.mock('react-dnd', () => ({
-  useDrag: () => [{ isDragging: false }, jest.fn()],
-  useDrop: () => [{ isOver: false }, jest.fn()]
+// Mock the Lucide icons
+jest.mock('lucide-react', () => ({
+  Clock: () => <div data-testid="clock-icon" />,
+  NotebookPen: () => <div data-testid="notebook-icon" />,
+  X: () => <div data-testid="x-icon" />,
+  GripHorizontal: () => <div data-testid="grip-icon" />
 }));
-
-jest.mock('react-dnd-html5-backend', () => ({}));
 
 // Mock the PlacesAutocomplete component
 jest.mock('@/Maps/PlacesAutocomplete', () => {
@@ -29,12 +29,6 @@ jest.mock('@/Maps/PlacesAutocomplete', () => {
 jest.mock('@/Maps/loadMapsAPI', () => ({
   loadMapsAPI: jest.fn().mockResolvedValue(undefined),
   isGoogleMapsLoaded: jest.fn().mockReturnValue(false)
-}));
-
-// Mock the DndProvider by rendering children directly
-jest.mock('react-dnd', () => ({
-  ...jest.requireActual('react-dnd'),
-  DndProvider: ({ children }: { children: React.ReactNode }) => children
 }));
 
 describe('DraggableStop Component', () => {
@@ -68,45 +62,48 @@ describe('DraggableStop Component', () => {
     render(<DraggableStop {...mockProps} />);
     
     // Check if location name is displayed in the input
-    const input = screen.getByTestId('places-autocomplete') as HTMLInputElement;
+    const input = screen.getByTestId('places-autocomplete');
     expect(input).toBeInTheDocument();
     
     // Check if time is displayed
-    expect(screen.getByText(/Time: 10:00 AM/)).toBeInTheDocument();
-    
-    // Check for buttons
-    expect(screen.getByText('Set Time')).toBeInTheDocument();
-    expect(screen.getByText('Add Notes')).toBeInTheDocument();
+    const timeText = screen.getByText('10:00 AM');
+    expect(timeText).toBeInTheDocument();
   });
 
   test('calls removeStop when delete button is clicked', () => {
     render(<DraggableStop {...mockProps} />);
     
-    // Find and click the delete button (text content is X)
-    const deleteButton = screen.getByText('X');
+    // Find all buttons and click the one with the X icon
+    const buttons = screen.getAllByRole('button');
+    // Assuming the delete button is the third button (index 2) from your component structure
+    const deleteButton = buttons[2]; 
     fireEvent.click(deleteButton);
     
     // Check if removeStop was called with the correct parameters
     expect(mockProps.removeStop).toHaveBeenCalledWith(1, 'morning', 0);
   });
 
-  test('calls toggleNotes when Add Notes button is clicked', () => {
+  test('calls toggleNotes when notes button is clicked', () => {
     render(<DraggableStop {...mockProps} />);
     
-    // Find and click the Add Notes button
-    const addNotesButton = screen.getByText('Add Notes');
-    fireEvent.click(addNotesButton);
+    // Find all buttons and click the one with the NotebookPen icon
+    const buttons = screen.getAllByRole('button');
+    // Assuming the notes button is the second button (index 1) from your component structure
+    const notesButton = buttons[1];
+    fireEvent.click(notesButton);
     
     // Check if toggleNotes was called with the correct parameters
     expect(mockProps.toggleNotes).toHaveBeenCalledWith(1, 'morning', 0);
   });
 
-  test('sets up time picker when Set Time button is clicked', () => {
+  test('sets up time picker when time button is clicked', () => {
     render(<DraggableStop {...mockProps} />);
     
-    // Find and click the Set Time button
-    const setTimeButton = screen.getByText('Set Time');
-    fireEvent.click(setTimeButton);
+    // Find all buttons and click the one with the time text
+    const buttons = screen.getAllByRole('button');
+    // Assuming the time button is the first button (index 0) from your component structure
+    const timeButton = buttons[0];
+    fireEvent.click(timeButton);
     
     // Check if the correct functions were called to set up the time picker
     expect(mockProps.setSelectedDay).toHaveBeenCalledWith(1);

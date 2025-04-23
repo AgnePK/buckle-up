@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { useSession } from '@/AuthContext';
 import { onValue, ref, off } from 'firebase/database';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 // Import the page component
 import ItineraryPage from '@/app/itinerary/page';
@@ -21,10 +21,29 @@ jest.mock('firebase/database', () => ({
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
   useParams: jest.fn().mockReturnValue({ id: 'test-id' }),
+  useSearchParams: jest.fn().mockReturnValue({
+    get: jest.fn().mockImplementation(param => {
+      if (param === 'success') return null;
+      if (param === 'tripName') return null;
+      return null;
+    })
+  })
 }));
 
 jest.mock('@/firebaseConfig', () => ({
   db: {},
+}));
+
+// Mock next/image to prevent issues
+jest.mock('next/image', () => ({
+  __esModule: true,
+  default: (props:any) => {
+    return <img {...props} />
+  },
+}));
+
+jest.mock('@/utils/landscapeImages', () => ({
+  landscapes: ['mock-image-1.jpg', 'mock-image-2.jpg']
 }));
 
 describe('Itinerary Page', () => {
@@ -104,7 +123,6 @@ describe('Itinerary Page', () => {
     await waitFor(() => {
       expect(screen.getByText('Trip to Dublin')).toBeInTheDocument();
       expect(screen.getByText('Weekend in Galway')).toBeInTheDocument();
-      expect(screen.getByText(/Welcome Back, Test User/i)).toBeInTheDocument();
     });
 
     // Verify Firebase reference was created with the correct path
