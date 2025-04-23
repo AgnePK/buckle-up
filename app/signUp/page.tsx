@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSession } from "@/AuthContext";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,13 +9,15 @@ import Link from 'next/link';
 
 export default function SignUp() {
 
-    const { signUp, user } = useSession();
     const router = useRouter();
+    const { signUp, user, redirectBasedOnAuth } = useSession();
 
-    if (user) {
-        router.push('/itinerary');
-        return;
-    }
+    useEffect(() => {
+        if (user) {
+            redirectBasedOnAuth("/itinerary");
+        }
+    }, [user, redirectBasedOnAuth]);
+
     const [newUser, setNewUser] = useState({
         full_name: "",
         email: "",

@@ -18,20 +18,21 @@ import Image from 'next/image';
 import music from "@/public/illustrations/music.png"
 import { Input } from '@/components/ui/input';
 
-import { useRouter } from 'next/navigation';
 import { useSession } from '@/AuthContext';
+import Link from 'next/link';
 
 const PAGE_SIZE = 21;
 
 export default function EventsPage() {
 
-  const router = useRouter()
-  const {user} = useSession()
+  const { user, redirectBasedOnAuth } = useSession()
 
-  if (!user) {
-    router.push('/signIn');
-    return;
-  }
+  useEffect(() => {
+    if (!user) {
+      redirectBasedOnAuth("/signIn");
+    }
+  }, [user, redirectBasedOnAuth]);
+
 
   const [page, setPage] = useState(1);
   const [displayData, setDisplayData] = useState<any[]>([]);
@@ -103,13 +104,13 @@ export default function EventsPage() {
   return (
     <div className="px-8 pb-8">
       <div className='md:flex flex-row justify-evenly items-center'>
-        <div className='md:w-1/3 gap-6 flex flex-col gap-6'>
+        <div className='md:w-1/3 gap-6 flex flex-col'>
           <h1 className="text-3xl font-bold ">Music Events</h1>
           <p className='text-xl text-gray-800'>
             Explore the traditional Irish Music events provided by <a href="https://thesession.org/tunes" target='_blank' className='text-primary'>The Session</a>.
           </p>
           <p className='text-xl text-gray-800'>
-            Save the events you like, then find them in the Saved Places page
+            Save the events you like, then find them in your <Link href={"/itinerary/saved"} className='text-primary' >Saved Places</Link>
           </p>
           <div className="mb-6">
             <Input

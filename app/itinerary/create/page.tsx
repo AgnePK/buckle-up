@@ -1,5 +1,5 @@
 "use client"
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useState } from "react";
 import { useRouter } from 'next/navigation';
 import { DayType, StopType, TripType } from '@/types/types';
@@ -38,13 +38,15 @@ import {
 import TripSummary from '@/components/itinerary/TripSummary';
 
 const CreatePage = () => {
-    const { user } = useSession();
     const router = useRouter();
+    const { user, redirectBasedOnAuth } = useSession();
 
-    if (!user) {
-        router.push('/signIn');
-        return;
-    }
+    useEffect(() => {
+        if (!user) {
+            redirectBasedOnAuth("/signIn");
+        }
+    }, [user, redirectBasedOnAuth]);
+
 
     const [step, setStep] = useState(1);
     const nextStep = () => setStep(step + 1);
@@ -184,7 +186,7 @@ const CreatePage = () => {
     // Submit itinerary to Firebase
     const submitItinerary = async () => {
         if (!user) {
-            console.error("User not authenticated!");
+            redirectBasedOnAuth("/signIn");
             return;
         }
 

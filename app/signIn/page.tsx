@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSession } from "@/AuthContext";
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -11,12 +11,14 @@ import { AlertCircle } from 'lucide-react';
 export default function SignIn() {
 
     const router = useRouter()
-    const { signIn, user } = useSession();
+    const { signIn, redirectBasedOnAuth, user } = useSession();
 
-    if (user) {
-        router.replace("/itinerary")
-        return;
-    }
+    useEffect(() => {
+        if (user) {
+            redirectBasedOnAuth("/itinerary");
+        }
+    }, [user, redirectBasedOnAuth]);
+
 
     const [thisUser, setThisUser] = useState({
         email: "",

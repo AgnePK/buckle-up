@@ -182,21 +182,6 @@ export default function Itinerary() {
             </div>
         );
     }
-    // No trips yet
-    // if (trip.length === 0) {
-    //     return (
-    //         <div className="flex justify-center items-center p-8">
-    //             <Card className="w-full max-w-md text-center p-6">
-    //                 <CardHeader>
-    //                     <CardTitle>No Trips Found</CardTitle>
-    //                 </CardHeader>
-    //                 <CardContent>
-    //                     <p>You haven't created any trips yet.</p>
-    //                 </CardContent>
-    //             </Card>
-    //         </div>
-    //     );
-    // }
 
     return (
         <>

@@ -1,5 +1,5 @@
 "use client";
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -9,12 +9,14 @@ import { useSession } from '@/AuthContext';
 
 export default function Home() {
   const router = useRouter()
-  const { user } = useSession()
+  const { user, redirectBasedOnAuth } = useSession()
 
-  if (user) {
-    router.replace("/itinerary")
-    return;
-  }
+  useEffect(() => {
+    if (user) {
+      redirectBasedOnAuth("/itinerary");
+    }
+  }, [user, redirectBasedOnAuth]);
+
 
   return (
     <div className="grid place-content-center min-h-screen">

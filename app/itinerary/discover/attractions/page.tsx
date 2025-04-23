@@ -20,20 +20,21 @@ import { Input } from '@/components/ui/input';
 import Image from 'next/image';
 import parade from "@/public/illustrations/parade1.png"
 
-import { useRouter } from 'next/navigation';
 import { useSession } from '@/AuthContext';
+import Link from 'next/link';
 
 const PAGE_SIZE = 20;
 
 export default function AttractionsPage() {
 
-    const router = useRouter()
-    const { user } = useSession()
+    const { user, redirectBasedOnAuth } = useSession()
 
-    if (!user) {
-        router.push('/signIn');
-        return;
-    }
+    useEffect(() => {
+        if (!user) {
+            redirectBasedOnAuth("/signIn");
+        }
+    }, [user, redirectBasedOnAuth]);
+
     const [page, setPage] = useState(1);
     const [displayData, setDisplayData] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
@@ -89,13 +90,13 @@ export default function AttractionsPage() {
     return (
         <div className="px-8 pb-8">
             <div className='md:flex flex-row justify-evenly items-center'>
-                <div className='md:w-1/3 gap-6 flex flex-col gap-6'>
+                <div className='md:w-1/3 gap-6 flex flex-col'>
                     <h1 className="text-3xl font-bold ">Attractions</h1>
                     <p className='text-xl text-gray-800'>
                         Find below the attractions provided by <a href="https://www.failteireland.ie/" target='_blank' className='text-primary'>Fáilte Ireland</a>.
                     </p>
                     <p className='text-xl text-gray-800'>
-                        Save the events you like, then find them in the Saved Places page
+                        Save the events you like, then find them in the <Link href={"/itinerary/saved"} className='text-primary' >Saved Places</Link>
                     </p>
                     <div className="mb-6">
                         <Input

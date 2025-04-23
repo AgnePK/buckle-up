@@ -30,13 +30,15 @@ const ViewItinerary = () => {
     const [trip, setTrip] = useState<TripType | null>(null);
     const [loading, setLoading] = useState(true);
 
-    const { user, isLoading } = useSession();
+    const { user, isLoading, redirectBasedOnAuth } = useSession();
     const router = useRouter();
 
-    if (!user) {
-        router.push('/signIn');
-        return;
-    }
+    useEffect(() => {
+        if (!user) {
+            redirectBasedOnAuth("/signIn");
+        }
+    }, [user, redirectBasedOnAuth]);
+
 
     useEffect(() => {
         if (!isLoading && !user) {

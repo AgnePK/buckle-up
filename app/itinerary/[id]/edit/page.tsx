@@ -34,12 +34,14 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 const EditPage = () => {
 
     const router = useRouter();
-    const { user } = useSession();
+    const { user,redirectBasedOnAuth } = useSession();
 
-    if (!user) {
-        router.push('/signIn');
-        return;
-    }
+    useEffect(() => {
+        if (!user) {
+          redirectBasedOnAuth("/signIn");
+        }
+      }, [user, redirectBasedOnAuth]);
+    
     const params = useParams();
     const tripId = params.id as string;
     const [loading, setLoading] = useState(true);

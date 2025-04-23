@@ -40,7 +40,7 @@ interface SavedItemsState {
 }
 
 export default function SavedItemsPage() {
-    const { user, isLoading: authLoading } = useSession();
+    const { user, isLoading: authLoading, redirectBasedOnAuth } = useSession();
     const [savedItems, setSavedItems] = useState<SavedItemsState>({
         attractions: [],
         accommodations: [],
@@ -53,7 +53,7 @@ export default function SavedItemsPage() {
         if (authLoading) return;
 
         if (!user) {
-            router.push('/signIn');
+            redirectBasedOnAuth("/signIn");
             return;
         }
 

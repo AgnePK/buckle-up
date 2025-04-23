@@ -3,7 +3,7 @@
  * @module
  */
 "use client";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { User, browserLocalPersistence, onAuthStateChanged, setPersistence } from "firebase/auth";
 import {
     getCurrentUser,
@@ -55,6 +55,10 @@ interface AuthContextType {
     user: User | null;
     /** Loading state for authentication operations */
     isLoading: boolean;
+
+    /** Redirects the user to the appropriate page based on auth status */
+    redirectBasedOnAuth: (redirectTo?: string) => void;
+
 }
 
 // ============================================================================
@@ -117,6 +121,20 @@ export function SessionProvider(props: { children: React.ReactNode }) {
      */
     const [isLoading, setIsLoading] = useState(true);
 
+    // Error encountered when redirecting user from/to itierary :
+    // ChunkLoadError: Loading chunk app/layout failed. (timeout: http://localhost:3000/_next/static/chunks/app/layout.js)
+    
+    // Safe redirect function that avoids React router updates during render
+    const redirectBasedOnAuth = useCallback((redirectTo?: string) => {
+        // Use setTimeout to push this to the next event loop iteration
+        // This prevents "Cannot update component while rendering" errors
+        if (redirectTo) {
+            setTimeout(() => {
+                router.push(redirectTo);
+            }, 0);
+        }
+    }, [router]);
+
     useEffect(() => {
         const setupPersistence = async () => {
             try {
@@ -139,22 +157,22 @@ export function SessionProvider(props: { children: React.ReactNode }) {
      */
     useEffect(() => {
         console.log("Setting up auth state listener");
-        
+
         // Auth state change listener
         const unsubscribe = onAuthStateChanged(firebase_auth, (authUser) => {
             console.log("Auth state changed:", authUser ? `User logged in: ${authUser.email}` : "No user");
-            
+
             // Update state with the authenticated user
             setUser(authUser);
             setIsLoading(false);
         });
-        
+
         return () => {
             console.log("Cleaning up auth state listener");
             unsubscribe();
         };
     }, []);
-    
+
     // ============================================================================
     // Handlers
     // ============================================================================
@@ -210,7 +228,7 @@ export function SessionProvider(props: { children: React.ReactNode }) {
         try {
             setIsLoading(true);
             await logout();
-            router.push("/signIn");
+            redirectBasedOnAuth("/signIn");
         } catch (error) {
             console.error("[handleSignOut error] ==>", error);
         } finally {
@@ -230,6 +248,7 @@ export function SessionProvider(props: { children: React.ReactNode }) {
                 signOut: handleSignOut,
                 user,
                 isLoading,
+                redirectBasedOnAuth
             }}
         >
             {props.children}
@@ -238,6 +257,6 @@ export function SessionProvider(props: { children: React.ReactNode }) {
 }
 
 // https://github.com/aaronksaunders/firebase-exporouter-app/tree/main
-// this code was originally taken from the above github repo. 
+// this code was originally taken from the above github repo.
 // later modified to suit the needs of this project
 // also modified to work in NextJS instead of ReactNative

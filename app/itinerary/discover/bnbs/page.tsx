@@ -12,7 +12,6 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, ExternalLink, Navigation, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
-import Head from 'next/head';
 import SaveButton from '@/components/savedItems';
 import { Button } from '@/components/ui/button';
 import { bnbs } from '@/utils/bnbImages';
@@ -21,20 +20,21 @@ import { Input } from '@/components/ui/input';
 
 import bed from "@/public/illustrations/bed.png"
 
-import { useRouter } from 'next/navigation';
 import { useSession } from '@/AuthContext';
+import Link from 'next/link';
 
 const PAGE_SIZE = 21;
 
 export default function AccommodationsPage() {
 
-    const router = useRouter()
-    const { user } = useSession()
+    const { user, redirectBasedOnAuth } = useSession()
 
-    if (!user) {
-        router.push('/signIn');
-        return;
-    }
+    useEffect(() => {
+        if (!user) {
+            redirectBasedOnAuth("/signIn");
+        }
+    }, [user, redirectBasedOnAuth]);
+
 
     const [page, setPage] = useState(1);
     const [displayData, setDisplayData] = useState<any[]>([]);
@@ -105,7 +105,7 @@ export default function AccommodationsPage() {
                         Browse through the local BnBs provided by <a href="https://www.failteireland.ie/" target='_blank' className='text-primary'>Fáilte Ireland</a>.
                     </p>
                     <p className='text-xl text-gray-800'>
-                        Save the events you like, then find them in the Saved Places page
+                        Save the events you like, then find them in the <Link href={"/itinerary/saved"} className='text-primary' >Saved Places</Link>
                     </p>
                     <div className="mb-6">
                         <Input
