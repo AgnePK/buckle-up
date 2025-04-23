@@ -18,9 +18,21 @@ import Image from 'next/image';
 import music from "@/public/illustrations/music.png"
 import { Input } from '@/components/ui/input';
 
+import { useRouter } from 'next/navigation';
+import { useSession } from '@/AuthContext';
+
 const PAGE_SIZE = 21;
 
 export default function EventsPage() {
+
+  const router = useRouter()
+  const {user} = useSession()
+
+  if (!user) {
+    router.push('/signIn');
+    return;
+  }
+
   const [page, setPage] = useState(1);
   const [displayData, setDisplayData] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");

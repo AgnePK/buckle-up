@@ -32,8 +32,11 @@ const ViewItinerary = () => {
 
     const { user, isLoading } = useSession();
     const router = useRouter();
-    // PDF
 
+    if (!user) {
+        router.push('/signIn');
+        return;
+    }
 
     useEffect(() => {
         if (!isLoading && !user) {

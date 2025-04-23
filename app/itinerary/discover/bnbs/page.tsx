@@ -21,9 +21,21 @@ import { Input } from '@/components/ui/input';
 
 import bed from "@/public/illustrations/bed.png"
 
+import { useRouter } from 'next/navigation';
+import { useSession } from '@/AuthContext';
+
 const PAGE_SIZE = 21;
 
 export default function AccommodationsPage() {
+
+    const router = useRouter()
+    const { user } = useSession()
+
+    if (!user) {
+        router.push('/signIn');
+        return;
+    }
+
     const [page, setPage] = useState(1);
     const [displayData, setDisplayData] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
@@ -86,7 +98,7 @@ export default function AccommodationsPage() {
     return (
         <div className="px-8 pb-8">
             <div className='md:flex flex-row justify-evenly items-center mb-2'>
-                <div className='md:w-1/3 gap-6 flex flex-col gap-6'>
+                <div className='md:w-1/3 flex flex-col gap-6'>
                     <h1 className="text-3xl font-bold ">Bed and Breakfast <p className='text-sm text-gray-600'>Local Businesses</p></h1>
 
                     <p className='text-xl text-gray-800'>

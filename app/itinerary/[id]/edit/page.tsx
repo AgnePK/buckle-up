@@ -32,9 +32,16 @@ import { Separator } from '@/components/ui/separator';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 const EditPage = () => {
+
+    const router = useRouter();
+    const { user } = useSession();
+
+    if (!user) {
+        router.push('/signIn');
+        return;
+    }
     const params = useParams();
     const tripId = params.id as string;
-    const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [step, setStep] = useState(1);
     const nextStep = () => setStep(step + 1);
@@ -50,7 +57,6 @@ const EditPage = () => {
         notes: "",
     });
 
-    const { user } = useSession();
 
     // Fetch existing itinerary data
     useEffect(() => {

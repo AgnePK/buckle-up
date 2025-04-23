@@ -1,6 +1,6 @@
 "use client"
 import React from 'react'
-import { useEffect, useState, useRef } from "react";
+import { useState } from "react";
 import { useRouter } from 'next/navigation';
 import { DayType, StopType, TripType } from '@/types/types';
 import DatePicker from "react-datepicker";
@@ -20,8 +20,8 @@ import DraggableStop from '@/components/itinerary/DraggableStop';
 import DateRangePicker, { generateDays } from '@/components/itinerary/DateRangePicker'
 import { cleanItinerary, generateMarkedDates } from '@/components/itinerary/CleanItinerary';
 import { DateRange } from "react-day-picker";
-import { format, parse } from "date-fns";
-import { Bold, ChevronRight, Clock, Eye, EyeOff, Info, Italic, Plus, Trash2, Underline, X } from 'lucide-react';
+import { format } from "date-fns";
+import { Bold, Clock, Eye, EyeOff, Info, Italic, Plus, Trash2, Underline, X } from 'lucide-react';
 
 import Image from 'next/image';
 import landscape2 from "@/public/illustrations/landscape2.png"
@@ -29,8 +29,6 @@ import landscape3 from "@/public/illustrations/landscape3.png"
 import calendar2 from "@/public/illustrations/calendar2.png"
 import notes from "@/public/illustrations/notes.png"
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
-import { Separator } from '@/components/ui/separator';
-import { Textarea } from '@/components/ui/textarea';
 import {
     ToggleGroup,
     ToggleGroupItem,
@@ -40,7 +38,14 @@ import {
 import TripSummary from '@/components/itinerary/TripSummary';
 
 const CreatePage = () => {
+    const { user } = useSession();
     const router = useRouter();
+
+    if (!user) {
+        router.push('/signIn');
+        return;
+    }
+
     const [step, setStep] = useState(1);
     const nextStep = () => setStep(step + 1);
     const prevStep = () => setStep(step - 1);
@@ -175,8 +180,6 @@ const CreatePage = () => {
             return { ...prev, [key]: !prev[key] };
         });
     };
-
-    const { user } = useSession();
 
     // Submit itinerary to Firebase
     const submitItinerary = async () => {
@@ -338,7 +341,7 @@ const CreatePage = () => {
 
             <div className='relative'>
                 {/* Summary Toggle Button (visible in step 3 and 4) */}
-                {(step === 1 ||  step === 2 || step === 3 || step === 4) && (
+                {(step === 1 || step === 2 || step === 3 || step === 4) && (
                     <Button
                         onClick={toggleSummary}
                         variant="outline"
@@ -628,7 +631,7 @@ const CreatePage = () => {
                                             Travel can be stressful sometimes, makes things easier by writing down everything you need!
                                         </p>
                                         <p >
-                                            Come back later if you remember soemthing you need for the trip.
+                                            Come back later if you remember something you need for the trip.
                                         </p>
                                     </div>
                                 </div>

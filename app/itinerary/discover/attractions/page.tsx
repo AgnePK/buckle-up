@@ -19,9 +19,21 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
 import parade from "@/public/illustrations/parade1.png"
+
+import { useRouter } from 'next/navigation';
+import { useSession } from '@/AuthContext';
+
 const PAGE_SIZE = 20;
 
 export default function AttractionsPage() {
+
+    const router = useRouter()
+    const { user } = useSession()
+
+    if (!user) {
+        router.push('/signIn');
+        return;
+    }
     const [page, setPage] = useState(1);
     const [displayData, setDisplayData] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
