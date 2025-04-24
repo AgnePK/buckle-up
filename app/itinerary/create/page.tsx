@@ -67,6 +67,8 @@ const CreatePage = () => {
 
     const [showSummary, setShowSummary] = useState(false);
 
+    const [error, setError] = useState<string | null>(null);
+
     // Main itinerary state
     const [itinerary, setItinerary] = useState<TripType>({
         title: "",
@@ -225,6 +227,7 @@ const CreatePage = () => {
     const handleDateRangeChange = (range: DateRange | undefined) => {
         if (!range) return;
 
+        setError(null);
         setDateRange(range);
 
         // Update itinerary with selected dates
@@ -250,9 +253,11 @@ const CreatePage = () => {
     // Handle itinerary generation
     const handleGenerateItinerary = () => {
         if (!itinerary.start_date || !itinerary.end_date) {
-            alert("Start and end dates are required.");
-            return;
+            setError("Start and End dates are required");
+            return false; // Return false when generation fails
         }
+
+        setError(null);
 
         setItinerary((prev) => ({
             ...prev,
@@ -260,13 +265,22 @@ const CreatePage = () => {
         }));
 
         setDaysGenerated(true);
+        return true; // Return true when generation works
     };
 
+    // Handle generation and navigation to next step
     const handleGenerateAndNext = () => {
-        if (!daysGenerated) {
-            handleGenerateItinerary(); // Generates the itinerary
+        if (daysGenerated) {
+            nextStep();
+            return;
         }
-        nextStep(); // Moves to the next step
+
+        const success = handleGenerateItinerary();
+
+        // next step if generation is successful
+        if (success) {
+            nextStep();
+        }
     };
 
     const onChangeTime = (selectedTime: Date | null) => {
@@ -484,11 +498,16 @@ const CreatePage = () => {
                                     </div>
                                 </div>
                                 <div>
+
                                     <DateRangePicker
                                         dateRange={dateRange}
                                         onDateRangeChange={handleDateRangeChange}
                                     />
-
+                                    {error && (
+                                        <div className="mt-2 text-destructive">
+                                            <p>{error}</p>
+                                        </div>
+                                    )}
 
                                     <div className="flex flex-row justify-end mt-8 ">
                                         <Button onClick={prevStep} variant="outline" className="w-40 mr-2">Back</Button>
@@ -515,74 +534,63 @@ const CreatePage = () => {
                                         </p>
                                     </div>
                                 </div>
-                                {Object.keys(itinerary.days).length > 0 ? (
-                                    <div className="">
-                                        {Object.entries(itinerary.days).map(([day, data]) => (
-                                            <div key={day} className=" p-6 mb-4 border border-gray-300 rounded-xl">
-                                                <div className="flex justify-between items-center mb-4">
-                                                    <h3 className="text-2xl font-semibold">Day {day}</h3>
+                                {/* Display itinerary days */}
+                                <div className="">
+                                    {Object.entries(itinerary.days || {}).map(([day, data]) => (
+                                        <div key={day} className="p-6 mb-4 border border-gray-300 rounded-xl">
+                                            <div className="flex justify-between items-center mb-4">
+                                                <h3 className="text-2xl font-semibold">Day {day}</h3>
+                                                <Button
+                                                    variant="destructive"
+                                                    size="sm"
+                                                    onClick={() => removeDay(Number(day))}
+                                                >
+                                                    <Trash2 />
+                                                    Remove Day
+                                                </Button>
+                                            </div>
+
+                                            {["morning", "afternoon", "evening"].map((period) => (
+                                                <div key={period} className="my-12 ms-4">
+                                                    <div className="items-center mb-2">
+                                                        <h4 className="capitalize font-medium text-lg">{period}</h4>
+                                                    </div>
+                                                    <div className='bg-card rounded-xl p-4'>
+                                                        {data[period as keyof DayType].map((stop, stopIndex) => (
+                                                            <DraggableStop
+                                                                key={stopIndex}
+                                                                day={Number(day)}
+                                                                period={period as keyof DayType}
+                                                                index={stopIndex}
+                                                                stop={stop}
+                                                                updateStop={updateStop}
+                                                                removeStop={removeStop}
+                                                                toggleNotes={toggleNotes}
+                                                                showNotes={showNotes}
+                                                                setSelectedDay={setSelectedDay}
+                                                                setSelectedSlot={setSelectedSlot}
+                                                                setSelectedEntryIndex={setSelectedEntryIndex}
+                                                                setShowTimePicker={setShowTimePicker}
+                                                                moveStop={moveStop}
+                                                                updateStopLocation={updateStopLocation}
+                                                            />
+                                                        ))}
+                                                    </div>
+
                                                     <Button
-                                                        variant="destructive"
-                                                        size="sm"
-                                                        onClick={() => removeDay(Number(day))}
+                                                        size={"sm"}
+                                                        variant={"outline"}
+                                                        className='m-5'
+                                                        onClick={() => addStop(Number(day), period as keyof DayType)}
                                                     >
-                                                        <Trash2 />
-                                                        Remove Day
+                                                        <Plus />
+                                                        <p className='font-normal'>add stop</p>
                                                     </Button>
                                                 </div>
-
-                                                {["morning", "afternoon", "evening"].map((period) => (
-                                                    <div key={period} className="my-12 ms-4">
-                                                        <div className="items-center mb-2">
-                                                            <h4 className="capitalize font-medium text-lg">{period}</h4>
-
-                                                        </div>
-                                                        <div className=' bg-card rounded-xl p-4'>
-
-                                                            {data[period as keyof DayType].map((stop, stopIndex) => (
-                                                                <DraggableStop
-                                                                    key={stopIndex}
-                                                                    day={Number(day)}
-                                                                    period={period as keyof DayType}
-                                                                    index={stopIndex}
-                                                                    stop={stop}
-                                                                    updateStop={updateStop}
-                                                                    removeStop={removeStop}
-                                                                    toggleNotes={toggleNotes}
-                                                                    showNotes={showNotes}
-                                                                    setSelectedDay={setSelectedDay}
-                                                                    setSelectedSlot={setSelectedSlot}
-                                                                    setSelectedEntryIndex={setSelectedEntryIndex}
-                                                                    setShowTimePicker={setShowTimePicker}
-                                                                    moveStop={moveStop}
-                                                                    updateStopLocation={updateStopLocation}
-                                                                />
-                                                            ))}
-                                                        </div>
-                                                        {/* <Separator className='bg-gray-400  md:mt-4 mt-8' /> */}
-
-                                                        <Button
-                                                            size={"sm"}
-                                                            variant={"outline"}
-                                                            className=' m-5 '
-                                                            onClick={() => addStop(Number(day), period as keyof DayType)}
-                                                        >
-                                                            <Plus />
-                                                            <p className='font-normal'>add stop</p>
-                                                        </Button>
-                                                    </div>
-                                                ))}
-
-                                            </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="py-8 text-red-600 text-center">
-                                        <p>No days have been generated yet.</p>
-                                        <p>Please go back</p>
-                                    </div>
-                                )}
-
+                                            ))}
+                                        </div>
+                                    ))}
+                                </div>
                                 {showTimePicker && selectedDay !== null && (
                                     <div className="fixed inset-0 bg-grey bg-opacity-50 flex items-center justify-center z-50">
                                         <div className="bg-white p-4 rounded-xl shadow-lg">

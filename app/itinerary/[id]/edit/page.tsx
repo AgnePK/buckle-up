@@ -34,14 +34,14 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 const EditPage = () => {
 
     const router = useRouter();
-    const { user,redirectBasedOnAuth } = useSession();
+    const { user, redirectBasedOnAuth } = useSession();
 
     useEffect(() => {
         if (!user) {
-          redirectBasedOnAuth("/signIn");
+            redirectBasedOnAuth("/signIn");
         }
-      }, [user, redirectBasedOnAuth]);
-    
+    }, [user, redirectBasedOnAuth]);
+
     const params = useParams();
     const tripId = params.id as string;
     const [loading, setLoading] = useState(true);
@@ -49,6 +49,8 @@ const EditPage = () => {
     const nextStep = () => setStep(step + 1);
     const prevStep = () => setStep(step - 1);
     const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+
+    const [error, setError] = useState<string | null>(null);
 
     const [itinerary, setItinerary] = useState<TripType>({
         title: "",
@@ -318,14 +320,17 @@ const EditPage = () => {
     // Handle itinerary regeneration
     const handleRegenerateItinerary = () => {
         if (!itinerary.start_date || !itinerary.end_date) {
-            alert("Start and end dates are required.");
-            return;
+            setError("Start and End dates are required");
+            return false; 
         }
+
+        setError(null);
 
         setItinerary((prev) => ({
             ...prev,
             days: generateDays(itinerary.start_date, itinerary.end_date),
         }));
+        return true
     };
 
     const handleGenerateAndNext = () => {
@@ -415,6 +420,7 @@ const EditPage = () => {
 
     const handleDateRangeChange = (range: DateRange | undefined) => {
         if (!range) return;
+        setError(null);
 
         setDateRange(range);
 
