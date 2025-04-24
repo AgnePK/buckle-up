@@ -214,7 +214,7 @@ export default function Itinerary() {
                                 <Button
                                     variant={"default"}
                                     onClick={() => router.push("/itinerary/create")}
-                                    className="w-40 m-2"
+                                    className="w-40 my-2"
                                 >
                                     Create Itinerary
                                     <Plus />

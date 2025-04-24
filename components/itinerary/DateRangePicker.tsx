@@ -69,7 +69,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
                 </p>
                 <Separator />
 
-                <div className="flex flex-col gap-2 flex-row justify-between">
+                <div className="flex gap-2 flex-row justify-between">
                     <div>
                         <p className="text-sm font-medium">From</p>
                         <p className="text-sm text-muted-foreground">
