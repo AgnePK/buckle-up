@@ -142,10 +142,18 @@ const ItineraryMapView = ({ trip }: ItineraryMapViewProps) => {
                     content:
                         `
                         <div>
-                        <strong>${stop.name}</strong>
-                        <br>Day ${stop.day}, ${stop.period}
-                        ${stop.time ? `<br>Time: ${stop.time}` : ''}
-                        ${stop.notes ? `<br>Notes: ${stop.notes}` : ''}
+                            <strong>
+                                <a href="https://www.google.com/maps?q=${encodeURIComponent(stop.name)}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style="color: #008d5c; text-decoration: none;"
+                                >
+                                    ${stop.name}
+                                </a>
+                            </strong>                        
+                            <br>Day ${stop.day}, ${stop.period}
+                            ${stop.time ? `<br>Time: ${stop.time}` : ''}
+                            ${stop.notes ? `<br>Notes: ${stop.notes}` : ''}
                         </div>
                     `
                 });
