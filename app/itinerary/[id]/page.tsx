@@ -245,8 +245,22 @@ const ViewItinerary = () => {
                     </div>
                     {/* Display Trip Days */}
                     {trip.days && Object.keys(trip.days).length > 0 && (
-                        <div className="bg-muted/40  md:-mx-[24px] p-6 ">
-                            <h2 className="text-xl font-semibold mb-4">Itinerary Plan</h2>
+                        <div className="bg-muted/40 md:-mx-[24px] p-6">
+                            {/* The button is not sticking to the top of the screen */}
+                            <div className="flex justify-between relative mb-4">
+                                <h2 className="text-xl font-semibold">Itinerary Plan</h2>
+                                <div className="sticky top-0 ">
+                                    <Button
+                                        onClick={() => generatePDF()}
+                                        className="flex items-center gap-2 shadow-sm "
+                                        variant="ghost"
+                                    >
+                                        <Download size={16} />
+                                    </Button>
+                                </div>
+                            </div>
+
+
 
                             {Object.entries(trip.days).map(([dayNumber, dayData]) => (
                                 <div key={dayNumber} className="mb-6 p-4">
@@ -310,17 +324,6 @@ const ViewItinerary = () => {
                                     })}
                                 </div>
                             ))}
-                            <div className="mt-6">
-
-                                <Button
-                                    onClick={() => generatePDF()}
-                                    className="flex items-center gap-2"
-                                    variant="default"
-                                >
-                                    <Download size={16} />
-                                    Save as PDF
-                                </Button>
-                            </div>
                         </div>
                     )}
 
