@@ -117,8 +117,8 @@ const OpenInGoogleMaps: React.FC<OpenInGoogleMapsProps> = ({ trip }) => {
   return (
     <Button 
       onClick={openInGoogleMaps} 
-      className="flex items-center gap-2 shadow-sm hover:shadow-md transition-shadow"
-      variant="default"
+      className="md:fixed md:bottom-4  flex items-center gap-2 shadow-sm hover:shadow-md transition-shadow"
+      variant="outline"
     >
       <Map className="h-4 w-4" /> 
       {isMobile ? 'Navigate in Google Maps' : 'Open in Google Maps'}
