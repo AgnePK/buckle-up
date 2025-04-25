@@ -45,6 +45,7 @@ export default function Itinerary() {
     const { user, isLoading } = useSession();
     const router = useRouter();
 
+    const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
 
     // Separate success alert component
     function SuccessAlert() {
@@ -233,17 +234,26 @@ export default function Itinerary() {
                 <div className='mx-8 flex justify-between mb-6 items-center '>
                     <h2 className='text-2xl'>My Itineraries</h2>
                     <div className='md:flex items-center justify-end md:w-1/3'>
-                        {/* <Input
-                            type="text"
-                            placeholder="Search itineraries..."
-                            value={""}
-                            className="p-2 border border-muted bg-transparent"
-                            readOnly
-                        /> */}
-                        <div className='flex gap-6 ms-4 md:me-2 '>
-                            <List />
-                            <LayoutGrid />
+
+                        <div className='flex gap-4 ms-4 md:me-2'>
+                            <Button
+                                variant={viewMode === 'list' ? "default" : "ghost"}
+                                size="icon"
+                                onClick={() => setViewMode('list')}
+                                className="h-8 w-8 p-0"
+                            >
+                                <List size={42} />
+                            </Button>
+                            <Button
+                                variant={viewMode === 'grid' ? "default" : "ghost"}
+                                size="icon"
+                                onClick={() => setViewMode('grid')}
+                                className="h-8 w-8 p-0"
+                            >
+                                <LayoutGrid />
+                            </Button>
                         </div>
+
 
                     </div>
                 </div>
@@ -266,18 +276,16 @@ export default function Itinerary() {
                             </CardContent>
                         </Card>
                     </div>
-                ) : (
-                    <div className='grid grid-cols-1 gap-2 bg-card rounded-md p-2 mb-6'>
+                ) : viewMode === 'list' ? (
+                    // List view (your existing view)
+                    <div className='grid grid-cols-1 gap-2 bg-card rounded-md p-2 mb-6 '>
                         {trip.slice(0).reverse().map((item, index) => {
                             // Format dates from "YYYY-MM-DD" to "Month DD"
                             const formatDate = (dateString: string) => {
                                 if (!dateString) return "";
-
                                 const date = new Date(dateString);
-
                                 // Check if date is valid
                                 if (isNaN(date.getTime())) return dateString;
-
                                 // Format the date
                                 return date.toLocaleDateString('en-US', {
                                     month: 'long',
@@ -289,7 +297,7 @@ export default function Itinerary() {
                             const endDate = formatDate(item.end_date);
                             return (
                                 <div key={item.id}>
-                                    <Card key={item.id} className='rounded-none -my-[8px] border-none bg-transparent shadow-none flex flex-col md:flex-row w-full'>
+                                    <Card key={item.id} className=' -my-[8px] border-none bg-transparent shadow-none hover:shadow-sm transition-shadow rounded-none flex flex-col md:flex-row w-full'>
                                         <Link
                                             href={`/itinerary/${item.id}`}
                                             className='w-full md:w-1/4'
@@ -341,6 +349,76 @@ export default function Itinerary() {
                                     <Separator className='bg-gray-300' />
                                 </div>
                             )
+                        })}
+                    </div>
+                ) : (
+                    // Grid view (card style)
+                    <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6'>
+                        {trip.slice(0).reverse().map((item) => {
+                            const formatDate = (dateString: string) => {
+                                if (!dateString) return "";
+                                const date = new Date(dateString);
+                                if (isNaN(date.getTime())) return dateString;
+                                return date.toLocaleDateString('en-US', {
+                                    month: 'long',
+                                    day: 'numeric'
+                                });
+                            };
+
+                            const startDate = formatDate(item.start_date);
+                            const endDate = formatDate(item.end_date);
+
+                            return (
+                                <Card key={item.id} className="hover:shadow-md transition-shadow ">
+                                    <Link
+                                        href={`/itinerary/${item.id}`}
+                                        className=''
+                                    >
+                                        <CardHeader>
+                                            <CardTitle className='text-lg'>
+                                                {item.title ?
+                                                    (item.title.length > 25 ? `${item.title.substring(0, 25)}...` : item.title)
+                                                    : 'Untitled Trip'}
+                                            </CardTitle>
+                                        </CardHeader>
+                                    </Link>
+                                    <CardContent className='flex items-center gap-3 '>
+                                        <CalendarDays className='w-6 h-6 text-primary' />
+                                        <div>
+                                            <p> {startDate} - {endDate} </p>
+                                        </div>
+                                    </CardContent>
+                                    <CardContent className=''>
+                                        {item.flight && (item.flight.departure || item.flight.landing) ? (
+                                            <div className="flex items-center gap-10">
+                                                <div className='flex gap-2'>
+                                                    <PlaneTakeoff className='text-primary' />
+                                                    {item.flight.departure}
+                                                </div>
+                                                <div className='flex gap-2'>
+                                                    <PlaneLanding className='text-primary' />
+                                                    {item.flight.landing}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="text-gray-600">
+                                                {item.notes ?
+                                                    (item.notes.length > 30 ? `${item.notes.substring(0, 30)}...` : item.notes)
+                                                    : <i>No notes</i>}
+                                            </div>
+                                        )}
+                                    </CardContent>
+                                    <CardFooter className='gap-2 justify-between'>
+                                        <Button variant="default" className='' onClick={() => { router.push(`/itinerary/${item.id}`) }}>
+                                            View Itinerary
+                                        </Button>
+                                        <Button variant="ghost" className=""
+                                            onClick={() => { router.push(`/itinerary/${item.id}/edit`) }}>
+                                            <PenLine className="text-slate-600" size={20} />
+                                        </Button>
+                                    </CardFooter>
+                                </Card>
+                            );
                         })}
                     </div>
                 )}
