@@ -39,8 +39,13 @@ const SaveButton: React.FC<SaveButtonProps> = ({ item, itemType }) => {
         return;
       }
 
+      // Sanitize the itemId to remove invalid Firebase path characters
+      const sanitisedId = typeof itemId === 'string'
+        ? itemId.replace(/[.#$/[\]]/g, '_')
+        : itemId;
+
       try {
-        const savedItemRef = ref(db, `User/${user.uid}/saved/${itemType}s/${itemId}`);
+        const savedItemRef = ref(db, `User/${user.uid}/saved/${itemType}s/${sanitisedId}`);
         const snapshot = await get(savedItemRef);
         setIsSaved(snapshot.exists());
       } catch (error) {

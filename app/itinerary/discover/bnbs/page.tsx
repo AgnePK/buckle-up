@@ -56,15 +56,14 @@ export default function AccommodationsPage() {
     function handleSearch(event: React.ChangeEvent<HTMLInputElement>) {
         const value = event.target.value;
         setSearchTerm(value);
-
+    
         if (!value.trim()) {
             setDisplayData(accommodationQuery.data?.items || []);
             return;
         }
-
+    
         const toLowCaseSearch = value.toLowerCase();
-
-        const filteredResults = accommodationQuery.data?.items.filter((item: any) => {
+        const filteredResults = accommodationQuery.data?.allItems.filter((item: any) => {
             return (
                 item["Account Name"]?.toLowerCase().includes(toLowCaseSearch) ||
                 item["Address County"]?.toLowerCase().includes(toLowCaseSearch)
@@ -73,6 +72,7 @@ export default function AccommodationsPage() {
 
         setDisplayData(filteredResults || []);
     }
+    
 
     // Handle pagination
     const nextPage = () => {

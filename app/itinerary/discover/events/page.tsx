@@ -62,7 +62,7 @@ export default function EventsPage() {
 
     const toLowCaseSearch = value.toLowerCase();
 
-    const filteredResults = eventsQuery.data?.items.filter((item: any) => {
+    const filteredResults = eventsQuery.data?.allItems.filter((item: any) => {
       return (
         item.name?.toLowerCase().includes(toLowCaseSearch) ||
         item.area?.name?.toLowerCase().includes(toLowCaseSearch) ||

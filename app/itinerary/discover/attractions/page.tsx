@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Phone, ExternalLink, Navigation, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
-import Head from 'next/head';
 import SaveButton from '@/components/savedItems';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -63,15 +62,21 @@ export default function AttractionsPage() {
 
         const toLowCaseSearch = value.toLowerCase();
 
-        const filteredResults = attractionsQuery.data?.items.filter((item: any) => {
+        // If search, limit the number of results to avoid website crashing
+        const allItems = attractionsQuery.data?.allItems || [];
+
+        // Limit search to first 25 matching items
+        const filteredResults = allItems.filter((item: any) => {
             return (
                 item.Name?.toLowerCase().includes(toLowCaseSearch) ||
                 item.County?.toLowerCase().includes(toLowCaseSearch) ||
                 item.Tags?.some((tag: string) => tag.toLowerCase().includes(toLowCaseSearch))
             );
-        });
+        })
+            .slice(0, 25);
 
-        setDisplayData(filteredResults || []);
+        setDisplayData(filteredResults);
+
     }
 
     // Handle pagination
@@ -144,7 +149,7 @@ export default function AttractionsPage() {
                                 </div>
                             )}
 
-                            <div className="flex flex-wrap gap-2 mt-2">
+                            <div className="flex flex-wrap gap-2 mt-2 ">
                                 {item.Tags && item.Tags.map((tag: string, tagIndex: number) => (
                                     <Badge key={tagIndex} variant="outline" className='border border-secondary'>{tag}</Badge>
                                 ))}
