@@ -106,10 +106,10 @@ export default function EventsPage() {
       <div className='md:flex flex-row justify-evenly items-center'>
         <div className='md:w-1/3 gap-6 flex flex-col'>
           <h1 className="text-3xl font-bold ">Music Events</h1>
-          <p className='text-xl text-gray-800'>
+          <p className='text-xl'>
             Explore the traditional Irish Music events provided by <a href="https://thesession.org/tunes" target='_blank' className='text-primary'>The Session</a>.
           </p>
-          <p className='text-xl text-gray-800'>
+          <p className='text-xl'>
             Save the events you like, then find them in your <Link href={"/itinerary/saved"} className='text-primary' >Saved Places</Link>
           </p>
           <div className="mb-6">
@@ -135,7 +135,7 @@ export default function EventsPage() {
       )}
 
       {eventsQuery.isError && (
-        <div className="p-4 bg-red-100 text-red-700 rounded-md">
+        <div className="p-4 bg-red-100 text-destructive rounded-md">
           Error: {eventsQuery.error.message}
         </div>
       )}

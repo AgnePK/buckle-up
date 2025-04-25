@@ -101,10 +101,10 @@ export default function AccommodationsPage() {
                 <div className='md:w-1/3 flex flex-col gap-6'>
                     <h1 className="text-3xl font-bold ">Bed and Breakfast <p className='text-sm text-gray-600'>Local Businesses</p></h1>
 
-                    <p className='text-xl text-gray-800'>
+                    <p className='text-xl'>
                         Browse through the local BnBs provided by <a href="https://www.failteireland.ie/" target='_blank' className='text-primary'>Fáilte Ireland</a>.
                     </p>
-                    <p className='text-xl text-gray-800'>
+                    <p className='text-xl'>
                         Save the events you like, then find them in the <Link href={"/itinerary/saved"} className='text-primary' >Saved Places</Link>
                     </p>
                     <div className="mb-6">
@@ -128,7 +128,7 @@ export default function AccommodationsPage() {
             )}
 
             {accommodationQuery.isError && (
-                <div className="p-4 bg-red-100 text-red-700 rounded-md">
+                <div className="p-4 bg-red-100 text-destructive rounded-md">
                     Error: {accommodationQuery.error.message}
                 </div>
             )}

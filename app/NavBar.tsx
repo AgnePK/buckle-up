@@ -87,7 +87,7 @@ export function NavBar() {
             </div>
 
             {/* Desktop Navigation */}
-            <ul className="hidden md:flex items-center gap-10 bg-muted/80 px-6 py-4 rounded-xl">
+            <ul className="hidden md:flex items-center gap-10 bg-muted px-6 py-4 rounded-xl">
                 <li>
                     <Link href={"/itinerary"}
                         className={`${isActive("/itinerary") ? " text-primary " : ""}`}>
@@ -135,7 +135,7 @@ export function NavBar() {
 
                 {/* Logout button - visible on medium screens and above */}
                 <div className="hidden md:block">
-                    <Button onClick={handleLogout} variant="outline" className="bg-muted border-none">Log out</Button>
+                    <Button onClick={handleLogout} variant="outline" className="bg-muted border-none ">Log out</Button>
                 </div>
 
                 {/* Mobile menu button - visible on medium screens and below */}

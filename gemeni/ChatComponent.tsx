@@ -55,15 +55,15 @@ export const ChatComponent = ({ onClose, isOpen }: ChatComponentProps) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed bottom-0 right-0 mb-4 mr-4 w-80 sm:w-96 h-[500px] bg-white rounded-lg shadow-lg flex flex-col z-50">
+        <div className="fixed bottom-0 right-0 mb-4 mr-4 w-80 sm:w-96 h-[500px] bg-background rounded-lg shadow-lg flex flex-col z-50">
             {/* Chat header */}
-            <div className="p-4 border-b flex justify-between items-center bg-emerald-600 text-white rounded-t-lg">
+            <div className="p-4 border-b flex justify-between items-center bg-primary rounded-t-lg">
                 <h3 className="font-semibold">Trip Assistant</h3>
                 <Button
                     onClick={onClose}
                     variant="ghost"
                     size="sm"
-                    className="h-8 w-8 p-0 text-white hover:bg-emerald-700"
+                    className="h-8 w-8 p-0 hover:bg-primary"
                 >
                     <X size={18} />
                 </Button>
@@ -91,8 +91,8 @@ export const ChatComponent = ({ onClose, isOpen }: ChatComponentProps) => {
                     >
                         <div
                             className={`max-w-[80%] rounded-lg p-3 ${message.role === 'user'
-                                ? 'bg-emerald-600 text-white rounded-tr-none'
-                                : 'bg-gray-100 text-gray-800 rounded-tl-none'
+                                ? 'bg-primary  rounded-tr-none'
+                                : 'bg-muted rounded-tl-none'
                                 }`}
                         >
                             {message.content}
@@ -102,7 +102,7 @@ export const ChatComponent = ({ onClose, isOpen }: ChatComponentProps) => {
 
                 {isLoading && (
                     <div className="flex justify-start">
-                        <div className="bg-gray-100 text-gray-800 rounded-lg rounded-tl-none p-3">
+                        <div className="bg-primary text-gray-800 rounded-lg rounded-tl-none p-3">
                             <Loader className="h-5 w-5 animate-spin" />
                         </div>
                     </div>

@@ -52,13 +52,17 @@ const DraggableStop: React.FC<DraggableStopProps> = ({
     }),
   });
 
-  const [{ isOver }, drop] = useDrop({
+  const [{ isOver, canDrop }, drop] = useDrop({
     accept: ItemTypes.STOP,
+    canDrop: (item: DragItem) => {
+      // Only allow drops from the same day and period
+      return item.day === day && item.period === period;
+    },
     hover(item: DragItem) {
       if (!ref.current) return;
 
       // Only handle items from the same day and period
-      if (item.day !== day) return;
+      if (item.day !== day || item.period !== period) return;
 
       const dragIndex = item.index;
       const hoverIndex = index;
@@ -74,6 +78,7 @@ const DraggableStop: React.FC<DraggableStopProps> = ({
     },
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
+      canDrop: !!monitor.canDrop() && monitor.isOver(),
     }),
   });
 
@@ -83,15 +88,27 @@ const DraggableStop: React.FC<DraggableStopProps> = ({
     updateStopLocation(day, period, index, placeData);
   };
 
+  // Determine the border class based on drag and drop state
+  let borderClass = '';
+  if (isDragging) {
+    borderClass = 'rounded-xl border border-muted';
+  } else if (isOver) {
+    if (canDrop) {
+      borderClass = 'rounded-xl bg-muted';
+    } else {
+      borderClass = 'rounded-xl bg-muted border border-destructive';
+    }
+  }
+
   return (
     <div
       ref={ref}
-      className={`mb-2 p-2 relative ${isDragging ? 'rounded-xl  border border-muted' : ''} ${isOver ? 'rounded-xl bg-muted  ' : ''}`}
+      className={`mb-2 p-2 relative rounded-xl ${borderClass}`}
     >
       <div className="flex flex-col md:flex-row md:items-center gap-2 mb-2 mt-8 md:mt-0">
         <div className="w-full md:w-auto md:flex-grow mb-2 md:mb-0">
           <div className="flex items-start">
-            <div className="cursor-move px-2 mt-1"><GripHorizontal className="pt-1"/></div>
+            <div className="cursor-move px-2 mt-1"><GripHorizontal className="pt-1" /></div>
             <div className="flex-grow w-full">
               <PlacesAutocomplete
                 value={stop.name}
@@ -138,10 +155,9 @@ const DraggableStop: React.FC<DraggableStopProps> = ({
         </div>
       </div>
 
-
       {/* Separate container for address */}
       {stop.location && (
-        <div className="text-xs text-gray-500 md:mt-1  ml-8 -mt-[65px]">
+        <div className="text-xs text-gray-500 md:mt-1 ml-8 -mt-[65px]">
           {stop.address || `Location: ${stop.location.lat.toFixed(5)}, ${stop.location.lng.toFixed(5)}`}
         </div>
       )}
@@ -151,11 +167,12 @@ const DraggableStop: React.FC<DraggableStopProps> = ({
           name="notes"
           value={stop.notes}
           onChange={(e: { target: { value: any; }; }) => updateStop(day, period, index, "notes", e.target.value)}
-          className="mb-4 w-full border border-gray-300 p-2 rounded-sm  md:mt-2 mt-14"
+          className="mb-4 w-full border border-gray-300 p-2 rounded-sm md:mt-2 mt-14"
           placeholder='Add your notes here'
         />
       )}
     </div>
   );
 }
+
 export default DraggableStop;

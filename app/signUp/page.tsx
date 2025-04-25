@@ -125,12 +125,7 @@ export default function SignUp() {
 
             </div>
             <form onSubmit={handleSubmit} className="grid gap-4">
-                {error && (
-                    <div className="p-3 rounded-md bg-red-50 border border-red-200 text-red-800 flex items-start gap-2">
-                        <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
-                        <p className="text-sm">{error}</p>
-                    </div>
-                )}
+
 
                 <div className='grid gap-3'>
                     <div>
@@ -138,13 +133,13 @@ export default function SignUp() {
                             placeholder="Full Name"
                             value={newUser.full_name}
                             onChange={handleChange}
-                            className={` ${fieldErrors.full_name ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                            className={` ${fieldErrors.full_name ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                             name="full_name"
                             autoComplete="name"
                             disabled={isSubmitting}
                         />
                         {fieldErrors.full_name && (
-                            <p className="text-red-500 text-xs mt-1">{fieldErrors.full_name}</p>
+                            <p className="text-destructive text-xs mt-1">{fieldErrors.full_name}</p>
                         )}
                     </div>
 
@@ -153,14 +148,14 @@ export default function SignUp() {
                             placeholder="Email address"
                             value={newUser.email}
                             onChange={handleChange}
-                            className={` ${fieldErrors.email ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                            className={` ${fieldErrors.email ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                             name="email"
                             type='email'
                             autoComplete="email"
                             disabled={isSubmitting}
                         />
                         {fieldErrors.email && (
-                            <p className="text-red-500 text-xs mt-1">{fieldErrors.email}</p>
+                            <p className="text-destructive text-xs mt-1">{fieldErrors.email}</p>
                         )}
                     </div>
 
@@ -169,17 +164,21 @@ export default function SignUp() {
                             placeholder="Password"
                             value={newUser.password}
                             onChange={handleChange}
-                            className={` ${fieldErrors.password ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                            className={` ${fieldErrors.password ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                             name="password"
                             type='password'
                             autoComplete="new-password"
                             disabled={isSubmitting}
                         />
                         {fieldErrors.password && (
-                            <p className="text-red-500 text-xs mt-1">{fieldErrors.password}</p>
+                            <p className="text-destructive text-xs mt-1">{fieldErrors.password}</p>
                         )}
                     </div>
-
+                    {error && (
+                        <div className="text-destructive max-w-75 flex items-start align-center gap-2">
+                            <p className="text-sm">{error}</p>
+                        </div>
+                    )}
                     <div className='flex gap-1 my-3'>
                         <p className='text-slate-600'>Already have an account?</p>
                         <Link href={"/signIn"} className='text-primary hover:underline'>Log In!</Link>

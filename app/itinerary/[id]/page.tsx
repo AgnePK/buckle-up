@@ -248,14 +248,14 @@ const ViewItinerary = () => {
                         <div className="bg-muted/40 md:-mx-[24px] p-6">
                             {/* The button is not sticking to the top of the screen */}
                             <div className="flex justify-between relative mb-4">
-                                <h2 className="text-xl font-semibold">Itinerary Plan</h2>
+                                <h2 className="text-xl font-semibold ">Itinerary Plan</h2>
                                 <div className="sticky top-0 ">
                                     <Button
                                         onClick={() => generatePDF()}
-                                        className="flex items-center gap-2 shadow-sm "
+                                        className="flex items-center gap-2  "
                                         variant="ghost"
                                     >
-                                        <Download size={16} />
+                                        <Download />
                                     </Button>
                                 </div>
                             </div>
@@ -273,12 +273,12 @@ const ViewItinerary = () => {
 
                                         return (
                                             <div key={timeOfDay} className="mb-4 ms-4">
-                                                <h4 className="capitalize font-medium text-slate-700 mb-2">
+                                                <h4 className="capitalize font-medium text-gray-500 mb-2">
                                                     {timeOfDay}
                                                 </h4>
 
                                                 {/* Timeline for this period */}
-                                                <ol className="relative border-s border-gray-300 dark:border-gray-700 ml-4">
+                                                <ol className="relative border-s border-gray-300 dark:border-gray-500 ml-4">
                                                     {stops.map((stop: any, index: number) => (
                                                         <li key={index} className={index !== stops.length - 1 ? "mb-6 ms-4" : "ms-4"}>
                                                             <div className="absolute w-3 h-3 bg-primary rounded-full mt-1.5 -start-1.5 border border-white"></div>

@@ -141,20 +141,93 @@ const ItineraryMapView = ({ trip }: ItineraryMapViewProps) => {
                 const infoWindow = new google.maps.InfoWindow({
                     content:
                         `
-                        <div>
-                            <strong>
-                                <a href="https://www.google.com/maps?q=${encodeURIComponent(stop.name)}"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                style="color: #008d5c; text-decoration: none;"
-                                >
-                                    ${stop.name}
-                                </a>
-                            </strong>                        
-                            <br>Day ${stop.day}, ${stop.period}
-                            ${stop.time ? `<br>Time: ${stop.time}` : ''}
-                            ${stop.notes ? `<br>Notes: ${stop.notes}` : ''}
+                        <div style="
+                            min-width: 200px;
+                            max-width: 300px;
+                        ">
+                        <strong>
+                            <a href="https://www.google.com/maps?q=${encodeURIComponent(stop.name)}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style="color: #008d5c; font-size:18px;margin-bottom: 6px;"
+                            >
+                                ${stop.name}
+                            </a>
+                        </strong>                        
+                        ${stop.address ? `
+                        <div style="
+                            display: flex;
+                            align-items: flex-start;
+                            margin-top: 8px;
+                            padding-top: 8px;
+                            border-top: 1px solid #e8eaed;
+                        ">
+                            <div style="
+                                color: #19784d;
+                                margin-right: 8px;
+                                margin-top: 2px;
+                            ">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                            </div>
+                            <div style="
+                                color: #5f6368;
+                                font-size: 14px;
+                                line-height: 1.4;
+                            ">${stop.address}</div>
                         </div>
+                        ` : ''}
+
+                        <div style="
+                            display: flex;
+                            align-items: flex-start;
+                            margin-top: 8px;
+                            margin-bottom: 8px;
+                        ">
+                            <div style="
+                                color: #19784d;
+                                margin-right: 8px;
+                                margin-top: 2px;
+                            ">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                            </div>
+                            <div style="
+                                color: #5f6368;
+                                font-size: 14px;
+                            ">Day ${stop.day}, ${stop.period}${stop.time ? ` at ${stop.time}` : ''}</div>
+                        </div>
+
+                        ${stop.notes ? `
+                        <div style="
+                            display: flex;
+                            align-items: flex-start;
+                        ">
+                            <div style="
+                                color: #19784d;
+                                margin-right: 8px;
+                                margin-top: 2px;
+                            ">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
+                                    <path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"></path>
+                                    <line x1="9" y1="9" x2="10" y2="9"></line>
+                                    <line x1="9" y1="13" x2="15" y2="13"></line>
+                                    <line x1="9" y1="17" x2="15" y2="17"></line>
+                                </svg>
+                            </div>
+                            <div style="
+                                color: #5f6368;
+                                font-size: 14px;
+                                line-height: 1.4;
+                            ">${stop.notes}</div>
+                        </div>
+                        ` : ''}
+                    </div>
                     `
                 });
 

@@ -36,6 +36,7 @@ import {
 
 
 import TripSummary from '@/components/itinerary/TripSummary';
+import getTimeRange from '@/components/itinerary/GetTimeRange';
 
 const CreatePage = () => {
     const router = useRouter();
@@ -437,9 +438,9 @@ const CreatePage = () => {
                                                     setFlightType("departure");
                                                     setShowTimePicker(true);
                                                 }}
-                                                size="lg"
-                                                // variant={"outline"}
-                                                className='flex gap-8 bg-card text-foreground'
+                                                size="sm"
+                                                variant={"outline"}
+                                                className='flex gap-8 bg-card border-gray-300'
                                             >
                                                 <p className='font-normal'>{itinerary.flight.departure || "Not Set"}</p>
                                                 <Clock />
@@ -453,9 +454,9 @@ const CreatePage = () => {
                                                     setFlightType("landing");
                                                     setShowTimePicker(true);
                                                 }}
-                                                size="lg"
-                                                // variant={"outline"}
-                                                className='flex gap-8 bg-card text-foreground'
+                                                size="sm"
+                                                variant={"outline"}
+                                                className='flex gap-8 bg-card border-gray-300'
                                             >
                                                 <p className='font-normal'>{itinerary.flight.landing || "Not Set"}</p>
                                                 <Clock />
@@ -465,18 +466,33 @@ const CreatePage = () => {
                                     </div>
 
                                     {showTimePicker && (
-                                        <div className="mb-4 p-4">
-                                            <DatePicker
-                                                selected={new Date()}
-                                                onChange={onChangeTime}
-                                                showTimeSelect
-                                                showTimeSelectOnly
-                                                timeIntervals={15}
-                                                timeCaption="Time"
-                                                dateFormat="h:mm aa"
-                                                inline
-                                            />
+
+                                        <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+                                            <div className="bg-background p-4 rounded-xl shadow-lg flex flex-col items-center">
+                                                <h3 className="mb-2 font-medium">Select Time</h3>
+                                                <DatePicker
+                                                    selected={new Date()}
+                                                    onChange={onChangeTime}
+                                                    showTimeSelect
+                                                    showTimeSelectOnly
+                                                    timeIntervals={15}
+                                                    timeCaption="Time"
+                                                    dateFormat="h:mm aa"
+                                                    inline
+                                                />
+                                                <div className="mt-2 flex justify-end">
+                                                    <Button
+                                                        variant="outline"
+                                                        onClick={() => {
+                                                            setShowTimePicker(false);
+                                                        }}
+                                                    >
+                                                        Cancel
+                                                    </Button>
+                                                </div>
+                                            </div>
                                         </div>
+
                                     )}
                                 </div>
                                 <div className='ms-auto '>
@@ -537,7 +553,7 @@ const CreatePage = () => {
                                 {/* Display itinerary days */}
                                 <div className="">
                                     {Object.entries(itinerary.days || {}).map(([day, data]) => (
-                                        <div key={day} className="p-6 mb-4 border border-gray-300 rounded-xl">
+                                        <div key={day} className="p-6 mb-4 border border-muted rounded-xl">
                                             <div className="flex justify-between items-center mb-4">
                                                 <h3 className="text-2xl font-semibold">Day {day}</h3>
                                                 <Button
@@ -592,8 +608,8 @@ const CreatePage = () => {
                                     ))}
                                 </div>
                                 {showTimePicker && selectedDay !== null && (
-                                    <div className="fixed inset-0 bg-grey bg-opacity-50 flex items-center justify-center z-50">
-                                        <div className="bg-white p-4 rounded-xl shadow-lg">
+                                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+                                        <div className="bg-background p-4 rounded-xl shadow-lg flex flex-col items-center">
                                             <h3 className="mb-2 font-medium">Select Time</h3>
                                             <DatePicker
                                                 selected={new Date()}
@@ -604,6 +620,8 @@ const CreatePage = () => {
                                                 timeCaption="Time"
                                                 dateFormat="h:mm aa"
                                                 inline
+                                                minTime={getTimeRange(selectedSlot).minTime}
+                                                maxTime={getTimeRange(selectedSlot).maxTime}
                                             />
                                             <div className="mt-2 flex justify-end">
                                                 <Button
@@ -666,7 +684,7 @@ const CreatePage = () => {
                                         name="notes"
                                         value={itinerary.notes}
                                         onChange={handleChange}
-                                        className="mb-4 w-full border border-gray-300 p-2 rounded-sm"
+                                        className="mb-4 w-full border border-muted p-2 rounded-sm"
                                         placeholder='Add your notes here'
                                     />
                                 </div>

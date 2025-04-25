@@ -92,10 +92,10 @@ export default function AttractionsPage() {
             <div className='md:flex flex-row justify-evenly items-center'>
                 <div className='md:w-1/3 gap-6 flex flex-col'>
                     <h1 className="text-3xl font-bold ">Attractions</h1>
-                    <p className='text-xl text-gray-800'>
+                    <p className='text-xl'>
                         Find below the attractions provided by <a href="https://www.failteireland.ie/" target='_blank' className='text-primary'>Fáilte Ireland</a>.
                     </p>
-                    <p className='text-xl text-gray-800'>
+                    <p className='text-xl'>
                         Save the events you like, then find them in the <Link href={"/itinerary/saved"} className='text-primary' >Saved Places</Link>
                     </p>
                     <div className="mb-6">
@@ -119,7 +119,7 @@ export default function AttractionsPage() {
             )}
 
             {attractionsQuery.isError && (
-                <div className="p-4 bg-red-100 text-red-700 rounded-md">
+                <div className="p-4 bg-red-100 text-destructive rounded-md">
                     Error: {attractionsQuery.error.message}
                 </div>
             )}

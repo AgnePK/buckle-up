@@ -7,7 +7,7 @@ import { db } from '@/firebaseConfig'
 import { ref, onValue, off, set, push, child } from "firebase/database";
 import { useSession } from '@/AuthContext';
 
-import { CalendarDays, CheckCircle, Filter, Plus, Search, PlaneTakeoff, PlaneLanding } from "lucide-react"
+import { CalendarDays, CheckCircle, Filter, Plus, Search, PlaneTakeoff, PlaneLanding, PenLine } from "lucide-react"
 import { LayoutGrid, List } from "lucide-react"
 
 // React native Reusables
@@ -33,14 +33,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-
-import {
-    Carousel,
-    CarouselContent,
-    CarouselItem,
-    CarouselNext,
-    CarouselPrevious,
-} from "@/components/ui/carousel"
 
 import { landscapes } from '@/utils/landscapeImages';
 import { Input } from '@/components/ui/input';
@@ -83,7 +75,7 @@ export default function Itinerary() {
         if (!showSuccessAlert) return null;
 
         return (
-            <Alert className="mx-auto mb-4 border-green-500 bg-green-50 w-1/3">
+            <Alert className="fixed bottom-5 right-5 max-w-sm border-green-500 bg-green-50">
                 <CheckCircle className="h-4 w-4 text-green-500" />
                 <AlertTitle>Success!</AlertTitle>
                 <AlertDescription>
@@ -186,9 +178,9 @@ export default function Itinerary() {
     return (
         <>
             <div className='flex flex-col mx-6 '>
-                <Suspense fallback={null}>
-                    <SuccessAlert />
-                </Suspense>
+                {/* <Suspense fallback={null}> */}
+                <SuccessAlert />
+                {/* </Suspense> */}
 
                 {/* HERO GOES HERE */}
                 <div className="relative h-[80vh] w-full -mt-[128px]">
@@ -208,9 +200,6 @@ export default function Itinerary() {
                             <h2 className="text-3xl md:text-4xl font-bold">Begin your journey <br /> across Ireland</h2>
                             <p className="text-sm md:text-base mt-2 md:w-3/5">Plan your next trip to The Emerald Isle. Build your itineraries, organise your trips, discover new places, browse through the local bnbs.</p>
                             <div className=" md:flex-row">
-                                {/* <Button variant={"outline"} className="bg-transparent m-2 w-40">
-                                    Discover
-                                </Button> */}
                                 <Button
                                     variant={"default"}
                                     onClick={() => router.push("/itinerary/create")}
@@ -236,30 +225,22 @@ export default function Itinerary() {
 
                                 <p className='text-lg'>Your Irish adventures await. Here are the itineraries you've created—ready to explore, edit, or share with your travel companions.
                                 </p>
-                                {/* <Button
-                                    variant={"default"}
-                                    onClick={() => router.push("/itinerary/create")}
-                                    className=' w-40 '
-                                >
-                                    <Plus />
-                                    New Itinerary
-                                </Button> */}
                             </div>
                         </div>
 
                     </div>
                 </div>
-                <div className='mx-8 md:flex justify-between mb-6 items-center'>
+                <div className='mx-8 flex justify-between mb-6 items-center '>
                     <h2 className='text-2xl'>My Itineraries</h2>
-                    <div className='md:flex items-center md:w-1/3'>
-                        <Input
+                    <div className='md:flex items-center justify-end md:w-1/3'>
+                        {/* <Input
                             type="text"
                             placeholder="Search itineraries..."
                             value={""}
-                            className="p-2 border border-gray-300 bg-white "
+                            className="p-2 border border-muted bg-transparent"
                             readOnly
-                        />
-                        <div className='flex gap-6 ms-4'>
+                        /> */}
+                        <div className='flex gap-6 ms-4 md:me-2 '>
                             <List />
                             <LayoutGrid />
                         </div>
@@ -286,7 +267,7 @@ export default function Itinerary() {
                         </Card>
                     </div>
                 ) : (
-                    <div className='grid grid-cols-1 gap-2 bg-card rounded-md p-2'>
+                    <div className='grid grid-cols-1 gap-2 bg-card rounded-md p-2 mb-6'>
                         {trip.slice(0).reverse().map((item, index) => {
                             // Format dates from "YYYY-MM-DD" to "Month DD"
                             const formatDate = (dateString: string) => {
@@ -347,9 +328,13 @@ export default function Itinerary() {
                                                 </div>
                                             )}
                                         </CardContent>
-                                        <CardFooter className='w-full md:w-1/4'>
+                                        <CardFooter className='w-full md:w-1/4 justify-end gap-2'>
                                             <Button variant="default" className='md:ms-auto' onClick={() => { router.push(`/itinerary/${item.id}`) }}>
                                                 View Itinerary
+                                            </Button>
+                                            <Button variant="ghost" className=""
+                                                onClick={() => { router.push(`/itinerary/${item.id}/edit`) }}>
+                                                <PenLine className="text-slate-600" size={20} />
                                             </Button>
                                         </CardFooter>
                                     </Card>

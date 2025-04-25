@@ -99,19 +99,14 @@ export default function SignIn() {
                     <Link href={"/signUp"} className='text-emerald-700 hover:underline'>Sign Up</Link>
                 </div>
 
-                {error && (
-                    <div className="p-3 rounded-md bg-red-50 border border-red-200 text-red-800 flex items-start gap-2">
-                        <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
-                        <p className="text-sm">{error}</p>
-                    </div>
-                )}
+
 
                 <div className='grid gap-3'>
                     <Input
                         placeholder="Email address"
                         value={thisUser.email}
                         onChange={handleChange}
-                        className={` ${error && !thisUser.email ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                        className={` ${error && !thisUser.email ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                         name="email"
                         type="email"
                         autoComplete="email"
@@ -122,13 +117,17 @@ export default function SignIn() {
                         placeholder="Password"
                         value={thisUser.password}
                         onChange={handleChange}
-                        className={` ${error && !thisUser.password ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                        className={` ${error && !thisUser.password ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                         name="password"
                         type='password'
                         autoComplete="current-password"
                         disabled={isSubmitting}
                     />
-
+                    {error && (
+                        <div className="text-destructive max-w-75 flex items-start align-center gap-2">
+                            <p className="text-sm">{error}</p>
+                        </div>
+                    )}
                     <p className='text-sm text-slate-500 text-right hover:text-emerald-700 cursor-pointer'>Forgot password?</p>
                 </div>
 
