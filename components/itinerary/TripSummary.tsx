@@ -11,7 +11,8 @@ import {
     Clock,
     Plane,
     MapPin,
-    FileText
+    FileText,
+    Map
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -72,7 +73,7 @@ const TripSummary: React.FC<TripSummaryProps> = ({
                                     <span>Trip Details</span>
                                 </div>
                             </AccordionTrigger>
-                            <AccordionContent className="px-2">
+                            <AccordionContent className="px-9">
                                 <div className="space-y-2">
                                     <div>
                                         <p className="text-sm font-medium">Trip Name</p>
@@ -102,7 +103,7 @@ const TripSummary: React.FC<TripSummaryProps> = ({
                                         <span>Flight Information</span>
                                     </div>
                                 </AccordionTrigger>
-                                <AccordionContent className="px-2">
+                                <AccordionContent className="px-9">
                                     <div className="space-y-2">
                                         {trip.flight?.flight_number && (
                                             <div>
@@ -164,7 +165,7 @@ const TripSummary: React.FC<TripSummaryProps> = ({
                                                 <AccordionItem
                                                     key={dayNumber}
                                                     value={`day-${dayNumber}`}
-                                                    className="border border-slate-200 rounded-md mb-2 overflow-hidden"
+                                                    className="border border-slate-200 rounded-md mb-2 p-2 overflow-hidden"
                                                 >
                                                     <AccordionTrigger
                                                         className="hover:bg-slate-50 px-2 py-1"
@@ -187,26 +188,51 @@ const TripSummary: React.FC<TripSummaryProps> = ({
                                                             }
 
                                                             return (
-                                                                <div key={period} className="mt-2">
-                                                                    <p className="text-sm font-medium capitalize">{period}</p>
-                                                                    <ul className="space-y-2 pl-2 mt-1">
+                                                                <div key={period} className="mt-2 bg-card p-2 rounded-lg">
+                                                                    <p className="text-sm font-medium capitalize mb-2">{period}</p>
+                                                                    <ol className="relative border-s border-gray-300 dark:border-gray-700 ml-4">
                                                                         {stops.filter((stop: StopType) => stop.name?.trim()).map((stop: StopType, idx: number) => (
-                                                                            <li key={idx} className="text-sm">
-                                                                                <p className="font-medium">{stop.name}</p>
+                                                                            <li key={idx} className={idx !== stops.filter((s: StopType) => s.name?.trim()).length - 1 ? "mb-6 ms-4" : "ms-4"}>
+                                                                                {/* Timeline dot */}
+                                                                                <div className="absolute w-3 h-3 bg-primary rounded-full mt-1.5 -start-1.5 border border-white"></div>
+
+                                                                                {/* Time marker */}
                                                                                 {stop.time && (
-                                                                                    <div className="flex items-center gap-1 text-xs text-slate-500">
+                                                                                    <time className="mb-1 text-xs font-normal leading-none text-gray-500 flex items-center gap-1">
                                                                                         <Clock size={12} />
-                                                                                        <span>{stop.time}</span>
-                                                                                    </div>
+                                                                                        {stop.time}
+                                                                                    </time>
                                                                                 )}
+
+                                                                                {/* Stop name as title */}
+                                                                                <h3 className="text-md font-semibold text-gray-900 mb-2">
+                                                                                    {stop.name}
+                                                                                </h3>
+
+                                                                                {/* Address with link if available */}
+                                                                                {stop.address && (
+                                                                                    <p className="text-xs italic text-gray-400">
+                                                                                        <a
+                                                                                            href={`https://www.google.com/maps?q=${encodeURIComponent(stop.address)}`}
+                                                                                            target="_blank"
+                                                                                            rel="noopener noreferrer"
+                                                                                            className="flex gap-1 text-emerald-500"
+                                                                                        >
+                                                                                            <Map size={12} className="mt-1" />
+                                                                                            {stop.address}
+                                                                                        </a>
+                                                                                    </p>
+                                                                                )}
+
+                                                                                {/* Notes as description */}
                                                                                 {stop.notes && (
-                                                                                    <p className="text-xs text-slate-500 line-clamp-2 mt-1">
+                                                                                    <p className="text-xs font-normal text-gray-500 mt-2">
                                                                                         {stop.notes}
                                                                                     </p>
                                                                                 )}
                                                                             </li>
                                                                         ))}
-                                                                    </ul>
+                                                                    </ol>
                                                                 </div>
                                                             );
                                                         })}
