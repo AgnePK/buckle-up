@@ -152,7 +152,7 @@ export default function SavedItemsPage() {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <h1 className="text-3xl font-bold mb-2">My Saved Items</h1>
+            <h1 className="text-3xl font-bold mb-2">My Saved Places</h1>
             <p className="text-muted-foreground mb-6">Places and events you've saved for your trip</p>
 
             <Tabs defaultValue="attractions" className="w-full">

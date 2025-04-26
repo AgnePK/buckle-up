@@ -169,7 +169,7 @@ export default function AttractionsPage() {
                                     Google Maps
                                 </Button>
                             </a>
-                            <Button variant={"outline"} className='bg-transparent'>
+                            <Button variant={"ghost"} className='bg-transparent'>
                                 <Plus size={22} />
                             </Button>
                             {item.Url ? (

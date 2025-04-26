@@ -36,7 +36,15 @@ import {
 
 
 import TripSummary from '@/components/itinerary/TripSummary';
-import getTimeRange from '@/components/itinerary/GetTimeRange';
+import getTimeRange from '@/utils/GetTimeRange';
+import {
+    updateStop,
+    moveStop,
+    addStop,
+    removeStop,
+    removeDay,
+    updateStopLocation
+} from '@/utils/itineraryUtils';
 
 const CreatePage = () => {
     const router = useRouter();
@@ -100,83 +108,33 @@ const CreatePage = () => {
     };
 
     // Update a stop in the list
-    const updateStop = (day: number, timeOfDay: keyof DayType, index: number, field: keyof StopType, value: string) => {
-        setItinerary((prev) => ({
-            ...prev,
-            days: {
-                ...prev.days,
-                [day]: {
-                    ...prev.days[day],
-                    [timeOfDay]: prev.days[day][timeOfDay].map((stop, i) =>
-                        i === index ? { ...stop, [field]: value } : stop
-                    ),
-                },
-            },
-        }));
+    const handleUpdateStop = (day: number, timeOfDay: keyof DayType, index: number, field: keyof StopType, value: string) => {
+        setItinerary(prev => updateStop(prev, day, timeOfDay, index, field, value));
     };
 
     // Move a stop within the same day and period
-    const moveStop = (day: number, period: keyof DayType, fromIndex: number, toIndex: number) => {
-        setItinerary((prev) => {
-            const stops = [...prev.days[day][period]];
-            const [movedItem] = stops.splice(fromIndex, 1);
-            stops.splice(toIndex, 0, movedItem);
-
-            return {
-                ...prev,
-                days: {
-                    ...prev.days,
-                    [day]: {
-                        ...prev.days[day],
-                        [period]: stops,
-                    },
-                },
-            };
-        });
+    const handleMoveStop = (day: number, period: keyof DayType, fromIndex: number, toIndex: number) => {
+        setItinerary(prev => moveStop(prev, day, period, fromIndex, toIndex));
     };
 
-    const addStop = (day: number, period: keyof DayType) => {
-        setItinerary((prev) => {
-            const updatedDays = { ...prev.days };
-
-            if (!updatedDays[day]) {
-                updatedDays[day] = { morning: [], afternoon: [], evening: [] };
-            }
-
-            updatedDays[day][period] = [...updatedDays[day][period], { name: "", time: "", notes: "" }];
-
-            return { ...prev, days: updatedDays };
-        });
+    // Add a new stop
+    const handleAddStop = (day: number, period: keyof DayType) => {
+        setItinerary(prev => addStop(prev, day, period));
     };
 
     // Remove a specific stop
-    const removeStop = (day: number, timeOfDay: "morning" | "afternoon" | "evening", index: number) => {
-        setItinerary((prev) => {
-            const updatedStops = prev.days[day][timeOfDay].filter((_, i) => i !== index);
-            return {
-                ...prev,
-                days: {
-                    ...prev.days,
-                    [day]: {
-                        ...prev.days[day],
-                        [timeOfDay]: updatedStops
-                    }
-                }
-            };
-        });
+    const handleRemoveStop = (day: number, timeOfDay: keyof DayType, index: number) => {
+        setItinerary(prev => removeStop(prev, day, timeOfDay, index));
     };
 
     // Remove an entire day
-    const removeDay = (day: number) => {
-        setItinerary((prev) => {
-            const updatedDays = { ...prev.days };
-            delete updatedDays[day]; // Remove the selected day
+    const handleRemoveDay = (day: number) => {
+        setItinerary(prev => removeDay(prev, day));
+    };
 
-            return {
-                ...prev,
-                days: updatedDays
-            };
-        });
+    // Update stop location
+    const handleUpdateStopLocation = (day: number, timeOfDay: keyof DayType, index: number, placeData: any) => {
+        setItinerary(prev => updateStopLocation(prev, day, timeOfDay, index, placeData));
     };
 
     const toggleNotes = (day: number, period: keyof DayType, index: number): void => {
@@ -301,7 +259,7 @@ const CreatePage = () => {
             setFlightType(null);
         } else if (selectedDay !== null && selectedSlot && selectedEntryIndex !== null) {
             // Update itinerary with selected time
-            updateStop(selectedDay, selectedSlot, selectedEntryIndex, "time", formattedTime);
+            handleUpdateStop(selectedDay, selectedSlot, selectedEntryIndex, "time", formattedTime);
 
             // Reset selection
             setSelectedDay(null);
@@ -310,43 +268,6 @@ const CreatePage = () => {
         }
 
         setShowTimePicker(false);
-    };
-
-    // Maps integration
-    const updateStopLocation = (day: number, timeOfDay: keyof DayType, index: number, placeData: any) => {
-        console.log("Updating stop location:", placeData);
-
-        setItinerary((prev) => {
-            const updatedDays = { ...prev.days };
-
-            // Make sure the day exists
-            if (!updatedDays[day]) {
-                updatedDays[day] = { morning: [], afternoon: [], evening: [] };
-            }
-
-            // Make sure the period array exists and has enough items
-            if (!updatedDays[day][timeOfDay]) {
-                updatedDays[day][timeOfDay] = [];
-            }
-
-            while (updatedDays[day][timeOfDay].length <= index) {
-                updatedDays[day][timeOfDay].push({ name: "", time: "", notes: "" });
-            }
-
-            // Now update the specific stop with the place data
-            updatedDays[day][timeOfDay][index] = {
-                ...updatedDays[day][timeOfDay][index],
-                name: placeData.name || "",
-                address: placeData.address || "",
-                placeId: placeData.placeId || "",
-                location: placeData.location
-            };
-
-            return {
-                ...prev,
-                days: updatedDays
-            };
-        });
     };
 
     const toggleSummary = () => {
@@ -559,7 +480,7 @@ const CreatePage = () => {
                                                 <Button
                                                     variant="destructive"
                                                     size="sm"
-                                                    onClick={() => removeDay(Number(day))}
+                                                    onClick={() => handleRemoveDay(Number(day))}
                                                 >
                                                     <Trash2 />
                                                     Remove Day
@@ -579,16 +500,16 @@ const CreatePage = () => {
                                                                 period={period as keyof DayType}
                                                                 index={stopIndex}
                                                                 stop={stop}
-                                                                updateStop={updateStop}
-                                                                removeStop={removeStop}
+                                                                updateStop={handleUpdateStop}
+                                                                removeStop={handleRemoveStop}
                                                                 toggleNotes={toggleNotes}
                                                                 showNotes={showNotes}
                                                                 setSelectedDay={setSelectedDay}
                                                                 setSelectedSlot={setSelectedSlot}
                                                                 setSelectedEntryIndex={setSelectedEntryIndex}
                                                                 setShowTimePicker={setShowTimePicker}
-                                                                moveStop={moveStop}
-                                                                updateStopLocation={updateStopLocation}
+                                                                moveStop={handleMoveStop}
+                                                                updateStopLocation={handleUpdateStopLocation}
                                                             />
                                                         ))}
                                                     </div>
@@ -597,7 +518,7 @@ const CreatePage = () => {
                                                         size={"sm"}
                                                         variant={"outline"}
                                                         className='m-5'
-                                                        onClick={() => addStop(Number(day), period as keyof DayType)}
+                                                        onClick={() => handleAddStop(Number(day), period as keyof DayType)}
                                                     >
                                                         <Plus />
                                                         <p className='font-normal'>add stop</p>
