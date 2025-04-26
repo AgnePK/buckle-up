@@ -24,8 +24,8 @@ function sanitiseKeys(obj: any): any {
     const newObj: any = {};
     for (const key in obj) {
         // Replace invalid characters (., #, $, /, [, ]) with an underscore _
-        const sanitizedKey = key.replace(/[.#$/[\]]/g, "_");
-        newObj[sanitizedKey] = sanitiseKeys(obj[key]); // Recursively sanitize nested objects
+        const sanitisedKey = key.replace(/[.#$/[\]]/g, "_");
+        newObj[sanitisedKey] = sanitiseKeys(obj[key]); // Recursively sanitise nested objects
     }
     return newObj;
 }
