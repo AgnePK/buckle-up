@@ -55,6 +55,10 @@ export function NavBar() {
 
     const isActive = (path: Url) => pathname === path;
 
+    const isDiscoverActive = () => {
+        return dropdownItems.some(item => pathname?.startsWith(item.url));
+    };
+
     // Handle routing in mobile menu
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const handleMobileNavigation = (url: string) => {
@@ -105,7 +109,7 @@ export function NavBar() {
 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild className="items-center">
-                        <div className="flex gap-2 items-center cursor-pointer">
+                        <div className={`flex gap-2 items-center cursor-pointer ${isDiscoverActive() ? "text-primary" : ""}`}>
                             <p>Discover</p>
                             <ChevronDown className="pt-1 ms-1" />
                         </div>
@@ -162,7 +166,7 @@ export function NavBar() {
                             </SheetClose>
 
                             <div className="flex flex-col gap-3 ">
-                                <p className="text-lg flex items-center">
+                                <p className={`text-lg flex items-center ${isDiscoverActive() ? "text-primary font-medium" : ""}`}>
                                     <Compass className="mr-2 h-5 w-5" />
                                     Discover
                                 </p>
