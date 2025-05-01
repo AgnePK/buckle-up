@@ -68,7 +68,7 @@ const EditPage = () => {
     // Fetch existing itinerary data
     useEffect(() => {
         const fetchItinerary = async () => {
-            
+
             if (isLoading) {
                 return;
             }
@@ -358,7 +358,7 @@ const EditPage = () => {
                 )}
 
                 <div className='mx-auto px-8 md:w-1/2'>
-                    <h1 className="text-2xl font-bold text-center mb-6">Edit {itinerary.title}</h1>
+                    <h1 className="text-2xl font-bold text-center mb-6">Edit {itinerary.title ? itinerary.title : 'Untitled Trip'}</h1>
 
                     {step === 1 && (
                         <div className="flex flex-col gap-8 mb-10">
