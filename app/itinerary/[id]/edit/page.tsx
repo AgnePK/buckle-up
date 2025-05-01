@@ -36,13 +36,13 @@ import { updateStop, moveStop, addStop, removeStop, removeDay, updateStopLocatio
 const EditPage = () => {
 
     const router = useRouter();
-    const { user, redirectBasedOnAuth } = useSession();
+    const { user, redirectBasedOnAuth, isLoading } = useSession();
 
     useEffect(() => {
-        if (!user) {
+        if (!isLoading && !user) {
             redirectBasedOnAuth("/signIn");
         }
-    }, [user, redirectBasedOnAuth]);
+    }, [user, isLoading]);
 
     const params = useParams();
     const tripId = params.id as string;
@@ -70,7 +70,6 @@ const EditPage = () => {
         const fetchItinerary = async () => {
             if (!user || !tripId) {
                 console.error("User not authenticated or tripId not provided");
-                router.push('/itinerary');
                 return;
             }
 
@@ -358,7 +357,7 @@ const EditPage = () => {
 
                     {step === 1 && (
                         <div className="flex flex-col gap-8 mb-10">
-                            <div className='md:flex md:flex-row-reverse items-center justify-between gap-4 bg-card p-6 rounded'>
+                            <div className='md:flex md:flex-row-reverse items-center justify-between gap-4 bg-card p-6 rounded-xl'>
                                 <Image src={landscape2} alt={'Trip details'} width={250} className='mx-auto md:mx-0' />
                                 <div className='flex flex-col gap-4'>
                                     <p className='text-xl text-primary'>Make changes to your itinerary</p>

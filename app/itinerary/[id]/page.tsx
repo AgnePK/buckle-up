@@ -34,19 +34,10 @@ const ViewItinerary = () => {
     const router = useRouter();
 
     useEffect(() => {
-        if (!user) {
+        if (!isLoading && !user) {
             redirectBasedOnAuth("/signIn");
         }
-    }, [user, redirectBasedOnAuth]);
-
-
-    useEffect(() => {
-        if (!isLoading && !user) {
-            console.log("No authenticated user detected, redirecting to sign in");
-            router.push('/signIn');
-        }
-    }, [user, isLoading, router]);
-
+    }, [user, isLoading]);
 
     // READ USER trips
     useEffect(() => {

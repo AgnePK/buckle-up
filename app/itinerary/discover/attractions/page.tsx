@@ -26,13 +26,13 @@ const PAGE_SIZE = 20;
 
 export default function AttractionsPage() {
 
-    const { user, redirectBasedOnAuth } = useSession()
+    const { user, redirectBasedOnAuth, isLoading } = useSession()
 
     useEffect(() => {
-        if (!user) {
+        if (!isLoading && !user) {
             redirectBasedOnAuth("/signIn");
         }
-    }, [user, redirectBasedOnAuth]);
+    }, [user, isLoading]);
 
     const [page, setPage] = useState(1);
     const [displayData, setDisplayData] = useState<any[]>([]);

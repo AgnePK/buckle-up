@@ -48,14 +48,13 @@ import {
 
 const CreatePage = () => {
     const router = useRouter();
-    const { user, redirectBasedOnAuth } = useSession();
+    const { user, redirectBasedOnAuth, isLoading } = useSession();
 
     useEffect(() => {
-        if (!user) {
+        if (!isLoading && !user) {
             redirectBasedOnAuth("/signIn");
         }
-    }, [user, redirectBasedOnAuth]);
-
+    }, [user, isLoading]);
 
     const [step, setStep] = useState(1);
     const nextStep = () => setStep(step + 1);
