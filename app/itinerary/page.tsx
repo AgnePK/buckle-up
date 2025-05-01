@@ -331,7 +331,7 @@ export default function Itinerary() {
                                             ) : (
                                                 <div className="text-gray-600">
                                                     {item.notes ?
-                                                        (item.notes.length > 30 ? `${item.notes.substring(0, 30)}...` : item.notes)
+                                                        (item.notes.length > 25 ? `${item.notes.substring(0, 25)}...` : item.notes)
                                                         : <i>No notes</i>}
                                                 </div>
                                             )}
@@ -403,7 +403,7 @@ export default function Itinerary() {
                                         ) : (
                                             <div className="text-gray-600">
                                                 {item.notes ?
-                                                    (item.notes.length > 30 ? `${item.notes.substring(0, 30)}...` : item.notes)
+                                                    (item.notes.length > 25 ? `${item.notes.substring(0, 25)}...` : item.notes)
                                                     : <i>No notes</i>}
                                             </div>
                                         )}
