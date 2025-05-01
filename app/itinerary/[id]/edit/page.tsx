@@ -68,6 +68,11 @@ const EditPage = () => {
     // Fetch existing itinerary data
     useEffect(() => {
         const fetchItinerary = async () => {
+            
+            if (isLoading) {
+                return;
+            }
+
             if (!user || !tripId) {
                 console.error("User not authenticated or tripId not provided");
                 return;
