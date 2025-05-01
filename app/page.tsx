@@ -37,7 +37,7 @@ export default function Home() {
 
 
         <div className='flex flex-col gap-8 p-18'>
-          <h1 className="text-6xl text-primary font-extrabold ">Buckle Up</h1>
+          <h1 className="text-5xl text-primary font-extrabold ">Buckle Up</h1>
           <div className='w-80 flex flex-col gap-6 '>
             <p className='text-m font-bold'>Welcome to Buckle Up.</p>
             <p className='text-m '>Let's begin you journey across Eire. Plan your Itinerary and explore different activities and BnB's across Ireland</p>

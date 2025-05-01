@@ -297,13 +297,13 @@ export default function Itinerary() {
                             const endDate = formatDate(item.end_date);
                             return (
                                 <div key={item.id}>
-                                    <Card key={item.id} className=' -my-[8px] border-none bg-transparent shadow-none hover:shadow-sm transition-shadow rounded-none flex flex-col md:flex-row w-full'>
+                                    <Card key={item.id} className='md:items-center -my-[8px] border-none bg-transparent shadow-none hover:shadow-sm transition-shadow rounded-md flex flex-col md:flex-row w-full'>
                                         <Link
                                             href={`/itinerary/${item.id}`}
                                             className='w-full md:w-1/4'
                                         >
                                             <CardHeader>
-                                                <CardTitle className='text-lg'>
+                                                <CardTitle className=' text-lg'>
                                                     {item.title ?
                                                         (item.title.length > 25 ? `${item.title.substring(0, 25)}...` : item.title)
                                                         : 'Untitled Trip'}
@@ -336,11 +336,11 @@ export default function Itinerary() {
                                                 </div>
                                             )}
                                         </CardContent>
-                                        <CardFooter className='w-full md:w-1/4 justify-end gap-2'>
-                                            <Button variant="default" className='md:ms-auto' onClick={() => { router.push(`/itinerary/${item.id}`) }}>
+                                        <CardFooter className='w-full md:w-1/4 md:justify-end gap-2'>
+                                            <Button variant="default" className='md:ms-auto ' onClick={() => { router.push(`/itinerary/${item.id}`) }}>
                                                 View Itinerary
                                             </Button>
-                                            <Button variant="ghost" className=""
+                                            <Button variant="ghost" className="md:ms-none ms-auto"
                                                 onClick={() => { router.push(`/itinerary/${item.id}/edit`) }}>
                                                 <PenLine className="text-slate-600" size={20} />
                                             </Button>

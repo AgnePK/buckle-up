@@ -156,22 +156,7 @@ export default function AttractionsPage() {
                             </div>
 
                         </CardContent>
-                        <CardFooter className='mt-auto flex justify-between'>
-                            <a
-                                href={`https://www.google.com/maps?q=${item.Latitude}+${item.Longitude}`}
-                                target="_blank"
-                                // this is to protect my site from bring linked in booking.com
-                                rel="noopener noreferrer"
-                                className='flex gap-2'
-                            >
-                                <Button variant={"outline"} className='bg-transparent'>
-                                    <Navigation size={22} className='' />
-                                    Google Maps
-                                </Button>
-                            </a>
-                            <Button variant={"ghost"} className='bg-transparent'>
-                                <Plus size={22} />
-                            </Button>
+                        <CardFooter className='mt-auto gap-4'>
                             {item.Url ? (
                                 <a
                                     href={item.Url}
@@ -189,6 +174,22 @@ export default function AttractionsPage() {
                                     <p className="text-gray-500 text-sm italic">No link available</p>
                                 </Button>
                             )}
+                            <a
+                                href={`https://www.google.com/maps?q=${item.Latitude}+${item.Longitude}`}
+                                target="_blank"
+                                // this is to protect my site from bring linked in booking.com
+                                rel="noopener noreferrer"
+                                className='flex gap-2'
+                            >
+                                <Button variant={"outline"} className='bg-transparent'>
+                                    <Navigation size={22} className='' />
+
+                                </Button>
+                            </a>
+
+                            <Button variant={"ghost"} className='bg-transparent ms-auto'>
+                                <Plus size={22} />
+                            </Button>
                         </CardFooter>
                     </Card>
                 ))}

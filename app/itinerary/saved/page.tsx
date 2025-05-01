@@ -22,7 +22,8 @@ import {
     Calendar,
     Loader2,
     BookmarkX,
-    Navigation
+    Navigation,
+    Plus
 } from 'lucide-react';
 import SaveButton from '@/components/savedItems';
 import { useRouter } from 'next/navigation';
@@ -210,19 +211,7 @@ export default function SavedItemsPage() {
                                         </div>
 
                                     </CardContent>
-                                    <CardFooter className='mt-auto flex justify-between'>
-                                        <a
-                                            href={`https://www.google.com/maps?q=${item.Latitude}+${item.Longitude}`}
-                                            target="_blank"
-                                            // this is to protect my site from bring linked in booking.com
-                                            rel="noopener noreferrer"
-                                            className='flex gap-2'
-                                        >
-                                            <Button variant={"outline"} className='bg-transparent'>
-                                                <Navigation size={22} className='' />
-                                                Google Maps
-                                            </Button>
-                                        </a>
+                                    <CardFooter className='mt-auto gap-4'>
                                         {item.Url ? (
                                             <a
                                                 href={item.Url}
@@ -240,6 +229,22 @@ export default function SavedItemsPage() {
                                                 <p className="text-gray-500 text-sm italic">No link available</p>
                                             </Button>
                                         )}
+                                        <a
+                                            href={`https://www.google.com/maps?q=${item.Latitude}+${item.Longitude}`}
+                                            target="_blank"
+                                            // this is to protect my site from bring linked in booking.com
+                                            rel="noopener noreferrer"
+                                            className='flex gap-2'
+                                        >
+                                            <Button variant={"outline"} className='bg-transparent'>
+                                                <Navigation size={22} className='' />
+
+                                            </Button>
+                                        </a>
+
+                                        <Button variant={"ghost"} className='bg-transparent ms-auto'>
+                                            <Plus size={22} />
+                                        </Button>
                                     </CardFooter>
                                 </Card>
                             ))}

@@ -91,7 +91,7 @@ export default function SignIn() {
 
     return (
         <div className='grid gap-8 place-content-center min-h-screen'>
-            <h1 className="text-6xl text-emerald-800 font-extrabold">Buckle Up</h1>
+            <h1 className="text-6xl text-primary font-extrabold">Buckle Up</h1>
 
             <form onSubmit={handleSubmit} className='grid gap-4'>
                 <div className='flex gap-1 justify-self-center'>
