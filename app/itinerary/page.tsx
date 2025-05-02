@@ -57,8 +57,8 @@ export default function Itinerary() {
             const success = searchParams.get('success');
             const tripName = searchParams.get('tripName');
 
-            if (success === 'true' && tripName) {
-                setSuccessMessage(`Your trip "${tripName}" has been created successfully!`);
+            if (success === 'true' && (tripName || "Untitled Trip")) {
+                setSuccessMessage(`"${tripName || "Untitled Trip"}" has been created successfully!`);
                 setShowSuccessAlert(true);
 
                 // Hide the alert after 5 seconds
@@ -76,7 +76,7 @@ export default function Itinerary() {
         if (!showSuccessAlert) return null;
 
         return (
-            <Alert className="fixed bottom-5 right-5 max-w-sm border-green-500 bg-green-50">
+            <Alert className="fixed bottom-5 right-5 md:max-w-sm max-w-90 border-green-500 bg-green-50">
                 <CheckCircle className="h-4 w-4 text-green-500" />
                 <AlertTitle>Success!</AlertTitle>
                 <AlertDescription>
@@ -332,7 +332,7 @@ export default function Itinerary() {
                                                 <div className="text-gray-600">
                                                     {item.notes ?
                                                         (item.notes.length > 25 ? `${item.notes.substring(0, 25)}...` : item.notes)
-                                                        : <i>No notes</i>}
+                                                        : <i>No data set</i>}
                                                 </div>
                                             )}
                                         </CardContent>
