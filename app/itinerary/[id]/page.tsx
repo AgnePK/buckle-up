@@ -276,12 +276,12 @@ const ViewItinerary = () => {
 
                                                             {/* Time as the timeline marker */}
                                                             <time className="mb-1 text-sm font-normal leading-none text-gray-500">
-                                                                {stop.time || "No time set"}
+                                                                {stop.time || ""}
                                                             </time>
 
                                                             {/* Stop name as the title */}
                                                             <h3 className="text-lg font-semibold text-gray-900">
-                                                                {stop.name}
+                                                                {stop.name || <span className='text-sm font-normal italic leading-none text-gray-500'>No data set</span>}
                                                             </h3>
 
                                                             {/* Show address if available */}
