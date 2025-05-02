@@ -105,7 +105,7 @@ export default function AccommodationsPage() {
                         Browse through the local BnBs provided by <a href="https://www.failteireland.ie/" target='_blank' className='text-primary'>Fáilte Ireland</a>.
                     </p>
                     <p className='text-xl'>
-                        Save the events you like, then find them in the <Link href={"/itinerary/saved"} className='text-primary' >Saved Places</Link>
+                        Save the places you like, then find them in the <Link href={"/itinerary/saved"} className='text-primary' >Saved Places</Link>
                     </p>
                     <div className="mb-6">
                         <Input
